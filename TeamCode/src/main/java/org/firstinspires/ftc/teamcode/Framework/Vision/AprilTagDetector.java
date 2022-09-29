@@ -10,7 +10,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-class AprilTagDetector extends OpenCvPipeline {
+public class AprilTagDetector extends OpenCvPipeline {
 	private long nativeApriltagPtr;
 	private Mat grey = new Mat();
 	private volatile ArrayList<AprilTagDetection> detections = new ArrayList<>();
@@ -38,7 +38,9 @@ class AprilTagDetector extends OpenCvPipeline {
 		this.drawBoxes = draw;
 
 		// Allocate a native context object. See the corresponding deletion in the finalizer
-		nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector("tag16h7", 3, 3);
+		nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(
+				AprilTagDetectorJNI.TagFamily.TAG_16h5.string, 3, 3
+		);
 	}
 
 	public AprilTagDetector(double tagsize, boolean draw) {
@@ -73,6 +75,7 @@ class AprilTagDetector extends OpenCvPipeline {
 		if (drawBoxes) {
 			for (int i = 0; i < detections.size(); i++) {
 				addBox(input, detections.get(i).corners);
+				addId(input, detections.get(i));
 			}
 		}
 
@@ -87,5 +90,10 @@ class AprilTagDetector extends OpenCvPipeline {
 		for (int i = 0; i < 4; i++) {
 			Imgproc.line(image, points[i], points[(i + 1) % 4], new Scalar(255, 255, 0));
 		}
+	}
+
+	private void addId(Mat image, AprilTagDetection detection) {
+		Imgproc.putText(image, String.valueOf(detection.id),
+				detection.center, 0, 1, new Scalar(0, 0, 0));
 	}
 }
