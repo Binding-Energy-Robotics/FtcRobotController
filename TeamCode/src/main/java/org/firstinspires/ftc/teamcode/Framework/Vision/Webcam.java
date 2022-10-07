@@ -34,17 +34,22 @@ public class Webcam {
 	private OpenCvCamera camera;
 
 	private volatile boolean open = false;
+	private volatile boolean viewportRunning = false;
 	public volatile boolean isStopped = false;
 
 	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline) {
+		int cameraMonitorViewId = hw.appContext.getResources().getIdentifier(
+				"cameraMonitorViewId", "id", hw.appContext.getPackageName());
+
 		WebcamName webcamName = hw.get(WebcamName.class, name);
 
-		camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+		camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
 		camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
 				camera.startStreaming(1280, 720);
+				camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
 				camera.setPipeline(pipeline);
 				open = true;
 			}
@@ -56,8 +61,22 @@ public class Webcam {
 		});
 	}
 
-	public boolean isOpen() {
-		return open;
+	public boolean isOpen() { return open; }
+
+	public boolean isViewportRunning() { return viewportRunning; }
+
+	public void pauseViewport() {
+		if (viewportRunning) {
+			viewportRunning = false;
+			camera.pauseViewport();
+		}
+	}
+
+	public void resumeViewport() {
+		if (!viewportRunning) {
+			viewportRunning = true;
+			camera.resumeViewport();
+		}
 	}
 
 	public void stop() {

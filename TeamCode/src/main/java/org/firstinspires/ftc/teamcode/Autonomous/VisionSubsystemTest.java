@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 
+@Autonomous(name="VisionSubsystemTest", group="Test")
 public class VisionSubsystemTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
-		Camera camera = new Camera(hardwareMap, "Camera");
+		telemetry.addData("Status", "Initializing camera");
+
+		Camera camera = new Camera(hardwareMap, "Webcam 1");
 
 		telemetry.addData("Camera", "Initializing");
 		telemetry.update();
