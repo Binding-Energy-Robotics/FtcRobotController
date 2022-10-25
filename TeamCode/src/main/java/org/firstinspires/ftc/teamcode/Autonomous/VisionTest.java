@@ -27,7 +27,7 @@ public class VisionTest extends LinearOpMode {
 	public void runOpMode() throws InterruptedException {
 		tagDetector = new AprilTagDetector();
 
-		webcam = new Webcam(hardwareMap, "Camera", tagDetector);
+		webcam = new Webcam(hardwareMap, "Camera", tagDetector, this);
 
 		while (!webcam.isOpen() && !isStarted() && !isStopRequested()) {
 			idle();

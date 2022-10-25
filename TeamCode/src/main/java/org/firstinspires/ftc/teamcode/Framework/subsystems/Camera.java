@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Framework.Vision.AprilTagDetector;
@@ -17,9 +18,9 @@ public class Camera extends SubsystemBase {
 	private double[] confidences = new double[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
 	private static final double UPDATE_WEIGHT = 0.1;
 
-	public Camera(HardwareMap hw, String webcamName) {
+	public Camera(HardwareMap hw, String webcamName, LinearOpMode mode) {
 		tagDetector = new AprilTagDetector();
-		webcam = new Webcam(hw, webcamName, tagDetector);
+		webcam = new Webcam(hw, webcamName, tagDetector, mode);
 	}
 
 	public int getSide() {

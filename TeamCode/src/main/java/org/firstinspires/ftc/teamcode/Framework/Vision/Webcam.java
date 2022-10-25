@@ -5,6 +5,7 @@ import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.apache.commons.math3.geometry.euclidean.twod.Line;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -37,11 +38,16 @@ public class Webcam {
 	private volatile boolean viewportRunning = false;
 	public volatile boolean isStopped = false;
 
-	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline) {
+	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline, LinearOpMode mode) {
 		int cameraMonitorViewId = hw.appContext.getResources().getIdentifier(
 				"cameraMonitorViewId", "id", hw.appContext.getPackageName());
 
 		WebcamName webcamName = hw.get(WebcamName.class, name);
+		mode.telemetry.addData("Test", "1");
+		mode.telemetry.addData("View", cameraMonitorViewId);
+		mode.telemetry.addData("Webcam attached", webcamName.isAttached());
+		mode.telemetry.addData("Webcam name", webcamName.getUsbDeviceNameIfAttached());
+		mode.telemetry.update();
 
 		camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
