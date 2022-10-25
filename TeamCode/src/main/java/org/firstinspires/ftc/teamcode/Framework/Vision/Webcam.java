@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Framework.Vision;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -38,16 +39,16 @@ public class Webcam {
 	private volatile boolean viewportRunning = false;
 	public volatile boolean isStopped = false;
 
-	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline, LinearOpMode mode) {
+	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline) {
 		int cameraMonitorViewId = hw.appContext.getResources().getIdentifier(
 				"cameraMonitorViewId", "id", hw.appContext.getPackageName());
 
 		WebcamName webcamName = hw.get(WebcamName.class, name);
-		mode.telemetry.addData("Test", "1");
-		mode.telemetry.addData("View", cameraMonitorViewId);
-		mode.telemetry.addData("Webcam attached", webcamName.isAttached());
-		mode.telemetry.addData("Webcam name", webcamName.getUsbDeviceNameIfAttached());
-		mode.telemetry.update();
+		FtcDashboard.getInstance().getTelemetry().addData("Test", "1");
+		FtcDashboard.getInstance().getTelemetry().addData("View", cameraMonitorViewId);
+		FtcDashboard.getInstance().getTelemetry().addData("Webcam attached", webcamName.isAttached());
+		FtcDashboard.getInstance().getTelemetry().addData("Webcam name", webcamName.getUsbDeviceNameIfAttached());
+		FtcDashboard.getInstance().getTelemetry().update();
 
 		camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 

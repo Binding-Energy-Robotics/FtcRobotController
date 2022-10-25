@@ -18,9 +18,9 @@ public class Camera extends SubsystemBase {
 	private double[] confidences = new double[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
 	private static final double UPDATE_WEIGHT = 0.1;
 
-	public Camera(HardwareMap hw, String webcamName, LinearOpMode mode) {
+	public Camera(HardwareMap hw, String webcamName) {
 		tagDetector = new AprilTagDetector();
-		webcam = new Webcam(hw, webcamName, tagDetector, mode);
+		webcam = new Webcam(hw, webcamName, tagDetector);
 	}
 
 	public int getSide() {
