@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Line;
@@ -11,6 +12,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvPipeline;
+
+import java.util.Iterator;
 
 /**
  * This class will initialize a camera from the robot and
@@ -42,6 +45,16 @@ public class Webcam {
 	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline) {
 		int cameraMonitorViewId = hw.appContext.getResources().getIdentifier(
 				"cameraMonitorViewId", "id", hw.appContext.getPackageName());
+		FtcDashboard.getInstance().getTelemetry().addData("View", cameraMonitorViewId);
+		FtcDashboard.getInstance().getTelemetry().addData("Name", name);
+		FtcDashboard.getInstance().getTelemetry().addData("Size", hw.size());
+		for (int i = 0; i < hw.allDeviceMappings.size(); i++) {
+			for (Iterator<? extends HardwareDevice> iter = hw.allDeviceMappings.get(i).iterator(); iter.hasNext(); ) {
+				HardwareDevice device = iter.next();
+				FtcDashboard.getInstance().getTelemetry().addData(String.valueOf(i), device.getDeviceName());
+			}
+		}
+		FtcDashboard.getInstance().getTelemetry().update();
 
 		WebcamName webcamName = hw.get(WebcamName.class, name);
 		FtcDashboard.getInstance().getTelemetry().addData("Test", "1");
