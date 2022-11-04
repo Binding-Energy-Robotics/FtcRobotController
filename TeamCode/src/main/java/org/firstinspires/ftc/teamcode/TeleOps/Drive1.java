@@ -1,15 +1,12 @@
 package org.firstinspires.ftc.teamcode.TeleOps;
 
-import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Framework.Commands.TankDriveCommand;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TankDriveCommand;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.TankDriveTrain;
 
-@TeleOp
 public class Drive1 extends CommandOpMode {
 
     public CommandScheduler scheduler;

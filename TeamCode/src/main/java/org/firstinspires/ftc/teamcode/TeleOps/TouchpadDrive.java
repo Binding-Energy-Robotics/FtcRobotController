@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Framework.subsystems.TeleDrive;
 
-@TeleOp
 public class TouchpadDrive extends LinearOpMode {
 
     @Override

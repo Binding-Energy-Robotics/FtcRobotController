@@ -16,23 +16,32 @@ public class LinearSlide extends SubsystemBase {
     private MotorEx slideMotor;
     private SlideState state;
     private PIDFController controller;
+    private SlideConstants slideConstants;
 
     public LinearSlide(final HardwareMap hw, final String name){
         this.hw = hw;
         this.name = name;
         this.state = SlideState.DOWN;
-        this.controller = new PIDFController(SlideConstants.KP, SlideConstants.KI, SlideConstants.KD, SlideConstants.KF);
+        this.slideConstants = new SlideConstants(this);
+        this.controller = new PIDFController(slideConstants.KP, slideConstants.KI, slideConstants.KD, slideConstants.KF);
 
         slideMotor = new MotorEx(hw, "slideMotor");
+    }
+
+    public int getEncoderCount(){
+        return slideMotor.getCurrentPosition();
     }
 
     public void setState(SlideState state){
         this.state = state;
     }
+    public SlideState getState(){
+        return this.state;
+    }
 
     @Override
     public void periodic(){
-        double output = controller.calculate(slideMotor.getCurrentPosition(), SlideConstants.getTicks(state));
+        double output = controller.calculate(slideMotor.getCurrentPosition(), slideConstants.getTicks(state));
         slideMotor.setVelocity(output);
     }
 }

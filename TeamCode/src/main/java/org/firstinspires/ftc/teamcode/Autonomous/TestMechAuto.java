@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.Framework.Commands.CloseClaw;
-import org.firstinspires.ftc.teamcode.Framework.Commands.OpenClaw;
-import org.firstinspires.ftc.teamcode.Framework.Commands.TrajectoryCommand;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TrajectoryCommand;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;

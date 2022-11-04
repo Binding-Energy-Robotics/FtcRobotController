@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Framework.Commands;
+package org.firstinspires.ftc.teamcode.Framework.Commands.Claw;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
