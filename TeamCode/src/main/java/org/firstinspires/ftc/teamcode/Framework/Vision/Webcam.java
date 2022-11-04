@@ -14,6 +14,8 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This class will initialize a camera from the robot and
@@ -48,10 +50,11 @@ public class Webcam {
 		FtcDashboard.getInstance().getTelemetry().addData("View", cameraMonitorViewId);
 		FtcDashboard.getInstance().getTelemetry().addData("Name", name);
 		FtcDashboard.getInstance().getTelemetry().addData("Size", hw.size());
-		for (int i = 0; i < hw.allDeviceMappings.size(); i++) {
-			for (Iterator<? extends HardwareDevice> iter = hw.allDeviceMappings.get(i).iterator(); iter.hasNext(); ) {
-				HardwareDevice device = iter.next();
-				FtcDashboard.getInstance().getTelemetry().addData(String.valueOf(i), device.getDeviceName());
+		List<WebcamName> webcamNames = hw.getAll(WebcamName.class);
+		for (int i = 0; i < webcamNames.size(); i++) {
+			Set<String> possibleNames = hw.getNamesOf(webcamNames.get(i));
+			for (String possibleName : possibleNames) {
+				FtcDashboard.getInstance().getTelemetry().addData(String.valueOf(i), possibleName);
 			}
 		}
 		FtcDashboard.getInstance().getTelemetry().update();
