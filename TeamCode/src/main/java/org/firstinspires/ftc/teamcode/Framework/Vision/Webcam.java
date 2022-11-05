@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.Framework.Vision;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Line;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -45,28 +47,22 @@ public class Webcam {
 	public volatile boolean isStopped = false;
 
 	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline) {
+		FtcDashboard dashboard = FtcDashboard.getInstance();
+
 		int cameraMonitorViewId = hw.appContext.getResources().getIdentifier(
 				"cameraMonitorViewId", "id", hw.appContext.getPackageName());
-		FtcDashboard.getInstance().getTelemetry().addData("View", cameraMonitorViewId);
-		FtcDashboard.getInstance().getTelemetry().addData("Name", name);
-		FtcDashboard.getInstance().getTelemetry().addData("Size", hw.size());
-		List<WebcamName> webcamNames = hw.getAll(WebcamName.class);
-		for (int i = 0; i < webcamNames.size(); i++) {
-			Set<String> possibleNames = hw.getNamesOf(webcamNames.get(i));
-			for (String possibleName : possibleNames) {
-				FtcDashboard.getInstance().getTelemetry().addData(String.valueOf(i), possibleName);
-			}
-		}
-		FtcDashboard.getInstance().getTelemetry().update();
 
 		WebcamName webcamName = hw.get(WebcamName.class, name);
-		FtcDashboard.getInstance().getTelemetry().addData("Test", "1");
-		FtcDashboard.getInstance().getTelemetry().addData("View", cameraMonitorViewId);
-		FtcDashboard.getInstance().getTelemetry().addData("Webcam attached", webcamName.isAttached());
-		FtcDashboard.getInstance().getTelemetry().addData("Webcam name", webcamName.getUsbDeviceNameIfAttached());
-		FtcDashboard.getInstance().getTelemetry().update();
+
+		TelemetryPacket packet = new TelemetryPacket();
+		packet.put("Test", "Test 1");
+		dashboard.sendTelemetryPacket(packet);
 
 		camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
+		packet = new TelemetryPacket();
+		packet.put("Test", "Test 2");
+		dashboard.sendTelemetryPacket(packet);
 
 		camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
@@ -82,6 +78,12 @@ public class Webcam {
 				Log.e("Webcam failed to open", String.valueOf(errorCode));
 			}
 		});
+
+		packet = new TelemetryPacket();
+		packet.put("Test", "Test 3");
+		dashboard.sendTelemetryPacket(packet);
+
+		FtcDashboard.getInstance().startCameraStream(camera, 0);
 	}
 
 	public boolean isOpen() { return open; }

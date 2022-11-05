@@ -12,24 +12,33 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 public class VisionSubsystemTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
+
+
 		Camera camera = new Camera(hardwareMap, "Webcam 1");
 
-		FtcDashboard.getInstance().getTelemetry().addData("Camera", "Initializing");
-		FtcDashboard.getInstance().getTelemetry().update();
+		TelemetryPacket packet = new TelemetryPacket();
+		packet.put("Status", "Camera Initializing");
+		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
 		while (!camera.isOpen() && !isStopRequested() && !opModeIsActive()) idle();
+		sleep(5000);
 
-		FtcDashboard.getInstance().getTelemetry().addData("Status", "Initialized");
-		FtcDashboard.getInstance().getTelemetry().update();
+		packet = new TelemetryPacket();
+		packet.put("Status", "Fully Initialized");
+		FtcDashboard.getInstance().sendTelemetryPacket(packet);
+
+		sleep(5000);
 
 		waitForStart();
 
 		while (opModeIsActive()) {
 			camera.periodic();
 
-			FtcDashboard.getInstance().getTelemetry().addData("Side", camera.getSide());
-			FtcDashboard.getInstance().getTelemetry().addData("Confidences", camera.getConfidences());
-			FtcDashboard.getInstance().getTelemetry().update();
+			packet = new TelemetryPacket();
+			packet.put("Status", "Running");
+			packet.put("Side", "Side: " + camera.getSide());
+			packet.put("Confidences", "Confidences: " + camera.getConfidences());
+			FtcDashboard.getInstance().sendTelemetryPacket(packet);
 		}
 	}
 }
