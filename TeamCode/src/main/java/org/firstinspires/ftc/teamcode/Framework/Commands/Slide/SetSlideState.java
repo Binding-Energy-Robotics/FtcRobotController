@@ -15,6 +15,7 @@ public class SetSlideState extends CommandBase {
     public SetSlideState(LinearSlide slide, Direction dir){
         this.slide = slide;
         this.dir = dir;
+        addRequirements(slide);
     }
 
     @Override

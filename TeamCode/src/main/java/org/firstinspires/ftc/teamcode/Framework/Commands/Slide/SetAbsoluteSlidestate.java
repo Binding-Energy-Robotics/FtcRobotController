@@ -14,6 +14,7 @@ public class SetAbsoluteSlidestate extends CommandBase {
     public SetAbsoluteSlidestate(LinearSlide slide, SlideState state){
         this.slide = slide;
         this.state = state;
+        addRequirements(slide);
     }
 
     @Override
