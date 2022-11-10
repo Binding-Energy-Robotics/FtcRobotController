@@ -18,7 +18,6 @@ public class LinearSlide extends SubsystemBase {
     private SlideState state;
     private PIDFController controller;
     private SlideConstants slideConstants;
-    private static int STOP_VALUE;
     private Telemetry t;
 
     public LinearSlide(final HardwareMap hw, final String name, Telemetry t){
@@ -28,7 +27,7 @@ public class LinearSlide extends SubsystemBase {
 //        this.slideConstants = new SlideConstants(this);
         this.controller = new PIDFController(SlideConstants.KP, SlideConstants.KI, SlideConstants.KD, SlideConstants.KF);
         slideMotor = new MotorEx(hw, "slideMotor");
-        STOP_VALUE = slideMotor.getCurrentPosition();
+        slideMotor.resetEncoder();
         this.t = t;
     }
 
@@ -41,13 +40,17 @@ public class LinearSlide extends SubsystemBase {
     }
 
     public void setPower(double power){
-        t.addData("Current Position", slideMotor.getCurrentPosition());
-        t.addData("Stop Position", STOP_VALUE);
+        double position = slideMotor.getCurrentPosition();
+        t.addData("Current Position", position);
         t.addData("Power", power);
+
+        if (position < 0 && power < 0 || position > 1750 && power > 0) {
+            power = 0;
+        }
+
+        t.addData("Run Power", power);
         t.update();
-//        if(slideMotor.getCurrentPosition() < STOP_VALUE && power < 0){
-//            slideMotor.set(0);
-//        }
+
         slideMotor.set(power);
     }
     public SlideState getState(){
@@ -58,10 +61,6 @@ public class LinearSlide extends SubsystemBase {
         return slideMotor.getCurrentPosition();
     }
 
-    public int getStopValue(){
-        return STOP_VALUE;
-    }
-
 //
 //    @Override
 //    public void periodic(){
@@ -69,10 +68,10 @@ public class LinearSlide extends SubsystemBase {
 //        slideMotor.setVelocity(output);
 //    }
 
-    @Override
-    public void periodic(){
-        t.addData("Current Position", slideMotor.getCurrentPosition());
-        t.addData("Stop Position", STOP_VALUE);
-        t.update();
-    }
+//    @Override
+//    public void periodic(){
+//        t.addData("Current Position", slideMotor.getCurrentPosition());
+//        t.addData("Stop Position", STOP_VALUE);
+//        t.update();
+//    }
 }

@@ -26,11 +26,9 @@ public class TeleDrive extends SubsystemBase {
         drive.driveRobotCentric(strafeSpeed, forwardSpeed, turn);
     }
 
-
-
-
-
-
-
-
+    public void driveWithMultiplier(double strafeSpeed, double forwardSpeed,
+                                    double turn, double multiplier){
+        drive.driveRobotCentric(strafeSpeed * multiplier,
+                forwardSpeed * multiplier, turn * multiplier);
+    }
 }

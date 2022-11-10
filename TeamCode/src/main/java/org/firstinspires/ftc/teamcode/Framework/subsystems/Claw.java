@@ -24,6 +24,5 @@ public class Claw extends SubsystemBase {
         clawServo.setPosition(1);
     }
 
-
-
+    public void toggle() { clawServo.setPosition(1 - clawServo.getPosition()); }
 }

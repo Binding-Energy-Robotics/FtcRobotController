@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.ToggleClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
@@ -32,56 +33,32 @@ public class MainTeleop extends CommandOpMode {
 
     @Override
     public void initialize() {
-
         driver =  new GamepadEx(gamepad1);
+        Button A = new GamepadButton(driver, GamepadKeys.Button.A);
+        Button B = new GamepadButton(driver, GamepadKeys.Button.B);
+
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
-//        claw = new Claw(hardwareMap, "claw");
+        claw = new Claw(hardwareMap, "claw");
         slide = new LinearSlide(hardwareMap, "slide", telemetry);
 
         // Command setup
-//        OpenClaw openClaw = new OpenClaw(claw);
-//        CloseClaw closeClaw = new CloseClaw(claw);
-        MecDrive mecDrive = new MecDrive(drive, () -> gamepad1.left_stick_x, () ->-1 * gamepad1.left_stick_y, () ->gamepad1.right_stick_x);
-//        SetSlideState slideDown = new SetSlideState(slide, Direction.DOWN);
-//        SetSlideState slideUp = new SetSlideState(slide, Direction.UP);
-        SetSlidePower slideFullPower = new SetSlidePower(slide, () -> 0.25);
-        SetSlidePower slideNoPower = new SetSlidePower(slide, () -> 0);
-        SetSlidePower slideReversePower = new SetSlidePower(slide, ()-> -0.25);
+        ToggleClaw toggleClaw = new ToggleClaw(claw);
 
-        // Button Setup
-        Button dpadUp = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
-        Button dpadDown = new GamepadButton(driver, GamepadKeys.Button.DPAD_DOWN);
-        Button A = new GamepadButton(driver, GamepadKeys.Button.A);
-        Button B = new GamepadButton(driver, GamepadKeys.Button.B);
-        Button Y = new GamepadButton(driver, GamepadKeys.Button.Y);
-        TriggerReader rightTrigger = new TriggerReader(driver, GamepadKeys.Trigger.RIGHT_TRIGGER);
-        TriggerReader leftTrigger = new TriggerReader(driver, GamepadKeys.Trigger.LEFT_TRIGGER);
-        Y.whenHeld(slideFullPower);
-        B.whenHeld(slideNoPower);
-        A.whenHeld(slideReversePower);
+        MecDrive mecDrive = new MecDrive(drive, () -> gamepad1.left_stick_x,
+                () -> -gamepad1.left_stick_y, () -> gamepad1.right_stick_x,
+                () -> driver.isDown(GamepadKeys.Button.LEFT_BUMPER));
 
-
+        SetSlidePower slidePower = new SetSlidePower(slide,
+                () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
+                        driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
         // Command Binding
-//        dpadUp.whenPressed(slideUp);
-//        dpadDown.whenPressed(slideDown);
-//        A.whenPressed(openClaw);
-//        B.whenPressed(closeClaw);
-//        dpadUp.whileActiveContinuous(new InstantCommand(()->slide.setPower(1)));
-//        dpadUp.whileActiveContinuous(new InstantCommand(()->slide.setPower(-1)));
-//        slide.setDefaultCommand(new InstantCommand(() -> {
-//            slide.setPower(driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
-//
-//        }));
+        A.whenPressed(toggleClaw);
 
-
-        // Command scheduling and registration
-//        schedule(openClaw, closeClaw, mecDrive);
         schedule(mecDrive);
-//        register(drive, claw, slide);
-        register(drive, slide);
+        schedule(slidePower);
 
-
+        register(drive, claw, slide);
     }
 }
