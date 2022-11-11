@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
-import android.transition.Slide;
-
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Framework.Utilities.PIDController;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideConstants;
+import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideState;
 
 public class LinearSlide extends SubsystemBase {
@@ -16,19 +16,24 @@ public class LinearSlide extends SubsystemBase {
     private String name;
     private MotorEx slideMotor;
     private SlideState state;
-    private PIDFController controller;
+    private SlideController controller;
     private SlideConstants slideConstants;
     private Telemetry t;
+
+    private boolean usingPID;
+    private long prevTime;
 
     public LinearSlide(final HardwareMap hw, final String name, Telemetry t){
         this.hw = hw;
         this.name = name;
         this.state = SlideState.DOWN;
 //        this.slideConstants = new SlideConstants(this);
-        this.controller = new PIDFController(SlideConstants.KP, SlideConstants.KI, SlideConstants.KD, SlideConstants.KF);
+        this.controller = new SlideController();
         slideMotor = new MotorEx(hw, "slideMotor");
         slideMotor.resetEncoder();
         this.t = t;
+        usingPID = true;
+        this.prevTime = System.nanoTime();
     }
 
     public int getEncoderCount(){
@@ -61,17 +66,14 @@ public class LinearSlide extends SubsystemBase {
         return slideMotor.getCurrentPosition();
     }
 
-//
-//    @Override
-//    public void periodic(){
-//        double output = controller.calculate(slideMotor.getCurrentPosition(), slideConstants.getTicks(state));
-//        slideMotor.setVelocity(output);
-//    }
-
-//    @Override
-//    public void periodic(){
-//        t.addData("Current Position", slideMotor.getCurrentPosition());
-//        t.addData("Stop Position", STOP_VALUE);
-//        t.update();
-//    }
+    @Override
+    public void periodic() {
+        long time = System.nanoTime();
+        double dt = (time - prevTime) * 1.0e-9;
+        if (usingPID) {
+            int position = slideMotor.getCurrentPosition();
+            double power = controller.getPower(position, dt);
+            slideMotor.set(power);
+        }
+    }
 }

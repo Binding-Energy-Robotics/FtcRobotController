@@ -16,17 +16,20 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlideState;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Wrist.MoveWrist;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.Direction;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideState;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.TeleDrive;
+import org.firstinspires.ftc.teamcode.Framework.subsystems.Wrist;
 
 @TeleOp
 public class MainTeleop extends CommandOpMode {
 
     TeleDrive drive;
     Claw claw;
+    Wrist wrist;
     LinearSlide slide;
     GamepadEx driver;
 
@@ -41,24 +44,28 @@ public class MainTeleop extends CommandOpMode {
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap, "claw");
         slide = new LinearSlide(hardwareMap, "slide", telemetry);
+        wrist = new Wrist(hardwareMap, "wrist");
 
         // Command setup
         ToggleClaw toggleClaw = new ToggleClaw(claw);
 
         MecDrive mecDrive = new MecDrive(drive, () -> gamepad1.left_stick_x,
-                () -> -gamepad1.left_stick_y, () -> gamepad1.right_stick_x,
+                () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y,
                 () -> driver.isDown(GamepadKeys.Button.LEFT_BUMPER));
 
         SetSlidePower slidePower = new SetSlidePower(slide,
                 () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
                         driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
+        MoveWrist moveWrist = new MoveWrist(wrist, () -> driver.getRightX());
+
         // Command Binding
         A.whenPressed(toggleClaw);
 
         schedule(mecDrive);
         schedule(slidePower);
+        schedule(moveWrist);
 
-        register(drive, claw, slide);
+        register(drive, claw, slide, wrist);
     }
 }
