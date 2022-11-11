@@ -64,26 +64,35 @@ public class Webcam {
 		packet.put("Test", "Test 2");
 		dashboard.sendTelemetryPacket(packet);
 
+		camera.setPipeline(pipeline);
+
+		packet = new TelemetryPacket();
+		packet.put("Test", "Test 3");
+		dashboard.sendTelemetryPacket(packet);
+
 		camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
 				camera.startStreaming(1280, 720);
 				camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
-				camera.setPipeline(pipeline);
 				open = true;
 			}
 
 			@Override
 			public void onError(int errorCode) {
 				Log.e("Webcam failed to open", String.valueOf(errorCode));
+
+				TelemetryPacket packet = new TelemetryPacket();
+				packet.put("Test", "Test 5");
+				dashboard.sendTelemetryPacket(packet);
 			}
 		});
 
 		packet = new TelemetryPacket();
-		packet.put("Test", "Test 3");
+		packet.put("Test", "Test 4");
 		dashboard.sendTelemetryPacket(packet);
 
-		FtcDashboard.getInstance().startCameraStream(camera, 0);
+		FtcDashboard.getInstance().startCameraStream(camera, 30);
 	}
 
 	public boolean isOpen() { return open; }
