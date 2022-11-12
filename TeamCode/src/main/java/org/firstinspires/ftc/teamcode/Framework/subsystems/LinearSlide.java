@@ -29,7 +29,7 @@ public class LinearSlide extends SubsystemBase {
         this.state = SlideState.DOWN;
 //        this.slideConstants = new SlideConstants(this);
         this.controller = new SlideController();
-        slideMotor = new MotorEx(hw, "slideMotor");
+        slideMotor = new MotorEx(hw, name);
         slideMotor.resetEncoder();
         this.t = t;
         usingPID = true;
@@ -46,15 +46,10 @@ public class LinearSlide extends SubsystemBase {
 
     public void setPower(double power){
         double position = slideMotor.getCurrentPosition();
-        t.addData("Current Position", position);
-        t.addData("Power", power);
 
         if (position < 0 && power < 0 || position > 1750 && power > 0) {
             power = 0;
         }
-
-        t.addData("Run Power", power);
-        t.update();
 
         slideMotor.set(power);
     }

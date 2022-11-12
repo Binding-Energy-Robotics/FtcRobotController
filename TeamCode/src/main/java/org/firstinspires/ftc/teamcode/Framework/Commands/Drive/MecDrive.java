@@ -33,7 +33,7 @@ public class MecDrive extends CommandBase {
 
     @Override
     public void execute(){
-        drive.driveWithMultiplier(forward.getAsDouble(), strafe.getAsDouble(),
+        drive.driveWithMultiplier(strafe.getAsDouble(), forward.getAsDouble(),
                 turn.getAsDouble(), slowMode.getAsBoolean() ? 0.33 : 1.0);
     }
 }

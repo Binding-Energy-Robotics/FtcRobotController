@@ -44,20 +44,20 @@ public class MainTeleop extends CommandOpMode {
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap, "claw");
         slide = new LinearSlide(hardwareMap, "slide", telemetry);
-        wrist = new Wrist(hardwareMap, "wrist");
+        wrist = new Wrist(hardwareMap, "wrist", telemetry);
 
         // Command setup
         ToggleClaw toggleClaw = new ToggleClaw(claw);
 
-        MecDrive mecDrive = new MecDrive(drive, () -> gamepad1.left_stick_x,
-                () -> -gamepad1.left_stick_y, () -> -gamepad1.right_stick_y,
+        MecDrive mecDrive = new MecDrive(drive, () -> driver.getLeftY(),
+                () -> driver.getLeftX(), () -> driver.getRightX(),
                 () -> driver.isDown(GamepadKeys.Button.LEFT_BUMPER));
 
         SetSlidePower slidePower = new SetSlidePower(slide,
                 () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
                         driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
-        MoveWrist moveWrist = new MoveWrist(wrist, () -> driver.getRightX());
+        MoveWrist moveWrist = new MoveWrist(wrist, () -> (1 - driver.getRightY()) * 0.3);
 
         // Command Binding
         A.whenPressed(toggleClaw);

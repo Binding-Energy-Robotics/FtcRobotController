@@ -10,7 +10,7 @@ public class PIDController {
 
 	private Double prevE;
 
-	private Double Sp;
+	private double Sp;
 
 	public PIDController(double Kp, double Ki, double Kd) {
 		this.Kp = Kp;
@@ -18,7 +18,7 @@ public class PIDController {
 		this.Kd = Kd;
 		I = 0;
 		prevE = null;
-		Sp = null;
+		Sp = 0;
 	}
 
 	public double getControl(double Pv, double dt) { // basic PID control todo add cool stuff
@@ -37,7 +37,7 @@ public class PIDController {
 	public void reset() {
 		I = 0;
 		prevE = null;
-		Sp = null;
+		Sp = 0;
 	}
 
 	public void setKp(double kp) { Kp = kp; }
