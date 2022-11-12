@@ -12,8 +12,6 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 public class VisionSubsystemTest extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
-
-
 		Camera camera = new Camera(hardwareMap, "Webcam 1");
 
 		TelemetryPacket packet = new TelemetryPacket();
@@ -21,13 +19,10 @@ public class VisionSubsystemTest extends LinearOpMode {
 		FtcDashboard.getInstance().sendTelemetryPacket(packet);
 
 		while (!camera.isOpen() && !isStopRequested() && !opModeIsActive()) idle();
-		sleep(5000);
 
 		packet = new TelemetryPacket();
 		packet.put("Status", "Fully Initialized");
 		FtcDashboard.getInstance().sendTelemetryPacket(packet);
-
-		sleep(5000);
 
 		waitForStart();
 

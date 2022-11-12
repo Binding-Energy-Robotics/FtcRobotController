@@ -20,7 +20,7 @@ public class Camera extends SubsystemBase {
 	private static final double UPDATE_WEIGHT = 0.1;
 
 	public Camera(HardwareMap hw, String webcamName) {
-		tagDetector = new AprilTagDetector();
+		tagDetector = new AprilTagDetector(true);
 		webcam = new Webcam(hw, webcamName, tagDetector);
 	}
 

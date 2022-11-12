@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.Iterator;
@@ -47,52 +48,30 @@ public class Webcam {
 	public volatile boolean isStopped = false;
 
 	public Webcam(HardwareMap hw, String name, OpenCvPipeline pipeline) {
-		FtcDashboard dashboard = FtcDashboard.getInstance();
-
 		int cameraMonitorViewId = hw.appContext.getResources().getIdentifier(
 				"cameraMonitorViewId", "id", hw.appContext.getPackageName());
 
 		WebcamName webcamName = hw.get(WebcamName.class, name);
 
-		TelemetryPacket packet = new TelemetryPacket();
-		packet.put("Test", "Test 1");
-		dashboard.sendTelemetryPacket(packet);
-
 		camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-
-		packet = new TelemetryPacket();
-		packet.put("Test", "Test 2");
-		dashboard.sendTelemetryPacket(packet);
 
 		camera.setPipeline(pipeline);
 
-		packet = new TelemetryPacket();
-		packet.put("Test", "Test 3");
-		dashboard.sendTelemetryPacket(packet);
+		FtcDashboard.getInstance().startCameraStream(camera, 30);
 
 		camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
 			@Override
 			public void onOpened() {
-				camera.startStreaming(1280, 720);
 				camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
+				camera.startStreaming(1280, 720, OpenCvCameraRotation.SIDEWAYS_RIGHT);
 				open = true;
 			}
 
 			@Override
 			public void onError(int errorCode) {
 				Log.e("Webcam failed to open", String.valueOf(errorCode));
-
-				TelemetryPacket packet = new TelemetryPacket();
-				packet.put("Test", "Test 5");
-				dashboard.sendTelemetryPacket(packet);
 			}
 		});
-
-		packet = new TelemetryPacket();
-		packet.put("Test", "Test 4");
-		dashboard.sendTelemetryPacket(packet);
-
-		FtcDashboard.getInstance().startCameraStream(camera, 30);
 	}
 
 	public boolean isOpen() { return open; }

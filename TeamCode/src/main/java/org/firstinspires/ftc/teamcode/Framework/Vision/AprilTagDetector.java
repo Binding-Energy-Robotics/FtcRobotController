@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Framework.Vision;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 public class AprilTagDetector extends OpenCvPipeline {
 	private long nativeApriltagPtr;
 	private Mat grey = new Mat();
+	private Mat rotated = new Mat();
 	private volatile ArrayList<AprilTagDetection> detections = new ArrayList<>();
 
 	double fx;
@@ -53,6 +55,8 @@ public class AprilTagDetector extends OpenCvPipeline {
 		this(tagsize, false);
 	}
 
+	public AprilTagDetector(boolean draw) { this(0.032, draw); }
+
 	public AprilTagDetector() {
 		this(0.032, true);
 	}
@@ -72,11 +76,15 @@ public class AprilTagDetector extends OpenCvPipeline {
 
 	@Override
 	public Mat processFrame(Mat input) {
+		// orient image properly
+//		Core.rotate(input, rotated, Core.ROTATE_90_CLOCKWISE);
+
 		// Convert to greyscale
 		Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
 
 		// Run AprilTag
-		detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
+		detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(
+				nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
 		newData = true;
 
 		if (drawBoxes) {
