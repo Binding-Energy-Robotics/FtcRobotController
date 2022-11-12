@@ -54,7 +54,8 @@ public class Camera extends SubsystemBase {
 			output.append("\nSide: ")
 					.append((int) confidencePairings[i][0])
 					.append(", Confidence: ")
-					.append((int) (confidencePairings[i][1] * 1000) / 10.0);
+					.append((int) (confidencePairings[i][1] * 1000) / 10.0)
+					.append(";");
 		}
 		output.append("\n}");
 		return output.toString();

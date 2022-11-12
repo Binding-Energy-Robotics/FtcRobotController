@@ -63,7 +63,7 @@ public class Webcam {
 			@Override
 			public void onOpened() {
 				camera.setViewportRenderer(OpenCvCamera.ViewportRenderer.GPU_ACCELERATED);
-				camera.startStreaming(1280, 720, OpenCvCameraRotation.SIDEWAYS_RIGHT);
+				camera.startStreaming(640, 360);
 				open = true;
 			}
 
