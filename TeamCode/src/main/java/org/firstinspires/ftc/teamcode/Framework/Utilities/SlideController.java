@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class SlideController {
 	public static double KP = 0.005;
-	public static double KI = 0.00001;
+	public static double KI = 0.0000;
 	public static double KD = 0;
 
 	public static double KG = 0.1;
