@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Framework.Vision;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -10,9 +11,10 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-class AprilTagDetector extends OpenCvPipeline {
+public class AprilTagDetector extends OpenCvPipeline {
 	private long nativeApriltagPtr;
 	private Mat grey = new Mat();
+	private Mat rotated = new Mat();
 	private volatile ArrayList<AprilTagDetection> detections = new ArrayList<>();
 
 	double fx;
@@ -27,6 +29,8 @@ class AprilTagDetector extends OpenCvPipeline {
 	double tagsizeX;
 	double tagsizeY;
 
+	private volatile boolean newData = false;
+
 	public AprilTagDetector(double tagsize, double fx, double fy, double cx, double cy, boolean draw) {
 		this.tagsize = tagsize;
 		this.tagsizeX = tagsize;
@@ -38,15 +42,23 @@ class AprilTagDetector extends OpenCvPipeline {
 		this.drawBoxes = draw;
 
 		// Allocate a native context object. See the corresponding deletion in the finalizer
-		nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector("tag16h7", 3, 3);
+		nativeApriltagPtr = AprilTagDetectorJNI.createApriltagDetector(
+				AprilTagDetectorJNI.TagFamily.TAG_36h11.string, 3, 1
+		);
 	}
 
 	public AprilTagDetector(double tagsize, boolean draw) {
-		this(tagsize, 578, 578, 402, 222, draw);
+		this(tagsize, 1430, 1430, 640, 360, draw);
 	}
 
 	public AprilTagDetector(double tagsize) {
 		this(tagsize, false);
+	}
+
+	public AprilTagDetector(boolean draw) { this(0.032, draw); }
+
+	public AprilTagDetector() {
+		this(0.032, true);
 	}
 
 	@Override
@@ -64,28 +76,42 @@ class AprilTagDetector extends OpenCvPipeline {
 
 	@Override
 	public Mat processFrame(Mat input) {
+		// orient image properly
+//		Core.rotate(input, rotated, Core.ROTATE_90_CLOCKWISE);
+
 		// Convert to greyscale
 		Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
 
 		// Run AprilTag
-		detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
+		detections = AprilTagDetectorJNI.runAprilTagDetectorSimple(
+				nativeApriltagPtr, grey, tagsize, fx, fy, cx, cy);
+		newData = true;
 
 		if (drawBoxes) {
 			for (int i = 0; i < detections.size(); i++) {
 				addBox(input, detections.get(i).corners);
+				addId(input, detections.get(i));
 			}
 		}
 
 		return input;
 	}
 
+	public boolean isNewData() { return newData; }
+
 	public ArrayList<AprilTagDetection> getLatestDetections() {
+		newData = false;
 		return detections;
 	}
 
 	private void addBox(Mat image, Point[] points) {
 		for (int i = 0; i < 4; i++) {
-			Imgproc.line(image, points[i], points[(i + 1) % 4], new Scalar(255, 255, 0));
+			Imgproc.line(image, points[i], points[(i + 1) % 4], new Scalar(255, 255, 0), 3);
 		}
+	}
+
+	private void addId(Mat image, AprilTagDetection detection) {
+		Imgproc.putText(image, String.valueOf(detection.id),
+				detection.corners[2], 0, 1, new Scalar(255, 0, 128), 2);
 	}
 }
