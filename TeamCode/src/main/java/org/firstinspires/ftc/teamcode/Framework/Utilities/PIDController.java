@@ -7,6 +7,7 @@ public class PIDController {
 	private double Ki;
 	private double Kd;
 	private double I;
+	private double Wi;
 
 	private Double prevE;
 
@@ -17,6 +18,7 @@ public class PIDController {
 		this.Ki = Ki;
 		this.Kd = Kd;
 		I = 0;
+		Wi = 200;
 		prevE = null;
 		Sp = 0;
 	}
@@ -26,8 +28,13 @@ public class PIDController {
 		double P = Kp * e;
 		double D = 0;
 		if (prevE != null) {
-			I += Ki * (e + prevE) / 2 * dt;
-			I = Range.clip(I, -0.8, 0.8);
+			if (Math.abs(e) <= Wi) {
+				I += Ki * (e + prevE) / 2 * dt;
+			}
+			else {
+				I = 0;
+			}
+			I = Range.clip(I, -0.2, 0.2);
 			D = Kd * (e - prevE) / dt;
 		}
 		prevE = e;
@@ -44,4 +51,5 @@ public class PIDController {
 	public void setKi(double ki) { Ki = ki; }
 	public void setKd(double kd) { Kd = kd; }
 	public void setSp(Double sp) { Sp = sp; }
+	public void setWi(double wi) { Wi = wi; }
 }
