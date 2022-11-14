@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Framework.Utilities.PIDController;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideConstants;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideState;
@@ -21,7 +19,6 @@ public class LinearSlide extends SubsystemBase {
     private Telemetry t;
 
     private boolean usingPID;
-    private long prevTime;
 
     public LinearSlide(final HardwareMap hw, final String name, Telemetry t){
         this.hw = hw;
@@ -33,7 +30,6 @@ public class LinearSlide extends SubsystemBase {
         slideMotor.resetEncoder();
         this.t = t;
         usingPID = true;
-        this.prevTime = System.nanoTime();
     }
 
     public int getEncoderCount(){
@@ -63,11 +59,9 @@ public class LinearSlide extends SubsystemBase {
 
     @Override
     public void periodic() {
-        long time = System.nanoTime();
-        double dt = (time - prevTime) * 1.0e-9;
         if (usingPID) {
             int position = slideMotor.getCurrentPosition();
-            double power = controller.getPower(position, dt);
+            double power = controller.getPower(position);
             slideMotor.set(power);
         }
     }
