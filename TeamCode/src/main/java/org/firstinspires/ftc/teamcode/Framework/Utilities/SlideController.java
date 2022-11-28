@@ -27,7 +27,7 @@ public class SlideController {
 
 	public static double MAX_V = 5000;
 	public static double MAX_A = 10000;
-	public static double MAX_J = 10000000;
+	public static double MAX_J = 0;
 
 	private double prevSP = 0;
 	public static double SP = 0;
