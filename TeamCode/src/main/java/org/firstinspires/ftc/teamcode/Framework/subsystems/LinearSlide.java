@@ -11,8 +11,10 @@ import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideState;
 
 public class LinearSlide extends SubsystemBase {
     private HardwareMap hw;
-    private String name;
+    private String nameMain;
     private MotorEx slideMotor;
+    private String nameAux;
+    private MotorEx auxillaryMotor;
     private SlideState state;
     private SlideController controller;
     private SlideConstants slideConstants;
@@ -20,16 +22,19 @@ public class LinearSlide extends SubsystemBase {
 
     private boolean usingPID;
 
-    public LinearSlide(final HardwareMap hw, final String name, Telemetry t){
+    public LinearSlide(final HardwareMap hw, String nameMain, String nameAux, Telemetry t){
         this.hw = hw;
-        this.name = name;
+        this.nameMain = nameMain;
+        this.nameAux = nameAux;
         this.state = SlideState.DOWN;
 //        this.slideConstants = new SlideConstants(this);
         this.controller = new SlideController();
-        slideMotor = new MotorEx(hw, name);
+        slideMotor = new MotorEx(hw, nameMain);
+        slideMotor.setInverted(true);
         slideMotor.resetEncoder();
+        auxillaryMotor = new MotorEx(hw, nameAux);
         this.t = t;
-        usingPID = true;
+        usingPID = false;
     }
 
     public int getEncoderCount(){
@@ -43,11 +48,14 @@ public class LinearSlide extends SubsystemBase {
     public void setPower(double power){
         double position = slideMotor.getCurrentPosition();
 
-        if (position < 0 && power < 0 || position > 1750 && power > 0) {
-            power = 0;
-        }
+        t.addData("Position", position);
+        t.update();
+//        if (position < 0 && power < 0 || position > 1750 && power > 0) {
+//            power = 0;
+//        }
 
         slideMotor.set(power);
+        auxillaryMotor.set(power);
     }
     public SlideState getState(){
         return this.state;

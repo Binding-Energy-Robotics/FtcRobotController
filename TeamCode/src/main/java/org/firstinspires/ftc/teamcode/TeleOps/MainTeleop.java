@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.TeleOps;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -10,6 +12,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.ToggleClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
@@ -33,9 +36,12 @@ public class MainTeleop extends CommandOpMode {
     LinearSlide slide;
     GamepadEx driver;
 
+    Telemetry telemetry;
 
     @Override
     public void initialize() {
+        telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
+
         driver =  new GamepadEx(gamepad1);
         Button A = new GamepadButton(driver, GamepadKeys.Button.A);
         Button B = new GamepadButton(driver, GamepadKeys.Button.B);
@@ -43,7 +49,7 @@ public class MainTeleop extends CommandOpMode {
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap, "claw");
-        slide = new LinearSlide(hardwareMap, "slide", telemetry);
+        slide = new LinearSlide(hardwareMap, "slideMain", "slideAux", telemetry);
         wrist = new Wrist(hardwareMap, "wrist", telemetry);
 
         // Command setup
@@ -57,7 +63,9 @@ public class MainTeleop extends CommandOpMode {
                 () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
                         driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
-        MoveWrist moveWrist = new MoveWrist(wrist, () -> (1 - driver.getRightY()) * 0.3);
+        MoveWrist moveWrist = new MoveWrist(wrist,
+                () -> (driver.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : 0) +
+                        (driver.getButton(GamepadKeys.Button.DPAD_DOWN) ? -1 : 0));
 
         // Command Binding
         A.whenPressed(toggleClaw);
