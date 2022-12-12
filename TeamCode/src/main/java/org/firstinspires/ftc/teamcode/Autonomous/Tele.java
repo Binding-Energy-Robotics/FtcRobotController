@@ -22,7 +22,7 @@ public class Tele extends CommandOpMode {
         drive = new TeleDrive(hardwareMap);
         register(drive);
 
-        drive.setDefaultCommand(new MecDrive(drive,() -> -1 * gamepad1.touchpad_finger_1_x, () -> -1 * gamepad1.touchpad_finger_1_y, ()-> -1 * gamepad1.right_stick_x));
+//        drive.setDefaultCommand(new MecDrive(drive,() -> -1 * gamepad1.touchpad_finger_1_x, () -> -1 * gamepad1.touchpad_finger_1_y, ()-> -1 * gamepad1.right_stick_x));
     }
 
 }

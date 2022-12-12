@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -29,10 +30,11 @@ public class LinearSlide extends SubsystemBase {
         this.state = SlideState.DOWN;
 //        this.slideConstants = new SlideConstants(this);
         this.controller = new SlideController();
-        slideMotor = new MotorEx(hw, nameMain);
+        slideMotor = new MotorEx(hw, "slide");
         slideMotor.setInverted(true);
+        slideMotor.encoder.setDirection(Motor.Direction.REVERSE);
         slideMotor.resetEncoder();
-        auxillaryMotor = new MotorEx(hw, nameAux);
+//        auxillaryMotor = new MotorEx(hw, nameAux);
         this.t = t;
         usingPID = false;
     }
@@ -50,12 +52,12 @@ public class LinearSlide extends SubsystemBase {
 
         t.addData("Position", position);
         t.update();
-//        if (position < 0 && power < 0 || position > 1750 && power > 0) {
-//            power = 0;
-//        }
+        if (position < 0 && power < 0 || position > 3000 && power > 0) {
+            power = 0;
+        }
 
         slideMotor.set(power);
-        auxillaryMotor.set(power);
+//        auxillaryMotor.set(power);
     }
     public SlideState getState(){
         return this.state;
