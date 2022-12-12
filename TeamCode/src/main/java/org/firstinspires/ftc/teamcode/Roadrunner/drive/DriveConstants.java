@@ -53,7 +53,8 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
+    // tuned by Alex Prichard on 12 Dec 2022
+    public static double kV = 0.0185;
     public static double kA = 0;
     public static double kStatic = 0;
 
