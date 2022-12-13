@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TrajectoryCommand;
-import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetAbsoluteSlidestate;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideState;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
@@ -36,10 +35,6 @@ public class TestMechAuto extends CommandOpMode {
                 drivetrain.getDrive().trajectoryBuilder(new Pose2d()).forward(20).splineTo(new Vector2d(50,50), 30).build());
         OpenClaw openClaw = new OpenClaw(claw);
         CloseClaw closeClaw = new CloseClaw(claw);
-        SetAbsoluteSlidestate slideDown = new SetAbsoluteSlidestate(slide, SlideState.DOWN);
-        SetAbsoluteSlidestate slideLow = new SetAbsoluteSlidestate(slide, SlideState.LOW);
-        SetAbsoluteSlidestate slideMed = new SetAbsoluteSlidestate(slide, SlideState.MEDIUM);
-        SetAbsoluteSlidestate slideHigh = new SetAbsoluteSlidestate(slide, SlideState.HIGH);
 
 
         // Command Scheduling

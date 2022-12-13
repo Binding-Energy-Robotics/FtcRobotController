@@ -16,9 +16,7 @@ public class LinearSlide extends SubsystemBase {
     private MotorEx slideMotor;
     private String nameAux;
     private MotorEx auxillaryMotor;
-    private SlideState state;
     private SlideController controller;
-    private SlideConstants slideConstants;
     private Telemetry t;
 
     private boolean usingPID;
@@ -27,40 +25,29 @@ public class LinearSlide extends SubsystemBase {
         this.hw = hw;
         this.nameMain = nameMain;
         this.nameAux = nameAux;
-        this.state = SlideState.DOWN;
-//        this.slideConstants = new SlideConstants(this);
         this.controller = new SlideController();
-        slideMotor = new MotorEx(hw, "slide");
+        slideMotor = new MotorEx(hw, nameMain);
         slideMotor.setInverted(true);
         slideMotor.encoder.setDirection(Motor.Direction.REVERSE);
         slideMotor.resetEncoder();
-//        auxillaryMotor = new MotorEx(hw, nameAux);
+        auxillaryMotor = new MotorEx(hw, nameAux);
         this.t = t;
-        usingPID = false;
+        usingPID = true;
     }
 
     public int getEncoderCount(){
         return slideMotor.getCurrentPosition();
     }
 
-    public void setState(SlideState state){
-        this.state = state;
-    }
-
     public void setPower(double power){
         double position = slideMotor.getCurrentPosition();
 
-        t.addData("Position", position);
-        t.update();
         if (position < 0 && power < 0 || position > 3000 && power > 0) {
             power = 0;
         }
 
         slideMotor.set(power);
-//        auxillaryMotor.set(power);
-    }
-    public SlideState getState(){
-        return this.state;
+        auxillaryMotor.set(power);
     }
 
     public int getEncoder(){
@@ -73,6 +60,7 @@ public class LinearSlide extends SubsystemBase {
             int position = slideMotor.getCurrentPosition();
             double power = controller.getPower(position);
             slideMotor.set(power);
+            auxillaryMotor.set(power);
         }
     }
 }

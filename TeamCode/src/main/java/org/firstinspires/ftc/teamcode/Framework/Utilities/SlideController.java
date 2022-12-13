@@ -21,7 +21,9 @@ public class SlideController {
 	public static double Kd = 0;
 	private PIDCoefficients coefficients;
 
-	public static double Kg = 0.14;
+	public static int[] SLIDE_SEGMENTS = new int[] { 880, 1000, 2000 };
+	public static double[] GRAVITY_FEEDFORWARDS = new double[] { 0.1, 0.1, 0.1, 0.1 };
+
 	public static double Kv = 0.0004;
 	public static double Ka = 0;
 
@@ -62,7 +64,16 @@ public class SlideController {
 		elapsedTime = new ElapsedTime();
 	}
 
-	public double getPower(double Pv) {
+	public double getKg(int position) {
+		for (int i = 0; i < SLIDE_SEGMENTS.length; i++) {
+			if (position < SLIDE_SEGMENTS[i]) {
+				return GRAVITY_FEEDFORWARDS[i];
+			}
+		}
+		return GRAVITY_FEEDFORWARDS[3];
+	}
+
+	public double getPower(int Pv) {
 		long time = System.nanoTime();
 		double dt = (time - prevTime) * 1.0e-9;
 
@@ -93,16 +104,17 @@ public class SlideController {
 			double a = targetState.getA();
 			controller.setTargetPosition(x);
 			controller.setTargetVelocity(v);
-			controller.setTargetAcceleration(a + Kg);
+			controller.setTargetAcceleration(a);
 
 			power = controller.update(Pv, prevVel)
-					+ Kv * v + Ka * a;
+					+ Kv * v + Ka * a + getKg(Pv);
 
 			prevTime = time;
 			telemetry.addData("targetPosition", String.valueOf(x));
 			telemetry.addData("actualPosition", String.valueOf(Pv));
 			telemetry.addData("targetVelocity", String.valueOf(v));
 			telemetry.addData("actualVelocity", String.valueOf(prevVel));
+
 			telemetry.update();
 		}
 		return power;
