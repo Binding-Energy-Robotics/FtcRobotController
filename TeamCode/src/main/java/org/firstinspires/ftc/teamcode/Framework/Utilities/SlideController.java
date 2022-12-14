@@ -21,8 +21,9 @@ public class SlideController {
 	public static double Kd = 0;
 	private PIDCoefficients coefficients;
 
-	public static int[] SLIDE_SEGMENTS = new int[] { 880, 1000, 2000 };
-	public static double[] GRAVITY_FEEDFORWARDS = new double[] { 0.1, 0.1, 0.1, 0.1 };
+	// tuned by Alex Prichard on 14 Dec 2022
+	public static int[] SLIDE_SEGMENTS = new int[] { 800, 1600, 2400, 3200 };
+	public static double[] GRAVITY_FEEDFORWARDS = new double[] { 0.001, 0.001, 0.05, 0.05 };
 
 	public static double Kv = 0.0004;
 	public static double Ka = 0;
@@ -70,7 +71,7 @@ public class SlideController {
 				return GRAVITY_FEEDFORWARDS[i];
 			}
 		}
-		return GRAVITY_FEEDFORWARDS[3];
+		return 0;
 	}
 
 	public double getPower(int Pv) {
@@ -78,10 +79,15 @@ public class SlideController {
 		double dt = (time - prevTime) * 1.0e-9;
 
 		if (dt > 1e-2) {
+			double vel = (Pv - prevPv) / dt;
+			prevVel = prevVel * 0.8 + vel * 0.2;
+			prevPv = Pv;
+
 			if (SP != prevSP) { // generate new motion profile if target position has changed
 				prevSP = SP;
 				motionProfile = MotionProfileGenerator.generateSimpleMotionProfile(
-						motionProfile.get(elapsedTime.seconds()),
+						new MotionState(prevPv, prevVel,
+								motionProfile.get(elapsedTime.seconds()).getA()),
 						new MotionState(SP, 0, 0),
 						MAX_V,
 						MAX_A,
@@ -89,10 +95,6 @@ public class SlideController {
 				);
 				elapsedTime = new ElapsedTime();
 			}
-
-			double vel = (Pv - prevPv) / dt;
-			prevVel = prevVel * 0.8 + vel * 0.2;
-			prevPv = Pv;
 
 			coefficients.kP = Kp;
 			coefficients.kI = Ki;
@@ -106,7 +108,7 @@ public class SlideController {
 			controller.setTargetVelocity(v);
 			controller.setTargetAcceleration(a);
 
-			power = controller.update(Pv, prevVel)
+			power = 0//controller.update(Pv, prevVel)
 					+ Kv * v + Ka * a + getKg(Pv);
 
 			prevTime = time;
