@@ -16,21 +16,21 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
 public class SlideController {
-	public static double Kp = 0;
-	public static double Ki = 0;
+	public static double Kp = 0.001682; // Kv Ka synthesis, see Ben Caunt for more info
+	public static double Ki = 0.003; // tuned by Alex Prichard on 14 Dec 2022
 	public static double Kd = 0;
 	private PIDCoefficients coefficients;
 
 	// tuned by Alex Prichard on 14 Dec 2022
 	public static int[] SLIDE_SEGMENTS = new int[] { 800, 1600, 2400, 3200 };
-	public static double[] GRAVITY_FEEDFORWARDS = new double[] { 0.001, 0.001, 0.05, 0.05 };
+	public static double[] GRAVITY_FEEDFORWARDS = new double[] { 0.05, 0.05, 0.05, 0.05 };
 
-	public static double Kv = 0.0004;
-	public static double Ka = 0;
+	private static final double Kv = 0.58e-3; // tuned by Alex Prichard on 14 Dec 2022
+	private static final double Ka = 0.015e-3; // tuned by Alex Prichard on 14 Dec 2022
 
-	public static double MAX_V = 5000;
-	public static double MAX_A = 10000;
-	public static double MAX_J = 0;
+	private static final double MAX_V = 1_850; // tuned by Alex Prichard on 14 Dec 2022
+	private static final double MAX_A = 15_000; // tuned by Alex Prichard on 14 Dec 2022
+	private static final double MAX_J = 300_000; // tuned by Alex Prichard on 14 Dec 2022
 
 	private double prevSP = 0;
 	public static double SP = 0;
@@ -51,21 +51,25 @@ public class SlideController {
 
 	public SlideController() {
 		coefficients = new PIDCoefficients(Kp, Ki, Kd);
-		controller = new PIDFController(coefficients, 0, 0);
+		controller = new PIDFController(coefficients, Kv, Ka);
 		prevTime = System.nanoTime();
 		dash = FtcDashboard.getInstance();
 		telemetry = dash.getTelemetry();
-		motionProfile = MotionProfileGenerator.generateSimpleMotionProfile(
-				new MotionState(0, 0, 0),
-				new MotionState(0, 0, 0),
+		motionProfile = staticProfile();
+		elapsedTime = new ElapsedTime();
+	}
+
+	private MotionProfile staticProfile() {
+		return MotionProfileGenerator.generateSimpleMotionProfile(
+				new MotionState(prevSP, 0 , 0),
+				new MotionState(prevSP, 0 , 0),
 				MAX_V,
 				MAX_A,
 				MAX_J
 		);
-		elapsedTime = new ElapsedTime();
 	}
 
-	public double getKg(int position) {
+	private double getKg(int position) {
 		for (int i = 0; i < SLIDE_SEGMENTS.length; i++) {
 			if (position < SLIDE_SEGMENTS[i]) {
 				return GRAVITY_FEEDFORWARDS[i];
@@ -93,7 +97,17 @@ public class SlideController {
 						MAX_A,
 						MAX_J
 				);
+				controller.reset();
 				elapsedTime = new ElapsedTime();
+			}
+
+			if (motionProfile.start().getX() < motionProfile.end().getX()) { // profile goes up
+				if (prevPv > motionProfile.end().getX()) {
+					motionProfile = staticProfile();
+				}
+			}
+			else if (prevPv < motionProfile.end().getX()) {
+				motionProfile = staticProfile();
 			}
 
 			coefficients.kP = Kp;
@@ -108,8 +122,7 @@ public class SlideController {
 			controller.setTargetVelocity(v);
 			controller.setTargetAcceleration(a);
 
-			power = 0//controller.update(Pv, prevVel)
-					+ Kv * v + Ka * a + getKg(Pv);
+			power = controller.update(Pv, prevVel) + getKg(Pv);
 
 			prevTime = time;
 			telemetry.addData("targetPosition", String.valueOf(x));
@@ -119,6 +132,11 @@ public class SlideController {
 
 			telemetry.update();
 		}
+
+		if (Pv < 10 && power < 0 || Pv > 3200 && power > 0) {
+			return 0;
+		}
+
 		return power;
 	}
 }
