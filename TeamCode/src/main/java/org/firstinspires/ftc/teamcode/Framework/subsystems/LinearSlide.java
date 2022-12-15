@@ -42,9 +42,11 @@ public class LinearSlide extends SubsystemBase {
     public void setPower(double power){
         double position = slideMotor.getCurrentPosition();
 
-        if (position < 0 && power < 0 || position > 3000 && power > 0) {
+        if (position < 10 && power < 0 || position > 3200 && power > 0) {
             power = 0;
         }
+
+        power += controller.getKg(getEncoder()); // gravity feedforward
 
         slideMotor.set(power);
         auxillaryMotor.set(power);

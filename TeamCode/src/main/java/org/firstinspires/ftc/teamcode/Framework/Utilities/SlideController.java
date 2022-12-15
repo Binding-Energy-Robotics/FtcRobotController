@@ -22,13 +22,13 @@ public class SlideController {
 	private PIDCoefficients coefficients;
 
 	// tuned by Alex Prichard on 14 Dec 2022
-	public static int[] SLIDE_SEGMENTS = new int[] { 800, 1600, 2400, 3200 };
-	public static double[] GRAVITY_FEEDFORWARDS = new double[] { 0.05, 0.05, 0.05, 0.05 };
+	private static final int[] SLIDE_SEGMENTS = new int[] { 800, 1600, 2400, 3200 };
+	private static final double[] GRAVITY_FEEDFORWARDS = new double[] { 0.05, 0.05, 0.05, 0.05 };
 
-	private static final double Kv = 0.58e-3; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double Ka = 0.015e-3; // tuned by Alex Prichard on 14 Dec 2022
+	private static final double Kv = 0.6e-3; // tuned by Alex Prichard on 14 Dec 2022
+	private static final double Ka = 0; // tuned by Alex Prichard on 14 Dec 2022
 
-	private static final double MAX_V = 1_850; // tuned by Alex Prichard on 14 Dec 2022
+	private static final double MAX_V = 1_650; // tuned by Alex Prichard on 14 Dec 2022
 	private static final double MAX_A = 15_000; // tuned by Alex Prichard on 14 Dec 2022
 	private static final double MAX_J = 300_000; // tuned by Alex Prichard on 14 Dec 2022
 
@@ -51,7 +51,7 @@ public class SlideController {
 
 	public SlideController() {
 		coefficients = new PIDCoefficients(Kp, Ki, Kd);
-		controller = new PIDFController(coefficients, Kv, Ka);
+		controller = new PIDFController(coefficients, 0, 0);
 		prevTime = System.nanoTime();
 		dash = FtcDashboard.getInstance();
 		telemetry = dash.getTelemetry();
@@ -69,7 +69,7 @@ public class SlideController {
 		);
 	}
 
-	private double getKg(int position) {
+	public double getKg(int position) {
 		for (int i = 0; i < SLIDE_SEGMENTS.length; i++) {
 			if (position < SLIDE_SEGMENTS[i]) {
 				return GRAVITY_FEEDFORWARDS[i];
@@ -122,7 +122,7 @@ public class SlideController {
 			controller.setTargetVelocity(v);
 			controller.setTargetAcceleration(a);
 
-			power = controller.update(Pv, prevVel) + getKg(Pv);
+			power = controller.update(Pv, prevVel) + getKg(Pv) + v * Kv + a * Ka;
 
 			prevTime = time;
 			telemetry.addData("targetPosition", String.valueOf(x));

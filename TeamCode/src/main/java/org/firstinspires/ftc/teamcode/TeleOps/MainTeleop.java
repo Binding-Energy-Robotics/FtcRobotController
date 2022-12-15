@@ -47,8 +47,8 @@ public class MainTeleop extends CommandOpMode {
         // Command setup
         ToggleClaw toggleClaw = new ToggleClaw(claw);
 
-        MecDrive mecDrive = new MecDrive(drive, () -> driver.getLeftY(),
-                () -> driver.getLeftX(), () -> gamepad1.right_stick_x,
+        MecDrive mecDrive = new MecDrive(drive, () -> -gamepad1.left_stick_y,
+                () -> gamepad1.left_stick_x, () -> gamepad1.right_stick_x,
                 () -> driver.isDown(GamepadKeys.Button.LEFT_BUMPER), telemetry);
 
         SetSlidePower slidePower = new SetSlidePower(slide,
