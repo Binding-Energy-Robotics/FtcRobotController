@@ -6,9 +6,7 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideConstants;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
-import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideState;
 
 public class LinearSlide extends SubsystemBase {
     private HardwareMap hw;
@@ -21,7 +19,7 @@ public class LinearSlide extends SubsystemBase {
 
     private boolean usingPID;
 
-    public LinearSlide(final HardwareMap hw, String nameMain, String nameAux, Telemetry t){
+    public LinearSlide(final HardwareMap hw, String nameMain, String nameAux, Telemetry t) {
         this.hw = hw;
         this.nameMain = nameMain;
         this.nameAux = nameAux;
@@ -33,6 +31,10 @@ public class LinearSlide extends SubsystemBase {
         auxillaryMotor = new MotorEx(hw, nameAux);
         this.t = t;
         usingPID = true;
+    }
+
+    public LinearSlide(final HardwareMap hw, Telemetry t) {
+        this(hw, "slideMain", "slideAux", t);
     }
 
     public int getEncoderCount(){

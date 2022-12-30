@@ -24,6 +24,10 @@ public class Camera extends SubsystemBase {
 		webcam = new Webcam(hw, webcamName, tagDetector);
 	}
 
+	public Camera(HardwareMap hw) {
+		this(hw, "Webcam 1");
+	}
+
 	public int getSide() {
 		int index = 0;
 		for (int i = 1; i < 3; i++) {

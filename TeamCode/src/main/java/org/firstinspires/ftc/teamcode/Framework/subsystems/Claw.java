@@ -17,6 +17,10 @@ public class Claw extends SubsystemBase {
         clawServo.setPosition(0);
     }
 
+    public Claw(HardwareMap hw) {
+        this(hw, "claw");
+    }
+
     public void open(){
         clawServo.setPosition(0);
     }

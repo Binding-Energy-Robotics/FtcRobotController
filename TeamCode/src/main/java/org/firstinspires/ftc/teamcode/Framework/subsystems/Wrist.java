@@ -19,6 +19,10 @@ public class Wrist extends SubsystemBase {
 		this.t = t;
 	}
 
+	public Wrist(HardwareMap hw, Telemetry t) {
+		this(hw, "wrist", t);
+	}
+
 	public void setPosition(double position) {
 		servo.setPosition(position);
 	}
