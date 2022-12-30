@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
@@ -16,4 +18,7 @@ public class AutoDrive extends SubsystemBase {
         return this.drive;
     }
 
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
+        return drive.trajectoryBuilder(startPose);
+    }
 }
