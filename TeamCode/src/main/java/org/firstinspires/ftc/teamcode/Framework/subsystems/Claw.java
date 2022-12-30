@@ -14,6 +14,7 @@ public class Claw extends SubsystemBase {
     public Claw(HardwareMap hw, String name){
         this.hw = hw;
         clawServo = new SimpleServo(hw,name, 0, 180);
+        clawServo.setPosition(0);
     }
 
     public void open(){
@@ -24,6 +25,5 @@ public class Claw extends SubsystemBase {
         clawServo.setPosition(1);
     }
 
-
-
+    public void toggle() { clawServo.setPosition(1 - clawServo.getPosition()); }
 }

@@ -11,10 +11,10 @@ public class TeleDrive extends SubsystemBase {
     private MecanumDrive drive;
 
     public TeleDrive(HardwareMap hw){
-        this.frontR = new MotorEx(hw, "frontR");
-        this.frontL = new MotorEx(hw, "frontL");
-        this.backR = new MotorEx(hw, "backR");
-        this.backL = new MotorEx(hw, "backL");
+        this.frontR = new MotorEx(hw, "rightFront");
+        this.frontL = new MotorEx(hw, "leftFront");
+        this.backR = new MotorEx(hw, "rightRear");
+        this.backL = new MotorEx(hw, "leftRear");
         this.drive = new MecanumDrive(frontL,frontR, backL, backR);
     }
 
@@ -22,11 +22,13 @@ public class TeleDrive extends SubsystemBase {
         drive.driveFieldCentric(strafeSpeed, forwardSpeed, turn, heading);
     }
 
+    public void drive(double strafeSpeed, double forwardSpeed, double turn){
+        drive.driveRobotCentric(strafeSpeed, forwardSpeed, turn);
+    }
 
-
-
-
-
-
-
+    public void driveWithMultiplier(double strafeSpeed, double forwardSpeed,
+                                    double turn, double multiplier){
+        drive.driveRobotCentric(strafeSpeed * multiplier,
+                forwardSpeed * multiplier, turn * multiplier);
+    }
 }
