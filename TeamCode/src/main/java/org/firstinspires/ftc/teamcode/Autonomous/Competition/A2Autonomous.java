@@ -17,6 +17,8 @@ public class A2Autonomous extends CommandOpMode {
 	Claw claw;
 	Camera camera;
 
+	int parkPosition = 0;
+
 	@Override
 	public void initialize() {
 		Telemetry telemetry = new MultipleTelemetry(this.telemetry);
@@ -25,9 +27,15 @@ public class A2Autonomous extends CommandOpMode {
 		slide = new LinearSlide(hardwareMap, telemetry);
 		wrist = new Wrist(hardwareMap, telemetry);
 		claw = new Claw(hardwareMap);
+		camera = new Camera(hardwareMap);
 
 
+		register(drive, slide, wrist, claw, camera);
 
-		register(drive, slide, wrist, claw);
+		while (!isStarted()) {
+			camera.periodic();
+		}
+
+		parkPosition = camera.getSide();
 	}
 }

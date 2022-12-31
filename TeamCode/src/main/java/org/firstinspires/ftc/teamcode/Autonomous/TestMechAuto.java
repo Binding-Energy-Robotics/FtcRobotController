@@ -8,8 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
-import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TrajectoryCommand;
-import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideState;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.BlockingTrajectoryCommand;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
@@ -31,7 +30,7 @@ public class TestMechAuto extends CommandOpMode {
         register(drivetrain, claw, slide);
 
         // Command Creation
-        TrajectoryCommand tc1 = new TrajectoryCommand(drivetrain,
+        BlockingTrajectoryCommand tc1 = new BlockingTrajectoryCommand(drivetrain,
                 drivetrain.getDrive().trajectoryBuilder(new Pose2d()).forward(20).splineTo(new Vector2d(50,50), 30).build());
         OpenClaw openClaw = new OpenClaw(claw);
         CloseClaw closeClaw = new CloseClaw(claw);

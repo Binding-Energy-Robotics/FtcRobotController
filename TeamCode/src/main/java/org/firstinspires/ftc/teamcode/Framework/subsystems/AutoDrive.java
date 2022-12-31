@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,5 +21,17 @@ public class AutoDrive extends SubsystemBase {
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
         return drive.trajectoryBuilder(startPose);
+    }
+
+    public boolean isBusy() {
+        return drive.isBusy();
+    }
+
+    public void followTrajectoryAsync(Trajectory trajectory) {
+        drive.followTrajectoryAsync(trajectory);
+    }
+
+    public void update() {
+        drive.update();
     }
 }

@@ -26,7 +26,7 @@ public class SlideController {
 	private static final double[] GRAVITY_FEEDFORWARDS = new double[] { 0.05, 0.05, 0.05, 0.05 };
 
 	private static final double Kv = 0.6e-3; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double Ka = 0; // tuned by Alex Prichard on 14 Dec 2022
+	private static final double Ka = 0; // set to zero due to issues caused by interference with PID
 
 	private static final double MAX_V = 1_650; // tuned by Alex Prichard on 14 Dec 2022
 	private static final double MAX_A = 15_000; // tuned by Alex Prichard on 14 Dec 2022
@@ -48,6 +48,7 @@ public class SlideController {
 	private long prevTime;
 	private FtcDashboard dash;
 	private Telemetry telemetry;
+	private boolean isMovementFinished = false;
 
 	public SlideController() {
 		coefficients = new PIDCoefficients(Kp, Ki, Kd);
@@ -78,6 +79,10 @@ public class SlideController {
 		return 0;
 	}
 
+	public void setTargetPosition(int Sp) {
+		SP = Sp;
+	}
+
 	public double getPower(int Pv) {
 		long time = System.nanoTime();
 		double dt = (time - prevTime) * 1.0e-9;
@@ -97,6 +102,7 @@ public class SlideController {
 						MAX_A,
 						MAX_J
 				);
+				isMovementFinished = false;
 				controller.reset();
 				elapsedTime = new ElapsedTime();
 			}
@@ -104,10 +110,12 @@ public class SlideController {
 			if (motionProfile.start().getX() < motionProfile.end().getX()) { // profile goes up
 				if (prevPv > motionProfile.end().getX()) {
 					motionProfile = staticProfile();
+					isMovementFinished = true;
 				}
 			}
 			else if (prevPv < motionProfile.end().getX()) {
 				motionProfile = staticProfile();
+				isMovementFinished = true;
 			}
 
 			coefficients.kP = Kp;
@@ -125,12 +133,12 @@ public class SlideController {
 			power = controller.update(Pv, prevVel) + getKg(Pv) + v * Kv + a * Ka;
 
 			prevTime = time;
-			telemetry.addData("targetPosition", String.valueOf(x));
-			telemetry.addData("actualPosition", String.valueOf(Pv));
-			telemetry.addData("targetVelocity", String.valueOf(v));
-			telemetry.addData("actualVelocity", String.valueOf(prevVel));
-
-			telemetry.update();
+//			telemetry.addData("targetPosition", String.valueOf(x));
+//			telemetry.addData("actualPosition", String.valueOf(Pv));
+//			telemetry.addData("targetVelocity", String.valueOf(v));
+//			telemetry.addData("actualVelocity", String.valueOf(prevVel));
+//
+//			telemetry.update();
 		}
 
 		if (Pv < 10 && power < 0 || Pv > 3200 && power > 0) {
@@ -138,5 +146,9 @@ public class SlideController {
 		}
 
 		return power;
+	}
+
+	public boolean isMovementFinished() {
+		return isMovementFinished;
 	}
 }

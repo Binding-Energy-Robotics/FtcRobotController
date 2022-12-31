@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 
-import org.firstinspires.ftc.teamcode.Framework.Commands.TrajectoryCommand;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.BlockingTrajectoryCommand;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 
 public class SplineTestingAuto extends CommandOpMode {
@@ -15,7 +15,7 @@ public class SplineTestingAuto extends CommandOpMode {
 
 		register(drive);
 
-		TrajectoryCommand move = new TrajectoryCommand(drive,
+		BlockingTrajectoryCommand move = new BlockingTrajectoryCommand(drive,
 				drive.trajectoryBuilder(new Pose2d(0, 0, 0))
 						.splineToSplineHeading(new Pose2d(12, 24, 0), 0)
 						.build()

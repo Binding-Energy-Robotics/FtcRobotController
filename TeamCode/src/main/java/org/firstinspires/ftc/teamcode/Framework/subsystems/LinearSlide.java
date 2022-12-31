@@ -58,6 +58,14 @@ public class LinearSlide extends SubsystemBase {
         return slideMotor.getCurrentPosition();
     }
 
+    public void setSlidePosition(int position) {
+        controller.setTargetPosition(position);
+    }
+
+    public boolean isMovementFinished() {
+        return controller.isMovementFinished();
+    }
+
     @Override
     public void periodic() {
         if (usingPID) {
