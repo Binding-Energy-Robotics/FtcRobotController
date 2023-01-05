@@ -27,6 +27,7 @@ public class MainTeleop extends CommandOpMode {
     Wrist wrist;
     LinearSlide slide;
     GamepadEx driver;
+    GamepadEx helper;
 
     Telemetry telemetry;
 
@@ -34,14 +35,16 @@ public class MainTeleop extends CommandOpMode {
     public void initialize() {
         telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
 
-        driver =  new GamepadEx(gamepad1);
+        driver = new GamepadEx(gamepad1);
+        helper = new GamepadEx(gamepad2);
         Button A = new GamepadButton(driver, GamepadKeys.Button.A);
         Button B = new GamepadButton(driver, GamepadKeys.Button.B);
 
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap, "claw");
-        slide = new LinearSlide(hardwareMap, "slideMain", "slideAux", telemetry);
+        slide = new LinearSlide(hardwareMap,
+                "slideMain", "slideAux", telemetry, false);
         wrist = new Wrist(hardwareMap, "wrist", telemetry);
 
         // Command setup
@@ -52,12 +55,12 @@ public class MainTeleop extends CommandOpMode {
                 () -> driver.isDown(GamepadKeys.Button.LEFT_BUMPER), telemetry);
 
         SetSlidePower slidePower = new SetSlidePower(slide,
-                () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
-                        driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
+                () -> helper.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
+                        helper.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
         MoveWrist moveWrist = new MoveWrist(wrist,
-                () -> (driver.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : 0) +
-                        (driver.getButton(GamepadKeys.Button.DPAD_DOWN) ? -1 : 0));
+                () -> (helper.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : 0) +
+                        (helper.getButton(GamepadKeys.Button.DPAD_DOWN) ? -1 : 0));
 
         // Command Binding
         A.whenPressed(toggleClaw);
