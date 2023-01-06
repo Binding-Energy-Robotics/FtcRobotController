@@ -44,7 +44,7 @@ public class MainTeleop extends CommandOpMode {
 
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
-        claw = new Claw(hardwareMap, "claw", telemetry);
+        claw = new Claw(hardwareMap, "claw");
         slide = new LinearSlide(hardwareMap,
                 "slideMain", "slideAux", telemetry, false);
         wrist = new Wrist(hardwareMap, "wrist", telemetry);

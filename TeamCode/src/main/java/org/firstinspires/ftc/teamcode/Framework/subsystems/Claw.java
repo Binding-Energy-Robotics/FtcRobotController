@@ -13,13 +13,10 @@ public class Claw extends SubsystemBase {
     private HardwareMap hw;
     private ServoEx clawServo;
     private boolean servoClosed;
-    private int toggleCount;
-    private Telemetry telemetry;
 
-    public Claw(HardwareMap hw, String name, Telemetry t){
+    public Claw(HardwareMap hw, String name){
         this.hw = hw;
         clawServo = new SimpleServo(hw, name, 0, 180);
-        telemetry = t;
         open();
     }
 

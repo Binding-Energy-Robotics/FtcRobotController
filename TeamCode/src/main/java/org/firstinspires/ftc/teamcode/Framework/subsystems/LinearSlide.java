@@ -34,8 +34,8 @@ public class LinearSlide extends SubsystemBase {
         this.usingPID = usingPID;
     }
 
-    public LinearSlide(final HardwareMap hw, Telemetry t) {
-        this(hw, "slideMain", "slideAux", t);
+    public LinearSlide(final HardwareMap hw, Telemetry t, boolean usingPID) {
+        this(hw, "slideMain", "slideAux", t, usingPID);
     }
 
     public int getEncoderCount(){
