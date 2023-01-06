@@ -26,4 +26,9 @@ public class Wrist extends SubsystemBase {
 	public void setPosition(double position) {
 		servo.setPosition(position);
 	}
+
+	@Override
+	public void periodic() {
+		t.addData("Wrist position", servo.getPosition());
+	}
 }

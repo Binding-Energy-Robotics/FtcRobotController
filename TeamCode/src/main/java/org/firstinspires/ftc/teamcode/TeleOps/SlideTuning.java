@@ -21,7 +21,8 @@ public class SlideTuning extends CommandOpMode {
 		telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry());
 
 		wrist = new Wrist(hardwareMap, "wrist", telemetry);
-		slide = new LinearSlide(hardwareMap, "slideMain", "slideAux", telemetry);
+		slide = new LinearSlide(hardwareMap,
+				"slideMain", "slideAux", telemetry, true);
 
 		MoveWrist moveWrist = new MoveWrist(wrist, () -> 0);
 
