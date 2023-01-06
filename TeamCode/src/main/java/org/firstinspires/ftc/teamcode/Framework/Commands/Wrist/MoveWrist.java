@@ -16,7 +16,8 @@ public class MoveWrist extends CommandBase {
 	public MoveWrist(Wrist wrist, DoubleSupplier power) {
 		this.wrist = wrist;
 		this.power = power;
-		this.position = 0.5;
+		this.position = 0.95;
+		this.wrist.setPosition(this.position);
 		this.prevNanos = System.nanoTime();
 		addRequirements(wrist);
 	}
@@ -25,9 +26,12 @@ public class MoveWrist extends CommandBase {
 	public void execute(){
 		double nanos = System.nanoTime();
 		double dt = (nanos - prevNanos) * 1e-9;
-		position += dt * power.getAsDouble();
-		position = Range.clip(position, -1, 1);
-		wrist.setPosition(position);
+		if (dt >= 1e-2) {
+			prevNanos = nanos;
+			position -= dt * power.getAsDouble();
+			position = Range.clip(position, 0.65, 0.95);
+			wrist.setPosition(position);
+		}
 	}
 
 	@Override
