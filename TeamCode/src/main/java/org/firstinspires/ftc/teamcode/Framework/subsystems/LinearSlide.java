@@ -21,7 +21,8 @@ public class LinearSlide extends SubsystemBase {
 
     private boolean usingPID;
 
-    public LinearSlide(final HardwareMap hw, String nameMain, String nameAux, Telemetry t){
+    public LinearSlide(final HardwareMap hw,
+                       String nameMain, String nameAux, Telemetry t, boolean usingPID){
         this.hw = hw;
         this.nameMain = nameMain;
         this.nameAux = nameAux;
@@ -32,7 +33,7 @@ public class LinearSlide extends SubsystemBase {
         slideMotor.resetEncoder();
         auxillaryMotor = new MotorEx(hw, nameAux);
         this.t = t;
-        usingPID = true;
+        this.usingPID = usingPID;
     }
 
     public int getEncoderCount(){
