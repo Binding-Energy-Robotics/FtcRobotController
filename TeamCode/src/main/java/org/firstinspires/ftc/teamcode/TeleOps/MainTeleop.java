@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.ToggleClaw;
@@ -41,6 +42,8 @@ public class MainTeleop extends CommandOpMode {
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap, "claw");
+        Servo claw_servo = hardwareMap.get(Servo.class, "claw");
+        claw_servo.setPosition(1);
         slide = new LinearSlide(hardwareMap, "slideMain", "slideAux", telemetry);
         wrist = new Wrist(hardwareMap, "wrist", telemetry);
 
@@ -67,5 +70,8 @@ public class MainTeleop extends CommandOpMode {
         schedule(moveWrist);
 
         register(drive, claw, slide, wrist);
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 }
