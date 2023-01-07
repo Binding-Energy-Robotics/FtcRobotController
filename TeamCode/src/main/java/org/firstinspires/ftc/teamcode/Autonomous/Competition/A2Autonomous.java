@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autonomous.Competition;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -59,8 +60,34 @@ public class A2Autonomous extends CommandOpMode {
 		claw = new Claw(hardwareMap);
 		camera = new Camera(hardwareMap);
 
-
 		register(drive, slide, wrist, claw, camera);
+
+		// generate trajectories
+		Trajectory startToTerminal = drive.trajectoryBuilder(START_POSE)
+				.lineTo(TERMINAL_TURN_POSE_A.vec())
+				.splineToSplineHeading(TERMINAL_POSE, TERMINAL_POSE.getHeading())
+				.build();
+		Trajectory terminalToCones = drive.trajectoryBuilder(TERMINAL_POSE)
+				.splineToSplineHeading(TERMINAL_TURN_POSE_B, Math.toRadians(180))
+				.lineTo(SUBSTATION_TURN_POSE.vec())
+				.splineToSplineHeading(SUBSTATION_POSE, SUBSTATION_POSE.getHeading())
+				.build();
+		Trajectory conesToTerminal = drive.trajectoryBuilder(SUBSTATION_POSE)
+				.splineToSplineHeading(SUBSTATION_TURN_POSE, Math.toRadians(0))
+				.lineTo(TERMINAL_TURN_POSE_A.vec())
+				.splineToSplineHeading(TERMINAL_POSE, TERMINAL_POSE.getHeading())
+				.build();
+		Trajectory park1 = drive.trajectoryBuilder(TERMINAL_POSE)
+				.splineToSplineHeading(PARK_TRANSITION_POSE_A, Math.toRadians(135))
+				.splineToSplineHeading(PARK_POSE_1, Math.toRadians(90))
+				.build();
+		Trajectory park2 = drive.trajectoryBuilder(TERMINAL_POSE)
+				.splineToSplineHeading(PARK_POSE_2, PARK_POSE_2.getHeading())
+				.build();
+		Trajectory park3 = drive.trajectoryBuilder(TERMINAL_POSE)
+				.splineToSplineHeading(PARK_TRANSITION_POSE_B, Math.toRadians(-120))
+				.splineToSplineHeading(PARK_POSE_3, Math.toRadians(90))
+				.build();
 
 		while (!isStarted()) {
 			camera.periodic();
