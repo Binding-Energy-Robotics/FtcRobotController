@@ -9,6 +9,11 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 
 public class LinearSlide extends SubsystemBase {
+    public static final int HIGH = 3000;
+    public static final int MEDIUM = 2000;
+    public static final int LOW = 1000;
+    public static final int BOTTOM = 0;
+
     private HardwareMap hw;
     private String nameMain;
     private MotorEx slideMotor;

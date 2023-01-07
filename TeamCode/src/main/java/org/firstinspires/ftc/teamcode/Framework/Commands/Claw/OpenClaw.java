@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 public class OpenClaw extends CommandBase {
 
     private Claw claw;
+    private long startTime;
 
     public OpenClaw(Claw claw){
         this.claw = claw;
@@ -15,12 +16,12 @@ public class OpenClaw extends CommandBase {
 
     @Override
     public void execute(){
+        startTime = System.nanoTime();
         this.claw.open();
     }
 
     @Override
     public boolean isFinished(){
-        return true;
+        return startTime + 0.5e9 < System.nanoTime();
     }
-
 }
