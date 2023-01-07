@@ -15,10 +15,13 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.AsyncDelay;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.Park;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TrajectoryCommand;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Wrist;
 
@@ -41,7 +44,7 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.Wrist;
 public class A2Autonomous extends CommandOpMode {
 	AutoDrive drive;
 	LinearSlide slide;
-	Wrist wrist;
+	Flipper flipper;
 	Claw claw;
 	Camera camera;
 
@@ -63,17 +66,17 @@ public class A2Autonomous extends CommandOpMode {
 
 		drive = new AutoDrive(hardwareMap);
 		slide = new LinearSlide(hardwareMap, telemetry, true);
-		wrist = new Wrist(hardwareMap, telemetry);
+		flipper = new Flipper(hardwareMap, telemetry);
 		claw = new Claw(hardwareMap);
 		camera = new Camera(hardwareMap);
 
-		register(drive, slide, wrist, claw, camera);
+		register(drive, slide, flipper, claw, camera);
 
 		// generate trajectories
 		Trajectory startToTerminal = drive.trajectoryBuilder(START_POSE)
 				.strafeTo(TERMINAL_TURN_A.vec())
-				.splineToSplineHeading(TERMINAL_TURN_B, Math.toRadians(-45))
-				.strafeTo(TERMINAL_POSE.vec())
+//				.splineToSplineHeading(TERMINAL_TURN_B, Math.toRadians(-45))
+//				.strafeTo(TERMINAL_POSE.vec())
 				.build();
 		Trajectory terminalToStack = drive.trajectoryBuilder(TERMINAL_POSE)
 				.strafeTo(TERMINAL_TURN_B.vec())
@@ -99,11 +102,17 @@ public class A2Autonomous extends CommandOpMode {
 				.strafeTo(PARK_3.vec())
 				.build();
 
-		DriveAndLift driveStartToTerminal =
-				new DriveAndLift(drive, slide, startToTerminal, LinearSlide.HIGH);
+		ParallelCommandGroup driveStartToTerminal = new ParallelCommandGroup(
+				new DriveAndLift(drive, slide, startToTerminal, LinearSlide.HIGH),
+				new FlipOut(flipper)
+		);
 		ParallelCommandGroup driveToStack = new ParallelCommandGroup(
 				new ReleaseThenDrive(drive, claw, terminalToStack),
-				new SetSlidePosition(slide, LinearSlide.BOTTOM)
+				new SetSlidePosition(slide, () -> slide.popStackHeight()),
+				new SequentialCommandGroup(
+						new AsyncDelay(0.5),
+						new FlipIn(flipper)
+				)
 		);
 		SequentialCommandGroup driveToTerminal = new SequentialCommandGroup(
 				new CloseClaw(claw),
@@ -111,7 +120,10 @@ public class A2Autonomous extends CommandOpMode {
 						new SetSlidePosition(slide, LinearSlide.HIGH),
 						new SequentialCommandGroup(
 								new AsyncDelay(0.5),
-								new TrajectoryCommand(drive, stackToTerminal)
+								new ParallelCommandGroup(
+										new TrajectoryCommand(drive, stackToTerminal),
+										new FlipOut(flipper)
+								)
 						)
 				)
 		);
@@ -121,17 +133,19 @@ public class A2Autonomous extends CommandOpMode {
 		);
 		ParallelCommandGroup prepareToPark = new ParallelCommandGroup(
 				new ReleaseThenDrive(drive, claw, preparePark),
-				new SetSlidePosition(slide, LinearSlide.BOTTOM)
+				new SetSlidePosition(slide, LinearSlide.BOTTOM),
+				new SequentialCommandGroup(
+						new AsyncDelay(1),
+						new FlipIn(flipper)
+				)
 		);
 		Park park = new Park(drive, () -> parkPosition, park1, park2, park3);
 
 		SequentialCommandGroup autonomousRoutine = new SequentialCommandGroup(
-				driveStartToTerminal,
-				cycle,
-				cycle,
-				cycle,
-				prepareToPark,
-				park
+//				driveStartToTerminal,
+//				prepareToPark,
+//				park
+//				new TrajectoryCommand(drive, startToTerminal)
 		);
 
 		schedule(autonomousRoutine);
@@ -144,5 +158,10 @@ public class A2Autonomous extends CommandOpMode {
 		}
 
 		parkPosition = camera.getSide();
+
+		drive.followTrajectoryAsync(startToTerminal);
+		while (drive.isBusy() && opModeIsActive()) {
+			drive.update();
+		}
 	}
 }

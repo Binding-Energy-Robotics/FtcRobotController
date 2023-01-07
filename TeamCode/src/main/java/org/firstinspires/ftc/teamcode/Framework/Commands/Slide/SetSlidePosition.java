@@ -4,18 +4,24 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 
+import java.util.function.IntSupplier;
+
 public class SetSlidePosition extends CommandBase {
 	LinearSlide slide;
-	int position;
+	IntSupplier position;
 
-	public SetSlidePosition(LinearSlide slide, int position) {
+	public SetSlidePosition(LinearSlide slide, IntSupplier position) {
 		this.slide = slide;
 		this.position = position;
 	}
 
+	public SetSlidePosition(LinearSlide slide, int position) {
+		this(slide, () -> position);
+	}
+
 	@Override
 	public void initialize() {
-		slide.setSlidePosition(position);
+		slide.setSlidePosition(position.getAsInt());
 	}
 
 	@Override

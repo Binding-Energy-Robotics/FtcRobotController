@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.ToggleClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Rumble;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
 import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Wrist.MoveWrist;
@@ -70,6 +71,9 @@ public class MainTeleop extends CommandOpMode {
 
         // Command Binding
         A.whenPressed(toggleClaw);
+        A.whenPressed(() -> gamepad1.rumbleBlips(1));
+        A.whenPressed(() -> gamepad2.rumbleBlips(1));
+
         dpadUp.whenPressed(flipOut);
         dpadDown.whenPressed(flipIn);
 

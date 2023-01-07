@@ -9,10 +9,25 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 
 public class LinearSlide extends SubsystemBase {
-    public static final int HIGH = 3000;
-    public static final int MEDIUM = 2000;
-    public static final int LOW = 1000;
+    public static final int HIGH = 2200;
+    public static final int MEDIUM = 1350;
+    public static final int LOW = 500;
     public static final int BOTTOM = 0;
+    public static final int FIVE_CONE = 430;
+    public static final int FOUR_CONE = 330;
+    public static final int THREE_CONE = 230;
+    public static final int TWO_CONE = 80;
+    public static final int ONE_CONE = 0;
+    public static final int[] CONE_STACK = new int[] {
+            0,
+            ONE_CONE,
+            TWO_CONE,
+            THREE_CONE,
+            FOUR_CONE,
+            FIVE_CONE
+    };
+
+    private int stackSize;
 
     private HardwareMap hw;
     private String nameMain;
@@ -37,6 +52,7 @@ public class LinearSlide extends SubsystemBase {
         auxillaryMotor = new MotorEx(hw, nameAux);
         this.t = t;
         this.usingPID = usingPID;
+        stackSize = 5;
     }
 
     public LinearSlide(final HardwareMap hw, Telemetry t, boolean usingPID) {
@@ -50,7 +66,7 @@ public class LinearSlide extends SubsystemBase {
     public void setPower(double power){
         double position = slideMotor.getCurrentPosition();
 
-        if (position < 10 && power < 0 || position > 3200 && power > 0) {
+        if (position < 10 && power < 0 || position > 2900 && power > 0) {
             power = 0;
         }
 
@@ -72,8 +88,16 @@ public class LinearSlide extends SubsystemBase {
         return controller.isMovementFinished();
     }
 
+    public int popStackHeight() {
+        int height = CONE_STACK[stackSize];
+        if (stackSize > 0)
+            stackSize--;
+        return height;
+    }
+
     @Override
     public void periodic() {
+        t.addData("Height", slideMotor.getCurrentPosition());
         if (usingPID) {
             int position = slideMotor.getCurrentPosition();
             double power = controller.getPower(position);
