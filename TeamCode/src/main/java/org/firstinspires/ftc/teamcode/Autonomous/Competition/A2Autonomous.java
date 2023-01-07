@@ -4,9 +4,18 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Framework.CommandGroups.DriveAndLift;
+import org.firstinspires.ftc.teamcode.Framework.CommandGroups.ReleaseThenDrive;
+import org.firstinspires.ftc.teamcode.Framework.Commands.AsyncDelay;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.Park;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TrajectoryCommand;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
@@ -38,17 +47,15 @@ public class A2Autonomous extends CommandOpMode {
 
 	int parkPosition = 0;
 
-	public static final Pose2d START_POSE = new Pose2d(-63, -36, Math.toRadians(0));
-	public static final Pose2d TERMINAL_TURN_POSE_A = new Pose2d(-12, -36, Math.toRadians(0));
-	public static final Pose2d TERMINAL_POSE = new Pose2d(-7, -31, Math.toRadians(45));
-	public static final Pose2d TERMINAL_TURN_POSE_B = new Pose2d(-12, -36, Math.toRadians(90));
-	public static final Pose2d SUBSTATION_TURN_POSE = new Pose2d(-59, -36, Math.toRadians(90));
-	public static final Pose2d SUBSTATION_POSE = new Pose2d(-61, -9, Math.toRadians(150));
-	public static final Pose2d PARK_TRANSITION_POSE_A = new Pose2d(-12, -35, Math.toRadians(90));
-	public static final Pose2d PARK_TRANSITION_POSE_B = new Pose2d(-12, -37, Math.toRadians(90));
-	public static final Pose2d PARK_POSE_1 = new Pose2d(-12, -12, Math.toRadians(90));
-	public static final Pose2d PARK_POSE_2 = new Pose2d(-61, -9, Math.toRadians(45));
-	public static final Pose2d PARK_POSE_3 = new Pose2d(-61, -9, Math.toRadians(90));
+	public static final Pose2d START_POSE = new Pose2d(-36, 61, Math.toRadians(-90));
+	public static final Pose2d TERMINAL_TURN_A = new Pose2d(-36, 13, Math.toRadians(-90));
+	public static final Pose2d TERMINAL_TURN_B = new Pose2d(-30, 6, Math.toRadians(-45));
+	public static final Pose2d TERMINAL_POSE = new Pose2d(-28, 4, Math.toRadians(-45));
+	public static final Pose2d TERMINAL_TURN_C = new Pose2d(-37, 12, Math.toRadians(0));
+	public static final Pose2d CONE_STACK = new Pose2d(-61, 12, Math.toRadians(0));
+	public static final Pose2d PARK_1 = new Pose2d(-60, 12, Math.toRadians(0));
+	public static final Pose2d PARK_2 = new Pose2d(-36, 12, Math.toRadians(0));
+	public static final Pose2d PARK_3 = new Pose2d(-12, 12, Math.toRadians(0));
 
 	@Override
 	public void initialize() {
@@ -64,30 +71,73 @@ public class A2Autonomous extends CommandOpMode {
 
 		// generate trajectories
 		Trajectory startToTerminal = drive.trajectoryBuilder(START_POSE)
-				.lineTo(TERMINAL_TURN_POSE_A.vec())
-				.splineToSplineHeading(TERMINAL_POSE, TERMINAL_POSE.getHeading())
+				.strafeTo(TERMINAL_TURN_A.vec())
+				.splineToSplineHeading(TERMINAL_TURN_B, Math.toRadians(-45))
+				.strafeTo(TERMINAL_POSE.vec())
 				.build();
-		Trajectory terminalToCones = drive.trajectoryBuilder(TERMINAL_POSE)
-				.splineToSplineHeading(TERMINAL_TURN_POSE_B, Math.toRadians(180))
-				.lineTo(SUBSTATION_TURN_POSE.vec())
-				.splineToSplineHeading(SUBSTATION_POSE, SUBSTATION_POSE.getHeading())
+		Trajectory terminalToStack = drive.trajectoryBuilder(TERMINAL_POSE)
+				.strafeTo(TERMINAL_TURN_B.vec())
+				.splineToSplineHeading(TERMINAL_TURN_C, Math.toRadians(180))
+				.strafeTo(CONE_STACK.vec())
 				.build();
-		Trajectory conesToTerminal = drive.trajectoryBuilder(SUBSTATION_POSE)
-				.splineToSplineHeading(SUBSTATION_TURN_POSE, Math.toRadians(0))
-				.lineTo(TERMINAL_TURN_POSE_A.vec())
-				.splineToSplineHeading(TERMINAL_POSE, TERMINAL_POSE.getHeading())
+		Trajectory stackToTerminal = drive.trajectoryBuilder(CONE_STACK)
+				.strafeTo(TERMINAL_TURN_B.vec())
+				.splineToSplineHeading(TERMINAL_TURN_C, Math.toRadians(180))
+				.strafeTo(CONE_STACK.vec())
 				.build();
-		Trajectory park1 = drive.trajectoryBuilder(TERMINAL_POSE)
-				.splineToSplineHeading(PARK_TRANSITION_POSE_A, Math.toRadians(135))
-				.splineToSplineHeading(PARK_POSE_1, Math.toRadians(90))
+		Trajectory preparePark = drive.trajectoryBuilder(TERMINAL_POSE)
+				.strafeTo(TERMINAL_TURN_B.vec())
+				.splineToSplineHeading(TERMINAL_TURN_C, Math.toRadians(180))
 				.build();
-		Trajectory park2 = drive.trajectoryBuilder(TERMINAL_POSE)
-				.splineToSplineHeading(PARK_POSE_2, PARK_POSE_2.getHeading())
+		Trajectory park1 = drive.trajectoryBuilder(TERMINAL_TURN_C)
+				.strafeTo(PARK_1.vec())
 				.build();
-		Trajectory park3 = drive.trajectoryBuilder(TERMINAL_POSE)
-				.splineToSplineHeading(PARK_TRANSITION_POSE_B, Math.toRadians(-120))
-				.splineToSplineHeading(PARK_POSE_3, Math.toRadians(90))
+		Trajectory park2 = drive.trajectoryBuilder(TERMINAL_TURN_C)
+				.strafeTo(PARK_2.vec())
 				.build();
+		Trajectory park3 = drive.trajectoryBuilder(TERMINAL_TURN_C)
+				.strafeTo(PARK_3.vec())
+				.build();
+
+		DriveAndLift driveStartToTerminal =
+				new DriveAndLift(drive, slide, startToTerminal, LinearSlide.HIGH);
+		ParallelCommandGroup driveToStack = new ParallelCommandGroup(
+				new ReleaseThenDrive(drive, claw, terminalToStack),
+				new SetSlidePosition(slide, LinearSlide.BOTTOM)
+		);
+		SequentialCommandGroup driveToTerminal = new SequentialCommandGroup(
+				new CloseClaw(claw),
+				new ParallelCommandGroup(
+						new SetSlidePosition(slide, LinearSlide.HIGH),
+						new SequentialCommandGroup(
+								new AsyncDelay(0.5),
+								new TrajectoryCommand(drive, stackToTerminal)
+						)
+				)
+		);
+		SequentialCommandGroup cycle = new SequentialCommandGroup(
+				driveToStack,
+				driveToTerminal
+		);
+		ParallelCommandGroup prepareToPark = new ParallelCommandGroup(
+				new ReleaseThenDrive(drive, claw, preparePark),
+				new SetSlidePosition(slide, LinearSlide.BOTTOM)
+		);
+		Park park = new Park(drive, () -> parkPosition, park1, park2, park3);
+
+		SequentialCommandGroup autonomousRoutine = new SequentialCommandGroup(
+				driveStartToTerminal,
+				cycle,
+				cycle,
+				cycle,
+				prepareToPark,
+				park
+		);
+
+		schedule(autonomousRoutine);
+
+		telemetry.addData("Status", "Initialized");
+		telemetry.update();
 
 		while (!isStarted()) {
 			camera.periodic();
