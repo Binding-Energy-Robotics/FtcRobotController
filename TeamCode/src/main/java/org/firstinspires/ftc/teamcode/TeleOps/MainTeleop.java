@@ -13,10 +13,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.ToggleClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
 import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Wrist.MoveWrist;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.TeleDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Wrist;
@@ -26,7 +29,7 @@ public class MainTeleop extends CommandOpMode {
 
     TeleDrive drive;
     Claw claw;
-    Wrist wrist;
+    Flipper flipper;
     LinearSlide slide;
     GamepadEx driver;
     GamepadEx helper;
@@ -41,13 +44,15 @@ public class MainTeleop extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         helper = new GamepadEx(gamepad2);
         Button A = new GamepadButton(driver, GamepadKeys.Button.A);
+        Button dpadUp = new GamepadButton(helper, GamepadKeys.Button.DPAD_UP);
+        Button dpadDown = new GamepadButton(helper, GamepadKeys.Button.DPAD_DOWN);
 
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap, "claw");
         slide = new LinearSlide(hardwareMap,
                 "slideMain", "slideAux", telemetry, false);
-        wrist = new Wrist(hardwareMap, "wrist", telemetry);
+        flipper = new Flipper(hardwareMap, telemetry);
 
         // Command setup
         ToggleClaw toggleClaw = new ToggleClaw(claw);
@@ -60,16 +65,17 @@ public class MainTeleop extends CommandOpMode {
                 () -> helper.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
                         helper.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
 
-        MoveWrist moveWrist = new MoveWrist(wrist,
-                () -> (helper.getButton(GamepadKeys.Button.DPAD_UP) ? 1 : 0) +
-                        (helper.getButton(GamepadKeys.Button.DPAD_DOWN) ? -1 : 0));
+        FlipOut flipOut = new FlipOut(flipper);
+        FlipIn flipIn = new FlipIn(flipper);
 
         // Command Binding
         A.whenPressed(toggleClaw);
+        dpadUp.whenPressed(flipOut);
+        dpadDown.whenPressed(flipIn);
 
-        schedule(mecDrive, slidePower, moveWrist, new TelemetryUpdate(telemetry));
+        schedule(mecDrive, slidePower, new TelemetryUpdate(telemetry));
 
-        register(drive, claw, slide, wrist);
+        register(drive, claw, slide, flipper);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
