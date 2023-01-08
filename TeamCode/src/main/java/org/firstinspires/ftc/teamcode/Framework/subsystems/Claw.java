@@ -17,7 +17,7 @@ public class Claw extends SubsystemBase {
     public Claw(HardwareMap hw, String name){
         this.hw = hw;
         clawServo = new SimpleServo(hw, name, 0, 180);
-        open();
+        close();
     }
 
     public Claw(HardwareMap hw) {
