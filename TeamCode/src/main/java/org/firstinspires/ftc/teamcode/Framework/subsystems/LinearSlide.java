@@ -30,7 +30,7 @@ public class LinearSlide extends SubsystemBase {
     private int stackSize;
 
     private HardwareMap hw;
-    private MotorEx[] slideMotors;
+    private MotorEx[] slideMotors = new MotorEx[4];
     private SlideController controller;
     private Telemetry t;
 
@@ -42,10 +42,9 @@ public class LinearSlide extends SubsystemBase {
         for (int i = 0; i < 4; i++) {
             slideMotors[i] = new MotorEx(hw, motorNames[i]);
         }
-        slideMotors[0].setInverted(true);
-        slideMotors[0].encoder.setDirection(Motor.Direction.REVERSE);
+        slideMotors[1].setInverted(true);
+        slideMotors[3].setInverted(true);
         slideMotors[0].resetEncoder();
-        slideMotors[2].setInverted(true);
         this.t = t;
         this.usingPID = usingPID;
         stackSize = 5;
@@ -60,14 +59,14 @@ public class LinearSlide extends SubsystemBase {
     public void setPower(double power){
         double position = slideMotors[0].getCurrentPosition();
 
-        if (position < 10 && power < 0 || position > 2900 && power > 0) {
+        if (position < 10 && power < 0 || position > 600 && power > 0) {
             power = 0;
         }
 
         power += controller.getKg(getEncoder()); // gravity feedforward
 
         for (int i = 0; i < 4; i++) {
-            slideMotors[i].set(power / 4.0);
+            slideMotors[i].set(power);
         }
     }
 

@@ -2,13 +2,17 @@ package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
+import com.arcrobotics.ftclib.hardware.ServoEx;
+import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class TeleDrive extends SubsystemBase {
 
     private MotorEx frontR, frontL, backL, backR;
     private MecanumDrive drive;
+    private ServoEx odometryServo;
 
     public TeleDrive(HardwareMap hw){
         this.frontR = new MotorEx(hw, "rightFront");
@@ -16,6 +20,8 @@ public class TeleDrive extends SubsystemBase {
         this.backR = new MotorEx(hw, "rightRear");
         this.backL = new MotorEx(hw, "leftRear");
         this.drive = new MecanumDrive(frontL,frontR, backL, backR);
+        odometryServo = new SimpleServo(hw, "odometryServo", 0, 180);
+        odometryServo.setPosition(1);
     }
 
     public void drive(double strafeSpeed, double forwardSpeed, double turn, double heading){
