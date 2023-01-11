@@ -22,7 +22,7 @@ public class SlideConstants {
     public static double KF = 0.1;
 
     public SlideConstants(LinearSlide slide){
-        STARTING_TICKS = slide.getEncoderCount();
+        STARTING_TICKS = slide.getEncoder();
         DOWN_TICKS = STARTING_TICKS;
         LOW_TICKS = STARTING_TICKS + 200;
         MED_TICKS = STARTING_TICKS + 400;

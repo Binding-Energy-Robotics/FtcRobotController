@@ -51,8 +51,7 @@ public class MainTeleop extends CommandOpMode {
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap, "claw");
-        slide = new LinearSlide(hardwareMap,
-                "slideMain", "slideAux", telemetry, false);
+        slide = new LinearSlide(hardwareMap, telemetry, false);
         flipper = new Flipper(hardwareMap, telemetry);
 
         // Command setup

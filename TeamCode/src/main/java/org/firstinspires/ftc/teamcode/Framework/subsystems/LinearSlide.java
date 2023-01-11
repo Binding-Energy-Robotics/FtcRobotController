@@ -30,41 +30,35 @@ public class LinearSlide extends SubsystemBase {
     private int stackSize;
 
     private HardwareMap hw;
-    private String nameMain;
-    private MotorEx slideMotor;
-    private String nameAux;
-    private MotorEx auxillaryMotor;
+    private MotorEx[] slideMotors;
     private SlideController controller;
     private Telemetry t;
 
     private boolean usingPID;
 
-    public LinearSlide(final HardwareMap hw,
-                       String nameMain, String nameAux, Telemetry t, boolean usingPID){
+    public LinearSlide(final HardwareMap hw, String[] motorNames, Telemetry t, boolean usingPID) {
         this.hw = hw;
-        this.nameMain = nameMain;
-        this.nameAux = nameAux;
         this.controller = new SlideController();
-        slideMotor = new MotorEx(hw, nameMain);
-        slideMotor.setInverted(true);
-        slideMotor.encoder.setDirection(Motor.Direction.REVERSE);
-        slideMotor.resetEncoder();
-        auxillaryMotor = new MotorEx(hw, nameAux);
+        for (int i = 0; i < 4; i++) {
+            slideMotors[i] = new MotorEx(hw, motorNames[i]);
+        }
+        slideMotors[0].setInverted(true);
+        slideMotors[0].encoder.setDirection(Motor.Direction.REVERSE);
+        slideMotors[0].resetEncoder();
+        slideMotors[2].setInverted(true);
         this.t = t;
         this.usingPID = usingPID;
         stackSize = 5;
     }
 
     public LinearSlide(final HardwareMap hw, Telemetry t, boolean usingPID) {
-        this(hw, "slideMain", "slideAux", t, usingPID);
-    }
-
-    public int getEncoderCount(){
-        return slideMotor.getCurrentPosition();
+        this(hw, new String[]{
+                "rightSpool", "rightAux", "leftAux", "leftSpool"
+        }, t, usingPID);
     }
 
     public void setPower(double power){
-        double position = slideMotor.getCurrentPosition();
+        double position = slideMotors[0].getCurrentPosition();
 
         if (position < 10 && power < 0 || position > 2900 && power > 0) {
             power = 0;
@@ -72,12 +66,13 @@ public class LinearSlide extends SubsystemBase {
 
         power += controller.getKg(getEncoder()); // gravity feedforward
 
-        slideMotor.set(power);
-        auxillaryMotor.set(power);
+        for (int i = 0; i < 4; i++) {
+            slideMotors[i].set(power / 4.0);
+        }
     }
 
     public int getEncoder(){
-        return slideMotor.getCurrentPosition();
+        return slideMotors[0].getCurrentPosition();
     }
 
     public void setSlidePosition(int position) {
@@ -97,12 +92,13 @@ public class LinearSlide extends SubsystemBase {
 
     @Override
     public void periodic() {
-        t.addData("Height", slideMotor.getCurrentPosition());
+        t.addData("Height", slideMotors[0].getCurrentPosition());
         if (usingPID) {
-            int position = slideMotor.getCurrentPosition();
+            int position = slideMotors[0].getCurrentPosition();
             double power = controller.getPower(position);
-            slideMotor.set(power);
-            auxillaryMotor.set(power);
+            for (int i = 0; i < 4; i++) {
+                slideMotors[i].set(power);
+            }
         }
     }
 }
