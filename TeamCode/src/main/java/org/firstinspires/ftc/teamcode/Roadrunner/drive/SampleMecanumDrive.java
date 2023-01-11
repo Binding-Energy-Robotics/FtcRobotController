@@ -163,16 +163,22 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
-        setLocalizer(new TwoTrackingWheelLocalizer() {
+        setLocalizer(new TwoTrackingWheelLocalizer(Arrays.asList(
+                    new Pose2d(0, -6, 0),
+                    new Pose2d(2, 0, Math.toRadians(-90))
+        )) {
             @NonNull
             @Override
             public List<Double> getWheelPositions() {
-                return null;
+                return Arrays.asList(
+                        leftFront.getCurrentPosition() * 1.0,
+                        rightFront.getCurrentPosition() * 1.0
+                );
             }
 
             @Override
             public double getHeading() {
-                return 0;
+                return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             }
         });
 
