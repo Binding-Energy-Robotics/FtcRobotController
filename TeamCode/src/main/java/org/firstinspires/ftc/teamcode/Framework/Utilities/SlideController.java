@@ -26,12 +26,13 @@ public class SlideController {
 	private static final int[] SLIDE_SEGMENTS = new int[] { 800, 1600, 2400, 3200 };
 	private static final double[] GRAVITY_FEEDFORWARDS = new double[] { 0.05, 0.05, 0.05, 0.05 };
 
-	private static final double Kv = 0.6e-3; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double Ka = 0; // set to zero due to issues caused by interference with PID
+	public static double Kv = 0.6e-3; // tuned by Alex Prichard on 14 Dec 2022
+	public static double Ka = 0; // set to zero due to issues caused by interference with PID
+	public static double Ks = 0.1;
 
-	private static final double MAX_V = 1_650; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double MAX_A = 15_000; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double MAX_J = 300_000; // tuned by Alex Prichard on 14 Dec 2022
+	public static double MAX_V = 1_650; // tuned by Alex Prichard on 14 Dec 2022
+	public static double MAX_A = 15_000; // tuned by Alex Prichard on 14 Dec 2022
+	public static double MAX_J = 300_000; // tuned by Alex Prichard on 14 Dec 2022
 
 	private double prevSP = 0;
 	public static double SP = 0;
@@ -131,15 +132,19 @@ public class SlideController {
 			controller.setTargetVelocity(v);
 			controller.setTargetAcceleration(a);
 
-			power = controller.update(Pv, prevVel) + getKg(Pv) + v * Kv + a * Ka;
+			double kStatic = 0;
+			if (v > 0)
+				kStatic = Ks;
+			else if (v < 0)
+				kStatic = -Ks;
+
+			power = controller.update(Pv, prevVel) + getKg(Pv) + v * Kv + a * Ka + kStatic;
 
 			prevTime = time;
-//			telemetry.addData("targetPosition", String.valueOf(x));
-//			telemetry.addData("actualPosition", String.valueOf(Pv));
-//			telemetry.addData("targetVelocity", String.valueOf(v));
-//			telemetry.addData("actualVelocity", String.valueOf(prevVel));
-//
-//			telemetry.update();
+			telemetry.addData("targetPosition", String.valueOf(x));
+			telemetry.addData("actualPosition", String.valueOf(Pv));
+			telemetry.addData("targetVelocity", String.valueOf(v));
+			telemetry.addData("actualVelocity", String.valueOf(prevVel));
 		}
 
 		if (Pv < 10 && power < 0 || Pv > 3200 && power > 0) {
