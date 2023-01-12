@@ -9,9 +9,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 
 public class LinearSlide extends SubsystemBase {
-    public static final int HIGH = 2200;
-    public static final int MEDIUM = 1350;
-    public static final int LOW = 500;
+    public static final int HIGH = 520;
+    public static final int MEDIUM = 300;
+    public static final int LOW = 200;
     public static final int BOTTOM = 0;
     public static final int FIVE_CONE = 430;
     public static final int FOUR_CONE = 330;
@@ -59,7 +59,7 @@ public class LinearSlide extends SubsystemBase {
     public void setPower(double power){
         double position = slideMotors[0].getCurrentPosition();
 
-        if (position < 10 && power < 0 || position > 600 && power > 0) {
+        if (position < 10 && power < 0 || position > 520 && power > 0) {
             power = 0;
         }
 

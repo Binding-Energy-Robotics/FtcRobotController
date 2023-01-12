@@ -13,7 +13,8 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.Util;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+// good shit, see Ben Caunt
+// Kd = 2 * sqrt(Ka * Kp) - Kv, Kp >= Kv * Kv / (4 * Ka)
 @Config
 public class SlideController {
 	public static double Kp = 0.001682; // Kv Ka synthesis, see Ben Caunt for more info

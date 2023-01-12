@@ -31,10 +31,4 @@ public class Flipper extends SubsystemBase {
 		mainPitchServo.setPosition(position);
 		auxPitchServo.setPosition(position);
 	}
-
-	@Override
-	public void periodic() {
-		t.addData("Pitch position", mainPitchServo.getPosition());
-		t.addData("Pitch position", auxPitchServo.getPosition());
-	}
 }
