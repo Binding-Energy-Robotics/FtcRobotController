@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
+import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -50,7 +51,7 @@ public class MainTeleop extends CommandOpMode {
 
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
-        claw = new Claw(hardwareMap, "claw");
+        claw = new Claw(hardwareMap);
         slide = new LinearSlide(hardwareMap, telemetry, false);
         flipper = new Flipper(hardwareMap, telemetry);
 

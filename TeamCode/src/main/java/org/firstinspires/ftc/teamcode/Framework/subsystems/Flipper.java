@@ -20,7 +20,7 @@ public class Flipper extends SubsystemBase {
 		this.auxPitchServo = new SimpleServo(hw, auxPitchName, 0, 180);
 		auxPitchServo.setInverted(true);
 		this.t = t;
-		setPosition(0);
+		setPosition(1);
 	}
 
 	public Flipper(HardwareMap hw, Telemetry t) {

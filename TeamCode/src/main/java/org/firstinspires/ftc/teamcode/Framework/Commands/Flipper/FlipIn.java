@@ -13,7 +13,7 @@ public class FlipIn extends CommandBase {
 
 	@Override
 	public void execute() {
-		flipper.setPosition(0);
+		flipper.setPosition(1);
 	}
 
 	@Override
