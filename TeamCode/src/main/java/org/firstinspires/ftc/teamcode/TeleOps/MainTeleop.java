@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOps;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.controller.wpilibcontroller.ProfiledPIDController;
@@ -40,6 +41,8 @@ public class MainTeleop extends CommandOpMode {
 
     @Override
     public void initialize() {
+        CommandScheduler.getInstance().reset();
+
         telemetry = new MultipleTelemetry(super.telemetry,
                 FtcDashboard.getInstance().getTelemetry());
 
@@ -62,10 +65,6 @@ public class MainTeleop extends CommandOpMode {
                 () -> gamepad1.left_stick_x, () -> -gamepad1.right_stick_x,
                 () -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1, telemetry);
 
-        SetSlidePower slidePower = new SetSlidePower(slide,
-                () -> helper.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
-                        helper.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER));
-
         FlipOut flipOut = new FlipOut(flipper);
         FlipIn flipIn = new FlipIn(flipper);
 
@@ -77,7 +76,7 @@ public class MainTeleop extends CommandOpMode {
         dpadUp.whenPressed(flipOut);
         dpadDown.whenPressed(flipIn);
 
-        schedule(mecDrive, slidePower, new TelemetryUpdate(telemetry));
+        schedule(mecDrive, new TelemetryUpdate(telemetry));
 
         register(drive, claw, slide, flipper);
 

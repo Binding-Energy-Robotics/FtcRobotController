@@ -91,7 +91,7 @@ public class LinearSlide extends SubsystemBase {
 
     @Override
     public void periodic() {
-        t.addData("Height", slideMotors[0].getCurrentPosition());
+//        t.addData("Height", slideMotors[0].getCurrentPosition());
         if (usingPID) {
             int position = slideMotors[0].getCurrentPosition();
             double power = controller.getPower(position);
