@@ -69,7 +69,7 @@ public class MaxVelocityTuner extends LinearOpMode {
 
         drive.setDrivePower(new Pose2d());
 
-        double effectiveKf = DriveConstants.getMotorVelocityF(veloInchesToTicks(maxVelocity));
+        double effectiveKf = org.firstinspires.ftc.teamcode.drive.DriveConstants.getMotorVelocityF(veloInchesToTicks(maxVelocity));
 
         telemetry.addData("Max Velocity", maxVelocity);
         telemetry.addData("Voltage Compensated kF", effectiveKf * batteryVoltageSensor.getVoltage() / 12);
@@ -79,6 +79,6 @@ public class MaxVelocityTuner extends LinearOpMode {
     }
 
     private double veloInchesToTicks(double inchesPerSec) {
-        return inchesPerSec / (2 * Math.PI * DriveConstants.WHEEL_RADIUS) / DriveConstants.GEAR_RATIO * DriveConstants.TICKS_PER_REV;
+        return inchesPerSec / (2 * Math.PI * org.firstinspires.ftc.teamcode.drive.DriveConstants.WHEEL_RADIUS) / org.firstinspires.ftc.teamcode.drive.DriveConstants.GEAR_RATIO * org.firstinspires.ftc.teamcode.drive.DriveConstants.TICKS_PER_REV;
     }
 }

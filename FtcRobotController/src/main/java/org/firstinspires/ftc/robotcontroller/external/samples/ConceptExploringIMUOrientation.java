@@ -91,7 +91,7 @@ public class ConceptExploringIMUOrientation extends LinearOpMode {
     @Override public void runOpMode() throws InterruptedException {
         imu = hardwareMap.get(IMU.class, "imu");
         logoFacingDirectionPosition = 4; // Left
-        usbFacingDirectionPosition = 0; // Up\
+        usbFacingDirectionPosition = 2; // Forward
 
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
