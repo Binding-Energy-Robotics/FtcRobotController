@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.control.PIDFController;
+import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.sequencesegm
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.sequencesegment.TurnSegment;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.sequencesegment.WaitSegment;
 import org.firstinspires.ftc.teamcode.Roadrunner.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -196,7 +198,14 @@ public class TrajectorySequenceRunner {
 
         dashboard.sendTelemetryPacket(packet);
 
-        return driveSignal;
+        if (driveSignal != null) {
+            Pose2d accel = driveSignal.getAccel();
+            return new DriveSignal(driveSignal.getVel(),
+                    new Pose2d(accel.getX(),accel.getY(),
+                            accel.getHeading() * DriveConstants.gyrationConstant));
+        }
+
+        return null;
     }
 
     private void draw(
