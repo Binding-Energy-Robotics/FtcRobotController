@@ -9,14 +9,15 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 
 public class LinearSlide extends SubsystemBase {
-    public static final int HIGH = 520;
-    public static final int MEDIUM = 300;
-    public static final int LOW = 200;
+    public static final int HIGH = 575;
+    public static final int MEDIUM = 250;
+    public static final int LOW = 500;
+    public static final int GROUND = 20;
     public static final int BOTTOM = 0;
-    public static final int FIVE_CONE = 430;
-    public static final int FOUR_CONE = 330;
-    public static final int THREE_CONE = 230;
-    public static final int TWO_CONE = 80;
+    public static final int FIVE_CONE = 200;
+    public static final int FOUR_CONE = 160;
+    public static final int THREE_CONE = 110;
+    public static final int TWO_CONE = 50;
     public static final int ONE_CONE = 0;
     public static final int[] CONE_STACK = new int[] {
             0,
@@ -87,6 +88,10 @@ public class LinearSlide extends SubsystemBase {
         if (stackSize > 0)
             stackSize--;
         return height;
+    }
+
+    public boolean isDown() {
+        return controller.SP == 0;
     }
 
     @Override

@@ -139,6 +139,7 @@ public class SlideController {
 			else {
 				power = controller.calculate(prevSP, Pv) + Kg;
 			}
+			telemetry.addData("power", power);
 
 			prevTime = time;
 //			telemetry.addData("targetPosition", String.valueOf(x));
