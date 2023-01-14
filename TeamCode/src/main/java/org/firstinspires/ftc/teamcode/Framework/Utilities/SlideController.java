@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.Framework.Utilities;
 
+import android.provider.ContactsContract;
+
+import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.PIDEx;
+import com.ThermalEquilibrium.homeostasis.Filters.Estimators.KalmanEstimator;
+import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.KalmanFilter;
+import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficientsEx;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -13,24 +19,26 @@ import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.util.Util;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+// good shit, see Ben Caunt
+// Kd = 2 * sqrt(Ka * Kp) - Kv, Kp >= Kv * Kv / (4 * Ka)
 @Config
 public class SlideController {
-	public static double Kp = 0.001682; // Kv Ka synthesis, see Ben Caunt for more info
-	public static double Ki = 0.003; // tuned by Alex Prichard on 14 Dec 2022
-	public static double Kd = 0;
-	private PIDCoefficients coefficients;
+	public static double Kp = 0.01; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
+	public static double Kd = 0.00013; // see Ben Caunt's paper for more details
+	public static double Imax = 0;//0.2 / Ki;
+	public static double stabilityThreshold = 25;
+	private PIDCoefficientsEx coefficients;
 
-	// tuned by Alex Prichard on 14 Dec 2022
-	private static final int[] SLIDE_SEGMENTS = new int[] { 800, 1600, 2400, 3200 };
-	private static final double[] GRAVITY_FEEDFORWARDS = new double[] { 0.05, 0.05, 0.05, 0.05 };
+	public static double Kg = 0.05; // tuned by Alex Prichard on 12 Jan 2023
 
-	private static final double Kv = 0.6e-3; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double Ka = 0; // set to zero due to issues caused by interference with PID
+	public static double Kv = 0.0005; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ka = 0.00001; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ks = 0;
 
-	private static final double MAX_V = 1_650; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double MAX_A = 15_000; // tuned by Alex Prichard on 14 Dec 2022
-	private static final double MAX_J = 300_000; // tuned by Alex Prichard on 14 Dec 2022
+	public static double MAX_V = 2_000; // tuned by Alex Prichard on 12 Jan 2023
+	public static double MAX_A = 15_000; // tuned by Alex Prichard on 12 Jan 2023
+	public static double MAX_J = 300_000; // tuned by Alex Prichard on 12 Jan 2023
 
 	private double prevSP = 0;
 	public static double SP = 0;
@@ -40,7 +48,9 @@ public class SlideController {
 
 	private double power = 0;
 
-	private PIDFController controller;
+	private PIDEx controller;
+
+	private KalmanFilter kalmanFilter;
 
 	private MotionProfile motionProfile;
 	private ElapsedTime elapsedTime;
@@ -51,13 +61,14 @@ public class SlideController {
 	private boolean isMovementFinished = false;
 
 	public SlideController() {
-		coefficients = new PIDCoefficients(Kp, Ki, Kd);
-		controller = new PIDFController(coefficients, 0, 0);
+		coefficients = new PIDCoefficientsEx(Kp, Ki, Kd, Imax, stabilityThreshold, 0.8);
+		controller = new PIDEx(coefficients);
 		prevTime = System.nanoTime();
 		dash = FtcDashboard.getInstance();
 		telemetry = dash.getTelemetry();
 		motionProfile = staticProfile();
 		elapsedTime = new ElapsedTime();
+		kalmanFilter = new KalmanFilter(1, 5, 3);
 	}
 
 	private MotionProfile staticProfile() {
@@ -71,12 +82,7 @@ public class SlideController {
 	}
 
 	public double getKg(int position) {
-		for (int i = 0; i < SLIDE_SEGMENTS.length; i++) {
-			if (position < SLIDE_SEGMENTS[i]) {
-				return GRAVITY_FEEDFORWARDS[i];
-			}
-		}
-		return 0;
+		return Kg;
 	}
 
 	public void setTargetPosition(int Sp) {
@@ -89,7 +95,8 @@ public class SlideController {
 
 		if (dt > 1e-2) {
 			double vel = (Pv - prevPv) / dt;
-			prevVel = prevVel * 0.8 + vel * 0.2;
+			prevVel = kalmanFilter.estimate(vel);
+
 			prevPv = Pv;
 
 			if (SP != prevSP) { // generate new motion profile if target position has changed
@@ -103,7 +110,6 @@ public class SlideController {
 						MAX_J
 				);
 				isMovementFinished = false;
-				controller.reset();
 				elapsedTime = new ElapsedTime();
 			}
 
@@ -118,30 +124,31 @@ public class SlideController {
 				isMovementFinished = true;
 			}
 
-			coefficients.kP = Kp;
-			coefficients.kI = Ki;
-			coefficients.kD = Kd;
+			coefficients.Kp = Kp;
+			coefficients.Ki = Ki;
+			coefficients.Kd = Kd;
 
 			MotionState targetState = motionProfile.get(elapsedTime.seconds());
 			double x = targetState.getX();
 			double v = targetState.getV();
 			double a = targetState.getA();
-			controller.setTargetPosition(x);
-			controller.setTargetVelocity(v);
-			controller.setTargetAcceleration(a);
-
-			power = controller.update(Pv, prevVel) + getKg(Pv) + v * Kv + a * Ka;
+			if (!isMovementFinished) {
+				power = controller.calculate(x, Pv) + Kg + v * Kv + a * Ka;
+				power += Math.copySign(Ks, v);
+			}
+			else {
+				power = controller.calculate(prevSP, Pv) + Kg;
+			}
+			telemetry.addData("power", power);
 
 			prevTime = time;
 //			telemetry.addData("targetPosition", String.valueOf(x));
 //			telemetry.addData("actualPosition", String.valueOf(Pv));
 //			telemetry.addData("targetVelocity", String.valueOf(v));
 //			telemetry.addData("actualVelocity", String.valueOf(prevVel));
-//
-//			telemetry.update();
 		}
 
-		if (Pv < 10 && power < 0 || Pv > 3200 && power > 0) {
+		if (Pv < 10 && power < 0 || Pv > 600 && power > 0) {
 			return 0;
 		}
 
