@@ -40,7 +40,7 @@ public class SlideController {
 	public static double MAX_A = 15_000; // tuned by Alex Prichard on 12 Jan 2023
 	public static double MAX_J = 300_000; // tuned by Alex Prichard on 12 Jan 2023
 
-	private double prevSP = 0;
+	public double prevSP = 0;
 	public static double SP = 0;
 
 	private double prevPv = 0;
@@ -100,17 +100,22 @@ public class SlideController {
 			prevPv = Pv;
 
 			if (SP != prevSP) { // generate new motion profile if target position has changed
-				prevSP = SP;
-				motionProfile = MotionProfileGenerator.generateSimpleMotionProfile(
-						new MotionState(prevPv, prevVel,
-								motionProfile.get(elapsedTime.seconds()).getA()),
-						new MotionState(SP, 0, 0),
-						MAX_V,
-						MAX_A,
-						MAX_J
-				);
-				isMovementFinished = false;
-				elapsedTime = new ElapsedTime();
+				try {
+					motionProfile = MotionProfileGenerator.generateSimpleMotionProfile(
+							new MotionState(prevPv, prevVel,
+									motionProfile.get(elapsedTime.seconds()).getA()),
+							new MotionState(SP, 0, 0),
+							MAX_V,
+							MAX_A,
+							MAX_J
+					);
+					prevSP = SP;
+					isMovementFinished = false;
+					elapsedTime = new ElapsedTime();
+				}
+				catch (NullPointerException e) {
+					e.printStackTrace();
+				}
 			}
 
 			if (motionProfile.start().getX() < motionProfile.end().getX()) { // profile goes up

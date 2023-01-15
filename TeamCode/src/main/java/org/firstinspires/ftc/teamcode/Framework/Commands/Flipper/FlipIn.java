@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.Framework.Commands.Flipper;
 
-import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.InstantCommand;
 
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
 
-public class FlipIn extends CommandBase {
+public class FlipIn extends InstantCommand {
 	Flipper flipper;
 
 	public FlipIn(Flipper flipper) {
@@ -14,10 +14,5 @@ public class FlipIn extends CommandBase {
 	@Override
 	public void execute() {
 		flipper.setPosition(1);
-	}
-
-	@Override
-	public boolean isFinished() {
-		return true;
 	}
 }
