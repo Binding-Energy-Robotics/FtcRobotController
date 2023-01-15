@@ -46,7 +46,7 @@ public class MainTeleop extends CommandOpMode {
 
         driver = new GamepadEx(gamepad1);
         gunner = new GamepadEx(gamepad2);
-        Button Ad = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
+        Button Ad = new GamepadButton(driver, GamepadKeys.Button.A);
         Button dpadUp = new GamepadButton(gunner, GamepadKeys.Button.DPAD_UP);
         Button dpadDown = new GamepadButton(gunner, GamepadKeys.Button.DPAD_DOWN);
         Button dpadLeft = new GamepadButton(gunner, GamepadKeys.Button.DPAD_LEFT);

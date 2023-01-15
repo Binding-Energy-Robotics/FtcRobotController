@@ -144,13 +144,8 @@ public class SlideController {
 			else {
 				power = controller.calculate(prevSP, Pv) + Kg;
 			}
-			telemetry.addData("power", power);
 
 			prevTime = time;
-//			telemetry.addData("targetPosition", String.valueOf(x));
-//			telemetry.addData("actualPosition", String.valueOf(Pv));
-//			telemetry.addData("targetVelocity", String.valueOf(v));
-//			telemetry.addData("actualVelocity", String.valueOf(prevVel));
 		}
 
 		if (Pv < 10 && power < 0 || Pv > 600 && power > 0) {

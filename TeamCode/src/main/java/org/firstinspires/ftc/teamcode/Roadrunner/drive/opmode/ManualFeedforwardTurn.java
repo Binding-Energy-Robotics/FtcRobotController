@@ -122,7 +122,7 @@ public class ManualFeedforwardTurn extends LinearOpMode {
 					double scaleFactor = 12 / batterVoltageSensor.getVoltage();
 
 					MotionState motionState = activeProfile.get(profileTime);
-					double targetPower = Kinematics.calculateMotorFeedforward(motionState.getV() * TRACK_WIDTH, motionState.getA() * TRACK_WIDTH * gyrationConstant, kV * scaleFactor, kA * scaleFactor, kStatic * scaleFactor);
+					double targetPower = Kinematics.calculateMotorFeedforward(motionState.getV() * TRACK_WIDTH, motionState.getA() * TRACK_WIDTH * gyrationConstant, kV, kA, kStatic);
 
 					drive.setDrivePower(new Pose2d(0, 0, targetPower));
 					drive.updatePoseEstimate();
