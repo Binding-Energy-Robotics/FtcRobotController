@@ -53,7 +53,7 @@ public class MainTeleop extends CommandOpMode {
 
         driver = new GamepadEx(gamepad1);
         gunner = new GamepadEx(gamepad2);
-        Button Ad = new GamepadButton(driver, GamepadKeys.Button.A);
+        Button Ad = new GamepadButton(gunner, GamepadKeys.Button.LEFT_BUMPER);
         Button dpadUp = new GamepadButton(gunner, GamepadKeys.Button.DPAD_UP);
         Button dpadDown = new GamepadButton(gunner, GamepadKeys.Button.DPAD_DOWN);
         Button dpadLeft = new GamepadButton(gunner, GamepadKeys.Button.DPAD_LEFT);
@@ -73,9 +73,9 @@ public class MainTeleop extends CommandOpMode {
         // Command setup
         DropCone dropCone = new DropCone(slide, flipper, claw);
 
-        MecDrive mecDrive = new MecDrive(drive, () -> gamepad1.left_stick_y,
-                () -> gamepad1.left_stick_x, () -> -gamepad1.right_stick_x,
-                () -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1, telemetry);
+        MecDrive mecDrive = new MecDrive(drive, () -> gamepad2.left_stick_y,
+                () -> -gamepad2.left_stick_x, () -> -gamepad2.right_stick_x,
+                () -> gunner.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1, telemetry);
 
         FlipOut flipOut = new FlipOut(flipper);
         FlipIn flipIn = new FlipIn(flipper);
