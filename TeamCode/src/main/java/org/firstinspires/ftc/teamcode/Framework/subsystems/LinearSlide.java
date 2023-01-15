@@ -91,12 +91,11 @@ public class LinearSlide extends SubsystemBase {
     }
 
     public boolean isDown() {
-        return controller.SP == 0;
+        return controller.prevSP == 0;
     }
 
     @Override
     public void periodic() {
-//        t.addData("Height", slideMotors[0].getCurrentPosition());
         if (usingPID) {
             int position = slideMotors[0].getCurrentPosition();
             double power = controller.getPower(position);
