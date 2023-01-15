@@ -40,7 +40,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.StandardTrackingWheelLoca
 @Autonomous(group="drive")
 public class TrackingWheelForwardOffsetTuner extends LinearOpMode {
     public static double ANGLE = 180; // deg
-    public static int NUM_TRIALS = 5;
+    public static int NUM_TRIALS = 10;
     public static int DELAY = 1000; // ms
 
     @Override

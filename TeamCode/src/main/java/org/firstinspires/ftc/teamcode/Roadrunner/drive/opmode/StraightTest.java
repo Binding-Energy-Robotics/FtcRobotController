@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleTankDrive;
 //@Disabled
 @Autonomous(group = "drive")
 public class StraightTest extends LinearOpMode {
-    public static double DISTANCE = 160; // in
+    public static double DISTANCE = 60; // in
 
     @Override
     public void runOpMode() throws InterruptedException {
