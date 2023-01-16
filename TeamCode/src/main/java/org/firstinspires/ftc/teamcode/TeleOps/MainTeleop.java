@@ -2,14 +2,17 @@ package org.firstinspires.ftc.teamcode.TeleOps;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
+import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -34,6 +37,8 @@ public class MainTeleop extends CommandOpMode {
     LinearSlide slide;
     GamepadEx driver;
     GamepadEx gunner;
+    BNO055IMU imu;
+    double initialAngle;
 
     Telemetry telemetry;
 
@@ -44,9 +49,15 @@ public class MainTeleop extends CommandOpMode {
         telemetry = new MultipleTelemetry(super.telemetry,
                 FtcDashboard.getInstance().getTelemetry());
 
+
         driver = new GamepadEx(gamepad1);
-        gunner = new GamepadEx(gamepad2);
-        Button Ad = new GamepadButton(driver, GamepadKeys.Button.A);
+        gunner = new GamepadEx(gamepad1);
+        Button rightTrigger = new Button() {
+            @Override
+            public boolean get() {
+                return driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1;
+            }
+        };
         Button dpadUp = new GamepadButton(gunner, GamepadKeys.Button.DPAD_UP);
         Button dpadDown = new GamepadButton(gunner, GamepadKeys.Button.DPAD_DOWN);
         Button dpadLeft = new GamepadButton(gunner, GamepadKeys.Button.DPAD_LEFT);
@@ -66,7 +77,7 @@ public class MainTeleop extends CommandOpMode {
         // Command setup
         DriverToggle driverToggle = new DriverToggle(slide, flipper, claw);
 
-        MecDrive mecDrive = new MecDrive(drive, () -> gamepad1.left_stick_y,
+        MecDrive mecDrive = new MecDrive(hardwareMap, drive, () -> gamepad1.left_stick_y,
                 () -> -gamepad1.left_stick_x, () -> -gamepad1.right_stick_x,
                 () -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1, telemetry);
 
@@ -114,9 +125,9 @@ public class MainTeleop extends CommandOpMode {
         );
 
         // Command Binding
-        Ad.whenPressed(driverToggle);
-        Ad.whenPressed(() -> gamepad1.rumbleBlips(1));
-        Ad.whenPressed(() -> gamepad2.rumbleBlips(1));
+        rightTrigger.whenPressed(driverToggle);
+
+        rightTrigger.whenPressed(() -> gamepad1.rumble(1, 1, 100));
 
         dpadUp.whenPressed(highJunction);
         dpadRight.whenPressed(mediumJunction);

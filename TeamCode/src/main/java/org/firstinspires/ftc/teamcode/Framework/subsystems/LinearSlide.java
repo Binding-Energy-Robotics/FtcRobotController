@@ -11,14 +11,15 @@ import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 public class LinearSlide extends SubsystemBase {
     public static final int HIGH = 575;
     public static final int MEDIUM = 250;
-    public static final int LOW = 500;
+    public static final int LOW = 525;
     public static final int GROUND = 20;
-    public static final int BOTTOM = 0;
+
     public static final int FIVE_CONE = 200;
     public static final int FOUR_CONE = 160;
     public static final int THREE_CONE = 110;
     public static final int TWO_CONE = 50;
     public static final int ONE_CONE = 0;
+
     public static final int[] CONE_STACK = new int[] {
             0,
             ONE_CONE,
@@ -91,7 +92,11 @@ public class LinearSlide extends SubsystemBase {
     }
 
     public boolean isDown() {
-        return controller.prevSP == 0;
+        for (int coneHeight: CONE_STACK) {
+            if (controller.prevSP == coneHeight)
+                return true;
+        }
+        return false;
     }
 
     @Override
