@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
 import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
@@ -42,36 +43,96 @@ public class MainTeleop extends CommandOpMode {
 
     Telemetry telemetry;
 
+    boolean isDriving;
+
     @Override
     public void initialize() {
         CommandScheduler.getInstance().reset();
+
+        isDriving = true;
 
         telemetry = new MultipleTelemetry(super.telemetry,
                 FtcDashboard.getInstance().getTelemetry());
 
 
         driver = new GamepadEx(gamepad1);
-        gunner = new GamepadEx(gamepad1);
         Button rightTrigger = new Button() {
             @Override
             public boolean get() {
-                return driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1;
+                return driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 && isDriving;
             }
         };
-        Button dpadUp = new GamepadButton(gunner, GamepadKeys.Button.DPAD_UP);
-        Button dpadDown = new GamepadButton(gunner, GamepadKeys.Button.DPAD_DOWN);
-        Button dpadLeft = new GamepadButton(gunner, GamepadKeys.Button.DPAD_LEFT);
-        Button dpadRight = new GamepadButton(gunner, GamepadKeys.Button.DPAD_RIGHT);
-        Button Ag = new GamepadButton(gunner, GamepadKeys.Button.A);
-        Button Bg = new GamepadButton(gunner, GamepadKeys.Button.B);
-        Button Xg = new GamepadButton(gunner, GamepadKeys.Button.X);
-        Button Yg = new GamepadButton(gunner, GamepadKeys.Button.Y);
-        Button rightShoulder = new GamepadButton(gunner, GamepadKeys.Button.RIGHT_BUMPER);
+        Button dpadUp = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.DPAD_UP) && isDriving;
+            }
+        };
+        Button dpadDown = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.DPAD_DOWN) && isDriving;
+            }
+        };
+        Button dpadLeft = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.DPAD_LEFT) && isDriving;
+            }
+        };
+        Button dpadRight = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.DPAD_RIGHT) && isDriving;
+            }
+        };
+        Button A = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.A) && isDriving;
+            }
+        };
+        Button B = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.B) && isDriving;
+            }
+        };
+        Button X = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.X) && isDriving;
+            }
+        };
+        Button Y = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.Y) && isDriving;
+            }
+        };
+        Button rightShoulder = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.RIGHT_BUMPER) && isDriving;
+            }
+        };
+        Button leftShoulder = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.LEFT_BUMPER);
+            }
+        };
+        Button resetEncoder = new Button() {
+            @Override
+            public boolean get() {
+                return driver.isDown(GamepadKeys.Button.A) && !isDriving;
+            }
+        };
 
         // Hardware initialization
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap);
-        slide = new LinearSlide(hardwareMap, telemetry, true);
+        slide = new LinearSlide(hardwareMap, telemetry, () -> isDriving);
         flipper = new Flipper(hardwareMap, telemetry);
 
         // Command setup
@@ -80,6 +141,10 @@ public class MainTeleop extends CommandOpMode {
         MecDrive mecDrive = new MecDrive(hardwareMap, drive, () -> gamepad1.left_stick_y,
                 () -> -gamepad1.left_stick_x, () -> -gamepad1.right_stick_x,
                 () -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1, telemetry);
+        SetSlidePower manualMove = new SetSlidePower(slide,
+                () -> (driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
+                        driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)) * 0.25);
+
 
         ParallelCommandGroup highJunction = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.HIGH),
@@ -133,13 +198,15 @@ public class MainTeleop extends CommandOpMode {
         dpadRight.whenPressed(mediumJunction);
         dpadDown.whenPressed(lowJunction);
         dpadLeft.whenPressed(groundJunction);
-        Ag.whenPressed(coneHeight);
-        Bg.whenPressed(twoConeHeight);
-        Xg.whenPressed(threeConeHeight);
-        Yg.whenPressed(fourConeHeight);
+        A.whenPressed(coneHeight);
+        B.whenPressed(twoConeHeight);
+        X.whenPressed(threeConeHeight);
+        Y.whenPressed(fourConeHeight);
         rightShoulder.whenPressed(fiveConeHeight);
+        leftShoulder.whenPressed(() -> isDriving = !isDriving);
+        resetEncoder.whenPressed(() -> slide.resetEncoder());
 
-        schedule(mecDrive, new TelemetryUpdate(telemetry));
+        schedule(mecDrive, manualMove, new TelemetryUpdate(telemetry));
 
         register(drive, claw, slide, flipper);
 

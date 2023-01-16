@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 
+import java.util.function.BooleanSupplier;
+
 public class LinearSlide extends SubsystemBase {
     public static final int HIGH = 575;
     public static final int MEDIUM = 250;
@@ -36,9 +38,10 @@ public class LinearSlide extends SubsystemBase {
     private SlideController controller;
     private Telemetry t;
 
-    private boolean usingPID;
+    private BooleanSupplier usingPID;
 
-    public LinearSlide(final HardwareMap hw, String[] motorNames, Telemetry t, boolean usingPID) {
+    public LinearSlide(final HardwareMap hw, String[] motorNames,
+                       Telemetry t, BooleanSupplier usingPID) {
         this.hw = hw;
         this.controller = new SlideController();
         for (int i = 0; i < 4; i++) {
@@ -52,13 +55,24 @@ public class LinearSlide extends SubsystemBase {
         stackSize = 5;
     }
 
-    public LinearSlide(final HardwareMap hw, Telemetry t, boolean usingPID) {
+    public LinearSlide(final HardwareMap hw, Telemetry t, BooleanSupplier usingPID) {
         this(hw, new String[]{
                 "rightSpool", "rightAux", "leftAux", "leftSpool"
         }, t, usingPID);
     }
 
+    public LinearSlide(final HardwareMap hw, String[] motorNames, Telemetry t, boolean usingPID) {
+        this(hw, motorNames, t, () -> usingPID);
+    }
+
+    public LinearSlide(final HardwareMap hw, Telemetry t, boolean usingPID) {
+        this(hw, t, () -> usingPID);
+    }
+
     public void setPower(double power){
+        if (usingPID.getAsBoolean())
+            return;
+
         double position = slideMotors[0].getCurrentPosition();
 
         if (position < 10 && power < 0 || position > 520 && power > 0) {
@@ -99,9 +113,13 @@ public class LinearSlide extends SubsystemBase {
         return false;
     }
 
+    public void resetEncoder() {
+        slideMotors[0].resetEncoder();
+    }
+
     @Override
     public void periodic() {
-        if (usingPID) {
+        if (usingPID.getAsBoolean()) {
             int position = slideMotors[0].getCurrentPosition();
             double power = controller.getPower(position);
             for (int i = 0; i < 4; i++) {
