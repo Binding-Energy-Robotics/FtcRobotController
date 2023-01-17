@@ -69,6 +69,10 @@ public class LinearSlide extends SubsystemBase {
         this(hw, t, () -> usingPID);
     }
 
+    public LinearSlide(final HardwareMap hw, Telemetry t) {
+        this(hw, t, true);
+    }
+
     public void setPower(double power){
         if (usingPID.getAsBoolean())
             return;

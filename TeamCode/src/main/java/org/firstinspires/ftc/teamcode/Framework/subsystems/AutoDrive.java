@@ -23,6 +23,14 @@ public class AutoDrive extends SubsystemBase {
         return drive.trajectoryBuilder(startPose);
     }
 
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startTangent) {
+        return drive.trajectoryBuilder(startPose, startTangent);
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
+        return drive.trajectoryBuilder(startPose, reversed);
+    }
+
     public boolean isBusy() {
         return drive.isBusy();
     }
