@@ -37,9 +37,6 @@ public class MainTeleop extends CommandOpMode {
     Flipper flipper;
     LinearSlide slide;
     GamepadEx driver;
-    GamepadEx gunner;
-    BNO055IMU imu;
-    double initialAngle;
 
     Telemetry telemetry;
 

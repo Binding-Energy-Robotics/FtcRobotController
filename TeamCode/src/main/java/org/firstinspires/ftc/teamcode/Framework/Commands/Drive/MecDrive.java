@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Framework.Utilities.AutoEndPose;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.TeleDrive;
 
 import java.util.function.BooleanSupplier;
@@ -19,7 +20,7 @@ public class MecDrive extends CommandBase {
     private final DoubleSupplier turn;
     private final BooleanSupplier slowMode;
     private final Telemetry t;
-    private double initialAngle;
+    private double angleAdjustment;
 
     public MecDrive(HardwareMap hw, TeleDrive drive, DoubleSupplier forward, DoubleSupplier strafe,
                     DoubleSupplier turn, BooleanSupplier slowMode, Telemetry t){
@@ -33,7 +34,8 @@ public class MecDrive extends CommandBase {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
-        initialAngle = imu.getAngularOrientation().firstAngle;
+        angleAdjustment = AutoEndPose.getPose().getHeading() -
+                imu.getAngularOrientation().firstAngle - Math.toRadians(90);
         addRequirements(drive);
     }
 
@@ -44,8 +46,8 @@ public class MecDrive extends CommandBase {
 
     @Override
     public void execute() {
-        drive.driveWithMultiplier(strafe.getAsDouble(), forward.getAsDouble(),
-                turn.getAsDouble(), Math.toDegrees(imu.getAngularOrientation().firstAngle - initialAngle),
+        drive.driveWithMultiplier(strafe.getAsDouble(), forward.getAsDouble(), turn.getAsDouble(),
+                Math.toDegrees(imu.getAngularOrientation().firstAngle + angleAdjustment),
                 slowMode.getAsBoolean() ? 0.33 : 1.0);
     }
 }

@@ -16,7 +16,7 @@ public class TeleDrive extends SubsystemBase {
     private ServoEx odometryServo;
     private BNO055IMU imu;
 
-    public TeleDrive(HardwareMap hw, boolean fieldCentric){
+    public TeleDrive(HardwareMap hw){
         this.frontR = new MotorEx(hw, "rightFront");
         this.frontL = new MotorEx(hw, "leftFront");
         this.backR = new MotorEx(hw, "rightRear");
@@ -26,22 +26,12 @@ public class TeleDrive extends SubsystemBase {
         odometryServo.setPosition(1);
     }
 
-    public TeleDrive(HardwareMap hw) {
-        this(hw, false);
-    }
-
     public void drive(double strafeSpeed, double forwardSpeed, double turn, double heading){
         drive.driveFieldCentric(strafeSpeed, forwardSpeed, turn, heading);
     }
 
     public void drive(double strafeSpeed, double forwardSpeed, double turn){
         drive.driveRobotCentric(strafeSpeed, forwardSpeed, turn);
-    }
-
-    public void driveWithMultiplier(double strafeSpeed, double forwardSpeed,
-                                    double turn, double multiplier){
-        drive.driveRobotCentric(strafeSpeed * multiplier,
-                forwardSpeed * multiplier, turn * multiplier);
     }
 
     public void driveWithMultiplier(double strafeSpeed, double forwardSpeed,
