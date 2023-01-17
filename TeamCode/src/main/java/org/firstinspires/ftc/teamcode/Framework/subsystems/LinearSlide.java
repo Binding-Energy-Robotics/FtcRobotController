@@ -73,12 +73,6 @@ public class LinearSlide extends SubsystemBase {
         if (usingPID.getAsBoolean())
             return;
 
-        double position = slideMotors[0].getCurrentPosition();
-
-        if (position < 10 && power < 0 || position > 520 && power > 0) {
-            power = 0;
-        }
-
         power += controller.getKg(getEncoder()); // gravity feedforward
 
         for (int i = 0; i < 4; i++) {

@@ -1,5 +1,10 @@
 package com.example.meepmeeptool;
 
+import static com.example.meepmeeptool.DriveConstants.MAX_ACCEL;
+import static com.example.meepmeeptool.DriveConstants.MAX_ANG_ACCEL;
+import static com.example.meepmeeptool.DriveConstants.MAX_ANG_VEL;
+import static com.example.meepmeeptool.DriveConstants.MAX_VEL;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
@@ -15,8 +20,10 @@ public class LeftAuto {
 
 		RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
 				// Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-				.setConstraints(45, 30, 2.5, Math.toRadians(60), 16.68)
-				.followTrajectorySequence(drive ->drive.trajectorySequenceBuilder(START_POSE)
+				.setConstraints(MAX_VEL, MAX_ACCEL, MAX_ANG_VEL, MAX_ANG_ACCEL, 13)
+				.followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(START_POSE)
+						.setTangent(Math.toRadians(90))
+						.splineToSplineHeading(SCORE_POSE, Math.toRadians(45))
 						.build()
 				);
 
