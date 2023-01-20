@@ -3,12 +3,23 @@ package org.firstinspires.ftc.teamcode.Autonomous.Competition;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SelectCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Framework.Commands.AsyncDelay;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TrajectoryCommand;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
@@ -17,15 +28,25 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 
 import java.util.HashMap;
 
+@Autonomous(preselectTeleOp="MainTeleop")
 public class LeftAuto extends CommandOpMode {
 	public static final Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
 	public static final Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(120));
 	public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(70));
-	public static final Pose2d SCORE_POSE = new Pose2d(-31, -7, Math.toRadians(45));
-	public static final Pose2d CONE_POSE = new Pose2d(-57.5, -11.25, Math.toRadians(0));
-	public static final Pose2d ZONE_ONE = new Pose2d(-59, -12, Math.toRadians(0));
-	public static final Pose2d ZONE_TWO = new Pose2d(-36, -12, Math.toRadians(90));
-	public static final Pose2d ZONE_THREE = new Pose2d(-12, -12, Math.toRadians(90));
+	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-26, -7, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-26, -8, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_TWO = new Pose2d(-26, -8.5, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_THREE = new Pose2d(-25.5, -9.5, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_FOUR = new Pose2d(-25, -10, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_FIVE = new Pose2d(-25, -10.5, Math.toRadians(45));
+	public static final Pose2d CONE_POSE_ONE = new Pose2d(-55.5, -13.5, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_TWO = new Pose2d(-55.5, -14.5, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_THREE = new Pose2d(-55.5, -15, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_FOUR = new Pose2d(-55.5, -15, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_FIVE = new Pose2d(-55.5, -15.5, Math.toRadians(0));
+	public static final Pose2d ZONE_ONE = new Pose2d(-59, -17, Math.toRadians(0));
+	public static final Pose2d ZONE_TWO = new Pose2d(-36, -17, Math.toRadians(90));
+	public static final Pose2d ZONE_THREE = new Pose2d(-12, -17, Math.toRadians(90));
 
 	Telemetry telemetry;
 
@@ -37,53 +58,120 @@ public class LeftAuto extends CommandOpMode {
 
 	public static int signalSide;
 
+	private Command cycle(int coneHeight, Trajectory junctionToCones, Trajectory conesToJunction) {
+		return new SequentialCommandGroup(
+				new ParallelCommandGroup(
+						new SetSlidePosition(slide, LinearSlide.CONE_STACK[coneHeight]),
+						new SequentialCommandGroup(
+								new AsyncDelay(0.1),
+								new OpenClaw(claw),
+								new AsyncDelay(0.1),
+								new FlipIn(flipper)
+						),
+						new SequentialCommandGroup(
+								new AsyncDelay(0.2),
+								new TrajectoryCommand(drive, junctionToCones)
+						)
+				),
+				new CloseClaw(claw),
+				new AsyncDelay(0.25),
+				new SetSlidePosition(slide, LinearSlide.HIGH),
+				new AsyncDelay(0.15),
+				new ParallelCommandGroup(
+						new TrajectoryCommand(drive, conesToJunction),
+						new FlipOut(flipper)
+				)
+		);
+	}
+
 	@Override
 	public void initialize() {
 		telemetry = new MultipleTelemetry(super.telemetry,
 				FtcDashboard.getInstance().getTelemetry());
 
-		drive = new AutoDrive(hardwareMap);
+		drive = new AutoDrive(hardwareMap, START_POSE);
 		slide = new LinearSlide(hardwareMap, telemetry);
 		flipper = new Flipper(hardwareMap, telemetry);
 		claw = new Claw(hardwareMap);
-//		camera = new Camera(hardwareMap);
+		claw.open();
+		camera = new Camera(hardwareMap);
+
+
+		Trajectory junctionToConesOne = drive.trajectoryBuilder(SCORE_POSE_ZERO, true)
+				.splineTo(CONE_POSE_ONE.vec(), Math.toRadians(180))
+				.build();
+		Trajectory conesToJunctionOne = drive.trajectoryBuilder(
+				junctionToConesOne.end(), Math.toRadians(0))
+				.splineTo(SCORE_POSE_ONE.vec(), SCORE_POSE_ONE.getHeading())
+				.build();
+
+		Trajectory junctionToConesTwo = drive.trajectoryBuilder(conesToJunctionOne.end(), true)
+				.splineTo(CONE_POSE_TWO.vec(), Math.toRadians(180))
+				.build();
+		Trajectory conesToJunctionTwo = drive.trajectoryBuilder(
+				junctionToConesTwo.end(), Math.toRadians(0))
+				.splineTo(SCORE_POSE_TWO.vec(), SCORE_POSE_TWO.getHeading())
+				.build();
+
+		Trajectory junctionToConesThree = drive.trajectoryBuilder(conesToJunctionTwo.end(), true)
+				.splineTo(CONE_POSE_THREE.vec(), Math.toRadians(180))
+				.build();
+		Trajectory conesToJunctionThree = drive.trajectoryBuilder(
+				junctionToConesThree.end(), Math.toRadians(0))
+				.splineTo(SCORE_POSE_THREE.vec(), SCORE_POSE_THREE.getHeading())
+				.build();
+
+		Trajectory junctionToConesFour = drive.trajectoryBuilder(conesToJunctionThree.end(), true)
+				.splineTo(CONE_POSE_FOUR.vec(), Math.toRadians(180))
+				.build();
+		Trajectory conesToJunctionFour = drive.trajectoryBuilder(
+				junctionToConesFour.end(), Math.toRadians(0))
+				.splineTo(SCORE_POSE_FOUR.vec(), SCORE_POSE_FOUR.getHeading())
+				.build();
+
+		Trajectory junctionToConesFive = drive.trajectoryBuilder(conesToJunctionFour.end(), true)
+				.splineTo(CONE_POSE_FIVE.vec(), Math.toRadians(180))
+				.build();
+		Trajectory conesToJunctionFive = drive.trajectoryBuilder(junctionToConesFive.end(), Math.toRadians(0))
+				.splineTo(SCORE_POSE_FIVE.vec(), SCORE_POSE_FIVE.getHeading())
+				.build();
 
 
 		TrajectoryCommand startToJunction = new TrajectoryCommand(drive,
 				drive.trajectoryBuilder(START_POSE, Math.toRadians(90))
 				.splineTo(START_POSE_A.vec(), START_POSE_A.getHeading())
 				.splineToSplineHeading(START_POSE_B, Math.toRadians(75))
-				.splineToSplineHeading(SCORE_POSE, SCORE_POSE.getHeading())
+				.splineToSplineHeading(SCORE_POSE_ZERO, SCORE_POSE_ZERO.getHeading())
 				.build()
 		);
-		TrajectoryCommand junctionToCones = new TrajectoryCommand(drive,
-				drive.trajectoryBuilder(SCORE_POSE, true)
-				.splineTo(CONE_POSE.vec(), Math.toRadians(180))
-				.build()
-		);
-		TrajectoryCommand conesToJunction = new TrajectoryCommand(drive,
-				drive.trajectoryBuilder(CONE_POSE, Math.toRadians(0))
-				.splineTo(SCORE_POSE.vec(), SCORE_POSE.getHeading())
-				.build()
-		);
-
 		TrajectoryCommand parkOne = new TrajectoryCommand(drive,
-				drive.trajectoryBuilder(SCORE_POSE, true)
+				drive.trajectoryBuilder(SCORE_POSE_FIVE, true)
 				.splineToSplineHeading(ZONE_ONE, Math.toRadians(180))
 				.build()
 		);
 		TrajectoryCommand parkTwo = new TrajectoryCommand(drive,
-				drive.trajectoryBuilder(SCORE_POSE)
+				drive.trajectoryBuilder(SCORE_POSE_FIVE)
 				.lineToLinearHeading(ZONE_TWO)
 				.build()
 		);
 		TrajectoryCommand parkThree = new TrajectoryCommand(drive,
-				drive.trajectoryBuilder(SCORE_POSE, Math.toRadians(-45))
+				drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(-45))
 				.splineToSplineHeading(ZONE_THREE, Math.toRadians(0))
 				.build()
 		);
 
 
+		ParallelCommandGroup setUpScoring = new ParallelCommandGroup(
+				startToJunction,
+				new CloseClaw(claw),
+				new SequentialCommandGroup(
+						new AsyncDelay(1),
+						new ParallelCommandGroup(
+								new SetSlidePosition(slide, LinearSlide.HIGH),
+								new FlipOut(flipper)
+						)
+				)
+		);
 		SelectCommand park = new SelectCommand(
 			new HashMap<Object, Command>() {{
 				put(1, parkOne);
@@ -92,5 +180,44 @@ public class LeftAuto extends CommandOpMode {
 			}},
 			() -> signalSide
 		);
+		ParallelCommandGroup dropForPark = new ParallelCommandGroup(
+				new SetSlidePosition(slide, LinearSlide.LOW),
+				new SequentialCommandGroup(
+						new AsyncDelay(0.1),
+						new OpenClaw(claw),
+						new ParallelCommandGroup(
+								park,
+								new SequentialCommandGroup(
+										new AsyncDelay(0.1),
+										new FlipIn(flipper)
+								)
+						)
+				)
+		);
+
+
+		SequentialCommandGroup runAuto = new SequentialCommandGroup(
+				setUpScoring,
+				cycle(5, junctionToConesOne, conesToJunctionOne),
+				cycle(4, junctionToConesTwo, conesToJunctionTwo),
+				cycle(3, junctionToConesThree, conesToJunctionThree),
+				cycle(2, junctionToConesFour, conesToJunctionFour),
+				cycle(1, junctionToConesFive, conesToJunctionFive),
+				dropForPark
+		);
+
+		register(drive, slide, flipper, claw);
+
+		while (!isStarted()) {
+			camera.periodic();
+			telemetry.addData("Camera", camera.getConfidences());
+			telemetry.update();
+			idle();
+		}
+
+		signalSide = camera.getSide();
+		camera.stop();
+
+		schedule(runAuto);
 	}
 }

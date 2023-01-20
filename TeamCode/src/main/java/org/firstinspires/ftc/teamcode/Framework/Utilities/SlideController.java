@@ -36,9 +36,9 @@ public class SlideController {
 	public static double Ka = 0.00001; // tuned by Alex Prichard on 12 Jan 2023
 	public static double Ks = 0;
 
-	public static double MAX_V = 2_000; // tuned by Alex Prichard on 12 Jan 2023
-	public static double MAX_A = 15_000; // tuned by Alex Prichard on 12 Jan 2023
-	public static double MAX_J = 300_000; // tuned by Alex Prichard on 12 Jan 2023
+	public static double MAX_V = 1_000; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_A = 5_000; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_J = 30_000; // tuned by Alex Prichard on 20 Jan 2023
 
 	public double prevSP = 0;
 	public static double SP = 0;

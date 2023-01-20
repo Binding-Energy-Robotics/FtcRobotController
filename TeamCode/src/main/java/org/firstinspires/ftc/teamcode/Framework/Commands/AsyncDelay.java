@@ -1,22 +1,24 @@
 package org.firstinspires.ftc.teamcode.Framework.Commands;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class AsyncDelay extends CommandBase {
-	private long endTime;
-	private long delayNs;
+	private ElapsedTime time;
+	private double delay;
 
 	public AsyncDelay(double delaySeconds) {
-		delayNs = (long)(delaySeconds * 1e9);
+		delay = delaySeconds;
 	}
 
 	@Override
 	public void initialize() {
-		endTime = System.nanoTime() + delayNs;
+		time = new ElapsedTime();
 	}
 
 	@Override
 	public boolean isFinished() {
-		return System.nanoTime() > endTime;
+		return time.time() > delay;
 	}
 }

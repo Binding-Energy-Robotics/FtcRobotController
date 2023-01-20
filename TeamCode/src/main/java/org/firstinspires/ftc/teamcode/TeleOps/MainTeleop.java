@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.AsyncDelay;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Rumble;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
 import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
@@ -146,14 +147,14 @@ public class MainTeleop extends CommandOpMode {
         ParallelCommandGroup highJunction = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.HIGH),
                 new SequentialCommandGroup(
-                        new AsyncDelay(0.2),
+                        new AsyncDelay(0.1),
                         new FlipOut(flipper)
                 )
         );
         ParallelCommandGroup mediumJunction = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.MEDIUM),
                 new SequentialCommandGroup(
-                        new AsyncDelay(0.2),
+                        new AsyncDelay(0.1),
                         new FlipOut(flipper)
                 )
         );
@@ -186,6 +187,31 @@ public class MainTeleop extends CommandOpMode {
                 new FlipIn(flipper)
         );
 
+        SequentialCommandGroup rumbleTimes = new SequentialCommandGroup(
+                new AsyncDelay(86),
+
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(26),
+
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333),
+                new AsyncDelay(1),
+                new Rumble(gamepad1, 333)
+        );
+
         // Command Binding
         rightTrigger.whenPressed(driverToggle);
 
@@ -203,7 +229,7 @@ public class MainTeleop extends CommandOpMode {
         leftShoulder.whenPressed(() -> isDriving = !isDriving);
         resetEncoder.whenPressed(() -> slide.resetEncoder());
 
-        schedule(mecDrive, manualMove, new TelemetryUpdate(telemetry));
+        schedule(mecDrive, manualMove, rumbleTimes, new TelemetryUpdate(telemetry));
 
         register(drive, claw, slide, flipper);
 

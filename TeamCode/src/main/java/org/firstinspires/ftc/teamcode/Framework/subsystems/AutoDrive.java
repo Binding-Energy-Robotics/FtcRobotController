@@ -11,8 +11,13 @@ public class AutoDrive extends SubsystemBase {
 
     private SampleMecanumDrive drive;
 
-    public AutoDrive(HardwareMap hw){
+    public AutoDrive(HardwareMap hw, Pose2d initialPosition){
         this.drive = new SampleMecanumDrive(hw);
+        this.drive.setPoseEstimate(initialPosition);
+    }
+
+    public AutoDrive(HardwareMap hw){
+        this(hw, new Pose2d());
     }
 
     public SampleMecanumDrive getDrive(){
