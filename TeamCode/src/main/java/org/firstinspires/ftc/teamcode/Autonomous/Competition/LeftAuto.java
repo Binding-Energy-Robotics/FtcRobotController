@@ -36,20 +36,23 @@ public class LeftAuto extends CommandOpMode {
 	public static final Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
 	public static final Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(120));
 	public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(70));
-	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-28, -7, Math.toRadians(45));
-	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-27, -8, Math.toRadians(45));
-	public static final Pose2d SCORE_POSE_TWO = new Pose2d(-26, -8.5, Math.toRadians(45));
+
+	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-28, -8.5, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-27, -9.5, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_TWO = new Pose2d(-26, -10.5, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_THREE = new Pose2d(-25.5, -9.5, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_FOUR = new Pose2d(-25, -10, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_FIVE = new Pose2d(-25, -10.5, Math.toRadians(45));
-	public static final Pose2d CONE_POSE_ONE = new Pose2d(-58, -13.8, Math.toRadians(0));
-	public static final Pose2d CONE_POSE_TWO = new Pose2d(-55.5, -14.5, Math.toRadians(0));
+
+	public static final Pose2d CONE_POSE_ONE = new Pose2d(-58, -12.8, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_TWO = new Pose2d(-58, -12.8, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_THREE = new Pose2d(-55.5, -15, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_FOUR = new Pose2d(-55.5, -15, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_FIVE = new Pose2d(-55.5, -15.5, Math.toRadians(0));
-	public static final Pose2d ZONE_ONE = new Pose2d(-56, -12, Math.toRadians(0));
-	public static final Pose2d ZONE_TWO = new Pose2d(-36, -12, Math.toRadians(90));
-	public static final Pose2d ZONE_THREE = new Pose2d(-12, -12, Math.toRadians(90));
+
+	public static final Pose2d ZONE_ONE = new Pose2d(-56, -14, Math.toRadians(0));
+	public static final Pose2d ZONE_TWO = new Pose2d(-36, -14, Math.toRadians(90));
+	public static final Pose2d ZONE_THREE = new Pose2d(-12, -14, Math.toRadians(90));
 
 	Telemetry telemetry;
 
@@ -198,7 +201,7 @@ public class LeftAuto extends CommandOpMode {
 						new ParallelCommandGroup(
 								park,
 								new SequentialCommandGroup(
-										new AsyncDelay(0.1),
+										new AsyncDelay(0.67),
 										new FlipIn(flipper)
 								)
 						)
@@ -209,7 +212,7 @@ public class LeftAuto extends CommandOpMode {
 		SequentialCommandGroup runAuto = new SequentialCommandGroup(
 				setUpScoring,
 				cycle(5, junctionToConesOne, conesToJunctionOne),
-//				cycle(4, junctionToConesTwo, conesToJunctionTwo),
+				cycle(4, junctionToConesTwo, conesToJunctionTwo),
 //				cycle(3, junctionToConesThree, conesToJunctionThree),
 //				cycle(2, junctionToConesFour, conesToJunctionFour),
 //				cycle(1, junctionToConesFive, conesToJunctionFive),
@@ -219,12 +222,12 @@ public class LeftAuto extends CommandOpMode {
 
 		register(drive, slide, flipper, claw);
 
+		telemetry.addData("Status", "Initialized");
+		telemetry.update();
+		waitForStart();
 		while (!isStarted()) {
 //			camera.periodic();
 //			telemetry.addData("Camera", camera.getConfidences());
-			telemetry.addData("Status", "Initialized");
-			telemetry.update();
-			idle();
 		}
 
 //		signalSide = camera.getSide();
