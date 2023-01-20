@@ -14,4 +14,6 @@ public class AutoEndPose {
 	public static void setPose(Pose2d pose) {
 		AutoEndPose.pose = pose;
 	}
+
+	public static void clearPose() { setPose(new Pose2d(0, 0, 90)); }
 }

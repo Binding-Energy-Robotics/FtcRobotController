@@ -36,6 +36,7 @@ public class MecDrive extends CommandBase {
         imu.initialize(parameters);
         angleAdjustment = AutoEndPose.getPose().getHeading() -
                 imu.getAngularOrientation().firstAngle - Math.toRadians(90);
+        AutoEndPose.clearPose();
         addRequirements(drive);
     }
 

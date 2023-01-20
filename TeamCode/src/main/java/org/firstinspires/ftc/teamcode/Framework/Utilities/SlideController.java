@@ -119,12 +119,12 @@ public class SlideController {
 			}
 
 			if (motionProfile.start().getX() < motionProfile.end().getX()) { // profile goes up
-				if (prevPv > motionProfile.end().getX()) {
+				if (prevPv > motionProfile.end().getX() - 10) {
 					motionProfile = staticProfile();
 					isMovementFinished = true;
 				}
 			}
-			else if (prevPv < motionProfile.end().getX()) {
+			else if (prevPv < motionProfile.end().getX() + 10) {
 				motionProfile = staticProfile();
 				isMovementFinished = true;
 			}

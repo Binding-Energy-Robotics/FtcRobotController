@@ -47,4 +47,8 @@ public class AutoDrive extends SubsystemBase {
     public void update() {
         drive.update();
     }
+
+    public Pose2d getPoseEstimate() {
+        return drive.getPoseEstimate();
+    }
 }

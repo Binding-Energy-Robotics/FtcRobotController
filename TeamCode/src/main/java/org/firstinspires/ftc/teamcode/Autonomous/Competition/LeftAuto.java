@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Competition;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -19,6 +20,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.TrajectoryCommand;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
+import org.firstinspires.ftc.teamcode.Framework.Commands.SavePosition;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
@@ -28,12 +30,13 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 
 import java.util.HashMap;
 
+@Config
 @Autonomous(preselectTeleOp="MainTeleop")
 public class LeftAuto extends CommandOpMode {
 	public static final Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
 	public static final Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(120));
 	public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(70));
-	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-26, -7, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-28, -7, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-26, -8, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_TWO = new Pose2d(-26, -8.5, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_THREE = new Pose2d(-25.5, -9.5, Math.toRadians(45));
@@ -44,9 +47,9 @@ public class LeftAuto extends CommandOpMode {
 	public static final Pose2d CONE_POSE_THREE = new Pose2d(-55.5, -15, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_FOUR = new Pose2d(-55.5, -15, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_FIVE = new Pose2d(-55.5, -15.5, Math.toRadians(0));
-	public static final Pose2d ZONE_ONE = new Pose2d(-59, -17, Math.toRadians(0));
-	public static final Pose2d ZONE_TWO = new Pose2d(-36, -17, Math.toRadians(90));
-	public static final Pose2d ZONE_THREE = new Pose2d(-12, -17, Math.toRadians(90));
+	public static final Pose2d ZONE_ONE = new Pose2d(-56, -12, Math.toRadians(0));
+	public static final Pose2d ZONE_TWO = new Pose2d(-36, -12, Math.toRadians(90));
+	public static final Pose2d ZONE_THREE = new Pose2d(-12, -12, Math.toRadians(90));
 
 	Telemetry telemetry;
 
@@ -56,14 +59,14 @@ public class LeftAuto extends CommandOpMode {
 	Claw claw;
 	Camera camera;
 
-	public static int signalSide;
+	public static int signalSide = 3;
 
 	private Command cycle(int coneHeight, Trajectory junctionToCones, Trajectory conesToJunction) {
 		return new SequentialCommandGroup(
 				new ParallelCommandGroup(
 						new SetSlidePosition(slide, LinearSlide.CONE_STACK[coneHeight]),
 						new SequentialCommandGroup(
-								new AsyncDelay(0.1),
+								new AsyncDelay(0.25),
 								new OpenClaw(claw),
 								new AsyncDelay(0.1),
 								new FlipIn(flipper)
@@ -94,7 +97,7 @@ public class LeftAuto extends CommandOpMode {
 		flipper = new Flipper(hardwareMap, telemetry);
 		claw = new Claw(hardwareMap);
 		claw.open();
-		camera = new Camera(hardwareMap);
+//		camera = new Camera(hardwareMap);
 
 
 		Trajectory junctionToConesOne = drive.trajectoryBuilder(SCORE_POSE_ZERO, true)
@@ -181,9 +184,9 @@ public class LeftAuto extends CommandOpMode {
 			() -> signalSide
 		);
 		ParallelCommandGroup dropForPark = new ParallelCommandGroup(
-				new SetSlidePosition(slide, LinearSlide.LOW),
+				new SetSlidePosition(slide, LinearSlide.ONE_CONE),
 				new SequentialCommandGroup(
-						new AsyncDelay(0.1),
+						new AsyncDelay(0.25),
 						new OpenClaw(claw),
 						new ParallelCommandGroup(
 								park,
@@ -198,25 +201,27 @@ public class LeftAuto extends CommandOpMode {
 
 		SequentialCommandGroup runAuto = new SequentialCommandGroup(
 				setUpScoring,
-				cycle(5, junctionToConesOne, conesToJunctionOne),
-				cycle(4, junctionToConesTwo, conesToJunctionTwo),
-				cycle(3, junctionToConesThree, conesToJunctionThree),
-				cycle(2, junctionToConesFour, conesToJunctionFour),
-				cycle(1, junctionToConesFive, conesToJunctionFive),
-				dropForPark
+//				cycle(5, junctionToConesOne, conesToJunctionOne),
+//				cycle(4, junctionToConesTwo, conesToJunctionTwo),
+//				cycle(3, junctionToConesThree, conesToJunctionThree),
+//				cycle(2, junctionToConesFour, conesToJunctionFour),
+//				cycle(1, junctionToConesFive, conesToJunctionFive),
+				dropForPark,
+				new SavePosition(drive::getPoseEstimate)
 		);
 
 		register(drive, slide, flipper, claw);
 
 		while (!isStarted()) {
-			camera.periodic();
-			telemetry.addData("Camera", camera.getConfidences());
+//			camera.periodic();
+//			telemetry.addData("Camera", camera.getConfidences());
+			telemetry.addData("Status", "Initialized");
 			telemetry.update();
 			idle();
 		}
 
-		signalSide = camera.getSide();
-		camera.stop();
+//		signalSide = camera.getSide();
+//		camera.stop();
 
 		schedule(runAuto);
 	}
