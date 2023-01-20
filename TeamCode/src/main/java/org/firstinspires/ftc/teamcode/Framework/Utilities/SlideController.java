@@ -23,9 +23,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 // Kd = 2 * sqrt(Ka * Kp) - Kv, Kp >= Kv * Kv / (4 * Ka)
 @Config
 public class SlideController {
-	public static double Kp = 0.01; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Kp = 0.02; // tuned by Alex Prichard on 20 Jan 2023
 	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
-	public static double Kd = 0.00013; // see Ben Caunt's paper for more details
+	public static double Kd = 0.00039; // see Ben Caunt's paper for more details
 	public static double Imax = 0;//0.2 / Ki;
 	public static double stabilityThreshold = 25;
 	private PIDCoefficientsEx coefficients;
@@ -157,5 +157,11 @@ public class SlideController {
 
 	public boolean isMovementFinished() {
 		return isMovementFinished;
+	}
+
+	public void timeOut() {
+		if (isMovementFinished) return;
+		motionProfile = staticProfile();
+		isMovementFinished = true;
 	}
 }

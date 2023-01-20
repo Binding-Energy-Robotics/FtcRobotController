@@ -37,12 +37,12 @@ public class LeftAuto extends CommandOpMode {
 	public static final Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(120));
 	public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(70));
 	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-28, -7, Math.toRadians(45));
-	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-26, -8, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-27, -8, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_TWO = new Pose2d(-26, -8.5, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_THREE = new Pose2d(-25.5, -9.5, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_FOUR = new Pose2d(-25, -10, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_FIVE = new Pose2d(-25, -10.5, Math.toRadians(45));
-	public static final Pose2d CONE_POSE_ONE = new Pose2d(-55.5, -13.5, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_ONE = new Pose2d(-58, -13.8, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_TWO = new Pose2d(-55.5, -14.5, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_THREE = new Pose2d(-55.5, -15, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_FOUR = new Pose2d(-55.5, -15, Math.toRadians(0));
@@ -78,11 +78,18 @@ public class LeftAuto extends CommandOpMode {
 				),
 				new CloseClaw(claw),
 				new AsyncDelay(0.25),
-				new SetSlidePosition(slide, LinearSlide.HIGH),
-				new AsyncDelay(0.15),
 				new ParallelCommandGroup(
-						new TrajectoryCommand(drive, conesToJunction),
-						new FlipOut(flipper)
+						new SetSlidePosition(slide, LinearSlide.HIGH),
+						new SequentialCommandGroup(
+								new AsyncDelay(0.15),
+								new ParallelCommandGroup(
+										new TrajectoryCommand(drive, conesToJunction),
+										new SequentialCommandGroup(
+												new AsyncDelay(0.25),
+												new FlipOut(flipper)
+										)
+								)
+						)
 				)
 		);
 	}
@@ -201,7 +208,7 @@ public class LeftAuto extends CommandOpMode {
 
 		SequentialCommandGroup runAuto = new SequentialCommandGroup(
 				setUpScoring,
-//				cycle(5, junctionToConesOne, conesToJunctionOne),
+				cycle(5, junctionToConesOne, conesToJunctionOne),
 //				cycle(4, junctionToConesTwo, conesToJunctionTwo),
 //				cycle(3, junctionToConesThree, conesToJunctionThree),
 //				cycle(2, junctionToConesFour, conesToJunctionFour),

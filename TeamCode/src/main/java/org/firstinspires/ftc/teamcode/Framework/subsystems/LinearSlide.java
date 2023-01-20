@@ -16,7 +16,7 @@ public class LinearSlide extends SubsystemBase {
     public static final int LOW = 525;
     public static final int GROUND = 20;
 
-    public static final int FIVE_CONE = 180;
+    public static final int FIVE_CONE = 200;
     public static final int FOUR_CONE = 140;
     public static final int THREE_CONE = 90;
     public static final int TWO_CONE = 40;
@@ -115,9 +115,13 @@ public class LinearSlide extends SubsystemBase {
         slideMotors[0].resetEncoder();
     }
 
+    public void timeOut() {
+        controller.timeOut();
+    }
+
     @Override
     public void periodic() {
-//        t.addData("slide", getEncoder());
+        t.addData("slide", getEncoder());
         t.update();
         if (usingPID.getAsBoolean()) {
             int position = slideMotors[0].getCurrentPosition();
