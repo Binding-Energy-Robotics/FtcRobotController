@@ -11,6 +11,7 @@ import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -222,12 +223,14 @@ public class LeftAuto extends CommandOpMode {
 
 		register(drive, slide, flipper, claw);
 
-		telemetry.addData("Status", "Initialized");
-		telemetry.update();
-		waitForStart();
+		ElapsedTime time = new ElapsedTime(); // allison has now contributed to the code :)
 		while (!isStarted()) {
-			camera.periodic();
-			telemetry.addData("Camera", camera.getConfidences());
+			camera.periodic(); // allison has now contributed to the code x2 :D
+			if (time.time() > 0.5) {
+				telemetry.addData("Camera", camera.getConfidences());
+				telemetry.update();
+				time.reset();
+			}
 		}
 
 		signalSide = camera.getSide();

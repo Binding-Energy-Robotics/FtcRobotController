@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.Competition;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,7 +15,13 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 public class ParkAuto extends LinearOpMode {
 	@Override
 	public void runOpMode() throws InterruptedException {
+		Pose2d START = new Pose2d(0, 0, Math.toRadians(-90));
+		Pose2d CENTER = new Pose2d(0, 24, Math.toRadians(-90));
+		Vector2d LEFT = new Vector2d(-24, 24);
+		Vector2d RIGHT = new Vector2d(24, 24);
+
 		SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+		drive.setPoseEstimate(START);
 
 		Claw claw = new Claw(hardwareMap);
 		Flipper flipper = new Flipper(hardwareMap, telemetry);
@@ -22,20 +29,20 @@ public class ParkAuto extends LinearOpMode {
 
 		telemetry.addData("Status", "1");
 		telemetry.update();
-		Trajectory forward = drive.trajectoryBuilder(new Pose2d(0, 0, 0))
-				.back(25)
+		Trajectory forward = drive.trajectoryBuilder(START)
+				.strafeTo(CENTER.vec())
 				.build();
 
 		telemetry.addData("Status", "2");
 		telemetry.update();
-		Trajectory left = drive.trajectoryBuilder(new Pose2d(-25, 0, 0))
-				.strafeLeft(24)
+		Trajectory left = drive.trajectoryBuilder(CENTER)
+				.strafeTo(LEFT)
 				.build();
 
 		telemetry.addData("Status", "3");
 		telemetry.update();
-		Trajectory right = drive.trajectoryBuilder(new Pose2d(-25, 0, 0))
-				.strafeRight(24)
+		Trajectory right = drive.trajectoryBuilder(CENTER)
+				.strafeTo(RIGHT)
 				.build();
 
 		telemetry.addData("Status", "4");
