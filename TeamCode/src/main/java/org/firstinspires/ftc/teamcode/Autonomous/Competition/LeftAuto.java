@@ -34,20 +34,20 @@ import java.util.HashMap;
 @Config
 @Autonomous(preselectTeleOp="MainTeleop")
 public class LeftAuto extends CommandOpMode {
-	public static final Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
+	public static final Pose2d START_POSE = new Pose2d(-31, -64.5, Math.toRadians(-90));
 	public static final Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(120));
 	public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(70));
 
-	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-28, -8.2, Math.toRadians(45));
-	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-27, -9.2, Math.toRadians(45));
-	public static final Pose2d SCORE_POSE_TWO = new Pose2d(-26, -10.2, Math.toRadians(45));
-	public static final Pose2d SCORE_POSE_THREE = new Pose2d(-25, -11.2, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_ZERO = new Pose2d(-26, -8, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_ONE = new Pose2d(-25, -9, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_TWO = new Pose2d(-24, -10, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE_THREE = new Pose2d(-23, -11, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_FOUR = new Pose2d(-25, -10, Math.toRadians(45));
 	public static final Pose2d SCORE_POSE_FIVE = new Pose2d(-25, -10.5, Math.toRadians(45));
 
-	public static final Pose2d CONE_POSE_ONE = new Pose2d(-58, -12.8, Math.toRadians(0));
-	public static final Pose2d CONE_POSE_TWO = new Pose2d(-57.75, -12.8, Math.toRadians(0));
-	public static final Pose2d CONE_POSE_THREE = new Pose2d(-57.5, -12.8, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_ONE = new Pose2d(-58, -13, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_TWO = new Pose2d(-57.5, -13.25, Math.toRadians(0));
+	public static final Pose2d CONE_POSE_THREE = new Pose2d(-57, -13.5, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_FOUR = new Pose2d(-55.5, -15, Math.toRadians(0));
 	public static final Pose2d CONE_POSE_FIVE = new Pose2d(-55.5, -15.5, Math.toRadians(0));
 
