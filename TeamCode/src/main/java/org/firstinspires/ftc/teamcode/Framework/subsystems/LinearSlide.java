@@ -18,9 +18,9 @@ public class LinearSlide extends SubsystemBase {
 
     public static final int FIVE_CONE = 200;
     public static final int FOUR_CONE = 160;
-    public static final int THREE_CONE = 90;
-    public static final int TWO_CONE = 40;
-    public static final int ONE_CONE = 0;
+    public static final int THREE_CONE = 110;
+    public static final int TWO_CONE = 60;
+    public static final int ONE_CONE = 30;
 
     public static final int[] CONE_STACK = new int[] {
             0,

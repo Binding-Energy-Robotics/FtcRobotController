@@ -62,7 +62,7 @@ public class LeftAuto extends CommandOpMode {
 	Claw claw;
 	Camera camera;
 
-	public static int signalSide = 3;
+	public static int signalSide = 1;
 
 	private Command cycle(int coneHeight, Trajectory junctionToCones, Trajectory conesToJunction) {
 		return new SequentialCommandGroup(

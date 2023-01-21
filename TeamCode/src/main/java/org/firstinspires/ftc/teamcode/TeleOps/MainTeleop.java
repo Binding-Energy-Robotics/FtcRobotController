@@ -164,27 +164,45 @@ public class MainTeleop extends CommandOpMode {
         );
         ParallelCommandGroup groundJunction = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.GROUND),
-                new FlipIn(flipper)
+                new SequentialCommandGroup(
+                        new AsyncDelay(0.1),
+                        new FlipIn(flipper)
+                )
         );
         ParallelCommandGroup coneHeight = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.ONE_CONE),
-                new FlipIn(flipper)
+                new SequentialCommandGroup(
+                        new AsyncDelay(0.1),
+                        new FlipIn(flipper)
+                )
         );
         ParallelCommandGroup twoConeHeight = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.TWO_CONE),
-                new FlipIn(flipper)
+                new SequentialCommandGroup(
+                        new AsyncDelay(0.1),
+                        new FlipIn(flipper)
+                )
         );
         ParallelCommandGroup threeConeHeight = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.THREE_CONE),
-                new FlipIn(flipper)
+                new SequentialCommandGroup(
+                        new AsyncDelay(0.1),
+                        new FlipIn(flipper)
+                )
         );
         ParallelCommandGroup fourConeHeight = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.FOUR_CONE),
-                new FlipIn(flipper)
+                new SequentialCommandGroup(
+                        new AsyncDelay(0.1),
+                        new FlipIn(flipper)
+                )
         );
         ParallelCommandGroup fiveConeHeight = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.FIVE_CONE),
-                new FlipIn(flipper)
+                new SequentialCommandGroup(
+                        new AsyncDelay(0.1),
+                        new FlipIn(flipper)
+                )
         );
 
         SequentialCommandGroup rumbleTimes = new SequentialCommandGroup(

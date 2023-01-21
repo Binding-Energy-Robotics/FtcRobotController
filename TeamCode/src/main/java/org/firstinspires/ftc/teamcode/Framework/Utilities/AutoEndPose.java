@@ -15,5 +15,5 @@ public class AutoEndPose {
 		AutoEndPose.pose = pose;
 	}
 
-	public static void clearPose() { setPose(new Pose2d(0, 0, 90)); }
+	public static void clearPose() { setPose(new Pose2d(0, 0, Math.toRadians(90))); }
 }
