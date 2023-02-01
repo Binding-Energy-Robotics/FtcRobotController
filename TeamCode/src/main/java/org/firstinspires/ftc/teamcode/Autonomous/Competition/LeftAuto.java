@@ -83,14 +83,26 @@ public class LeftAuto extends CommandOpMode {
 				new CloseClaw(claw),
 				new AsyncDelay(0.25),
 				new ParallelCommandGroup(
-						new SetSlidePosition(slide, LinearSlide.HIGH),
+						new SetSlidePosition(slide, LinearSlide.LOW),
 						new SequentialCommandGroup(
 								new AsyncDelay(0.15),
 								new ParallelCommandGroup(
 										new TrajectoryCommand(drive, conesToJunction),
 										new SequentialCommandGroup(
 												new AsyncDelay(0.25),
-												new FlipOut(flipper)
+												new ParallelCommandGroup(
+														new SetSlidePosition(slide, LinearSlide.TWO_CONE),
+														new SequentialCommandGroup(
+																new AsyncDelay(1),
+																new ParallelCommandGroup(
+																		new SetSlidePosition(slide, LinearSlide.HIGH),
+																		new SequentialCommandGroup(
+																				new AsyncDelay(0.5),
+																				new FlipOut(flipper)
+																		)
+																)
+														)
+												)
 										)
 								)
 						)
@@ -213,8 +225,8 @@ public class LeftAuto extends CommandOpMode {
 		SequentialCommandGroup runAuto = new SequentialCommandGroup(
 				setUpScoring,
 				cycle(5, junctionToConesOne, conesToJunctionOne),
-				cycle(4, junctionToConesTwo, conesToJunctionTwo),
-				cycle(3, junctionToConesThree, conesToJunctionThree),
+				cycle(4, junctionToConesOne, conesToJunctionOne),
+				cycle(3, junctionToConesOne, conesToJunctionOne),
 //				cycle(2, junctionToConesFour, conesToJunctionFour),
 //				cycle(1, junctionToConesFive, conesToJunctionFive),
 				dropForPark,
