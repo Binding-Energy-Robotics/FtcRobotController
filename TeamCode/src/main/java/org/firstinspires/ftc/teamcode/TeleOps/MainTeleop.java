@@ -30,6 +30,7 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.TeleDrive;
 
+@TeleOp
 public class MainTeleop extends CommandOpMode {
 
     TeleDrive drive;
