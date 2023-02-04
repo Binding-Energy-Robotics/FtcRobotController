@@ -24,11 +24,11 @@ public class LinearSlide extends SubsystemBase {
 
     public static final int[] CONE_STACK = new int[] {
             0,
-            ONE_CONE,
-            TWO_CONE,
-            THREE_CONE,
-            FOUR_CONE,
-            FIVE_CONE
+            30,
+            100,
+            130,
+            160,
+            200
     };
 
     private int stackSize;
