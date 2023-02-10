@@ -25,12 +25,12 @@ public class Claw extends SubsystemBase {
     }
 
     public void open(){
-        clawServo.setPosition(0.3);
+        clawServo.turnToAngle(90);
         servoClosed = false;
     }
 
     public void close(){
-        clawServo.setPosition(1);
+        clawServo.turnToAngle(0);
         servoClosed = true;
     }
 
