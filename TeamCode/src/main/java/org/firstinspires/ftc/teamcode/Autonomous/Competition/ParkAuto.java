@@ -65,6 +65,7 @@ public class ParkAuto extends LinearOpMode {
 			telemetry.update();
 			idle();
 		}
+		AutoEndPose.setTimer();
 		camera.stop();
 
 		int signalSide = camera.getSide();

@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -25,6 +26,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Rumble;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
 import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
+import org.firstinspires.ftc.teamcode.Framework.Utilities.AutoEndPose;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
@@ -206,7 +208,8 @@ public class MainTeleop extends CommandOpMode {
         );
 
         SequentialCommandGroup rumbleTimes = new SequentialCommandGroup(
-                new AsyncDelay(86),
+                new AsyncDelay(AutoEndPose::getTimer, AutoEndPose.ENDGAME_START - 5),
+                new InstantCommand(AutoEndPose::clearTimer),
 
                 new Rumble(gamepad1, 333),
                 new AsyncDelay(1),

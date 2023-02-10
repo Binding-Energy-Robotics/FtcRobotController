@@ -5,6 +5,11 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class AsyncDelay extends CommandBase {
+	public interface ElapsedTimeSupplier {
+		ElapsedTime get();
+	}
+
+	private ElapsedTimeSupplier supplier = null;
 	private ElapsedTime time;
 	private double delay;
 
@@ -12,9 +17,19 @@ public class AsyncDelay extends CommandBase {
 		delay = delaySeconds;
 	}
 
+	public AsyncDelay(ElapsedTimeSupplier timer, double stopTime) {
+		supplier = timer;
+		delay = stopTime;
+	}
+
 	@Override
 	public void initialize() {
-		time = new ElapsedTime();
+		if (supplier == null) {
+			time = new ElapsedTime();
+		}
+		else {
+			time = supplier.get();
+		}
 	}
 
 	@Override

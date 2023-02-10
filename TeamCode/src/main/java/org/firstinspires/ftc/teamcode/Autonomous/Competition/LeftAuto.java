@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
 import org.firstinspires.ftc.teamcode.Framework.Commands.SavePosition;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
+import org.firstinspires.ftc.teamcode.Framework.Utilities.AutoEndPose;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
@@ -234,9 +235,9 @@ public class LeftAuto extends CommandOpMode {
 
 		register(drive, slide, flipper, claw);
 
-		ElapsedTime time = new ElapsedTime(); // allison has now contributed to the code :)
+		ElapsedTime time = new ElapsedTime();
 		while (!isStarted()) {
-			camera.periodic(); // allison has now contributed to the code x2 :D
+			camera.periodic();
 			if (time.time() > 0.5) {
 				telemetry.addData("Camera", camera.getConfidences());
 				telemetry.update();
@@ -244,6 +245,7 @@ public class LeftAuto extends CommandOpMode {
 			}
 		}
 
+		AutoEndPose.setTimer();
 		signalSide = camera.getSide();
 		camera.stop();
 
