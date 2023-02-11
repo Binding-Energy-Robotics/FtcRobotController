@@ -134,6 +134,7 @@ public class MainTeleop extends CommandOpMode {
         claw = new Claw(hardwareMap);
         slide = new LinearSlide(hardwareMap, telemetry, () -> isDriving);
         flipper = new Flipper(hardwareMap, telemetry);
+        claw.open();
 
         // Command setup
         DriverToggle driverToggle = new DriverToggle(slide, flipper, claw);
