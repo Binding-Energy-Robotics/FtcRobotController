@@ -31,6 +31,14 @@ public class LinearSlide extends SubsystemBase {
             200
     };
 
+    public static final int[] TELEOP_HEIGHTS = new int[] {
+            ONE_CONE,
+            TWO_CONE,
+            THREE_CONE,
+            FOUR_CONE,
+            FIVE_CONE
+    };
+
     private int stackSize;
 
     private HardwareMap hw;
@@ -105,6 +113,10 @@ public class LinearSlide extends SubsystemBase {
 
     public boolean isDown() {
         for (int coneHeight: CONE_STACK) {
+            if (controller.prevSP == coneHeight)
+                return true;
+        }
+        for (int coneHeight: TELEOP_HEIGHTS) {
             if (controller.prevSP == coneHeight)
                 return true;
         }
