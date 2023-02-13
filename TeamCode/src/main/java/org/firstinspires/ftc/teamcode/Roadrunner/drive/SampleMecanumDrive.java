@@ -58,14 +58,19 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.encoderTicksTo
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.gyrationConstant;
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(16, 0, 0.35);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0.47);
+    public static double TRANS_P = 16;
+    public static double HEAD_P = 8;
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients( TRANS_P, 0,
+            2 * Math.sqrt(TRANS_P * kA) - kV);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(HEAD_P, 0,
+            2 * Math.sqrt(HEAD_P * kA / (TRACK_WIDTH * gyrationConstant)) - kV / TRACK_WIDTH);
 
     public static double LATERAL_MULTIPLIER = 1.8;
 
