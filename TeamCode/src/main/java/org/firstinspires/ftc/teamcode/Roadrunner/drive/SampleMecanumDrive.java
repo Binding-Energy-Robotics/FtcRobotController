@@ -242,7 +242,10 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void update() {
         updatePoseEstimate();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
-        if (signal != null) setDriveSignal(signal);
+        if (signal != null) {
+            // if signal != new DriveSignal, adrc
+            setDriveSignal(signal);
+        }
     }
 
     public void waitForIdle() {

@@ -104,4 +104,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 				encoderTicksToInches(perpendicularEncoder.getCorrectedVelocity())
 		);
 	}
+
+	@Override
+	public void update() { // implement extended kalman filter with adrc here
+		super.update()
+	}
 }
