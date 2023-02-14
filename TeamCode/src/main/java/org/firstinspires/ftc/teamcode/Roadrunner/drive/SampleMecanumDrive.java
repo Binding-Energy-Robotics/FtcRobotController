@@ -11,6 +11,8 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
 import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.kinematics.Kinematics;
+import com.acmerobotics.roadrunner.kinematics.MecanumKinematics;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
@@ -92,6 +94,9 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
+
+    private double[] previousPowers = new double[] { 0, 0, 0 };
+    private TwoWheelTrackingLocalizer localizer;
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
@@ -175,7 +180,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
-        setLocalizer(new TwoWheelTrackingLocalizer(hardwareMap, this));
+        localizer = new TwoWheelTrackingLocalizer(hardwareMap, this);
+        setLocalizer(localizer);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
     }
@@ -240,11 +246,64 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void update() {
-        updatePoseEstimate();
+        localizer.update(previousPowers);
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) {
             // if signal != new DriveSignal, adrc
-            setDriveSignal(signal);
+            if (signal.equals(new DriveSignal())) {
+                setDriveSignal(signal);
+                previousPowers = new double[] { 0, 0, 0 };
+                return;
+            }
+            List<Double> wheelVelocities = MecanumKinematics.robotToWheelVelocities(
+                    signal.getVel(),
+                    TRACK_WIDTH,
+                    TRACK_WIDTH,
+                    LATERAL_MULTIPLIER
+            );
+            List<Double> wheelAccelerations = MecanumKinematics.robotToWheelAccelerations(
+                    signal.getAccel(),
+                    TRACK_WIDTH,
+                    TRACK_WIDTH,
+                    LATERAL_MULTIPLIER
+            );
+            List<Double> motorPowers = Kinematics.calculateMotorFeedforward(
+                    wheelVelocities, wheelAccelerations, kV, kA, kStatic);
+            Pose2d robotRelativePower = MecanumKinematics.wheelToRobotVelocities(
+                    motorPowers,
+                    TRACK_WIDTH,
+                    TRACK_WIDTH,
+                    LATERAL_MULTIPLIER
+            );
+            Pose2d fieldRelativePower = new Pose2d(
+                    robotRelativePower.vec().rotated(getPoseEstimate().getHeading()),
+                    robotRelativePower.getHeading()
+            );
+            Pose2d disturbanceRejection = localizer.getDisturbanceRejectionPower();
+            fieldRelativePower = new Pose2d(
+                    fieldRelativePower.getX() + disturbanceRejection.getX(),
+                    fieldRelativePower.getY() + disturbanceRejection.getY(),
+                    fieldRelativePower.getHeading() + disturbanceRejection.getHeading()
+            );
+            previousPowers[0] = fieldRelativePower.getX();
+            previousPowers[1] = fieldRelativePower.getY();
+            previousPowers[2] = fieldRelativePower.getHeading();
+            Pose2d appliedPower = new Pose2d(
+                    fieldRelativePower.vec().rotated(-getPoseEstimate().getHeading()),
+                    fieldRelativePower.getHeading()
+            );
+            List<Double> appliedMotorPowers = MecanumKinematics.robotToWheelVelocities(
+                    appliedPower,
+                    TRACK_WIDTH,
+                    TRACK_WIDTH,
+                    LATERAL_MULTIPLIER
+            );
+            setMotorPowers(
+                    appliedMotorPowers.get(0),
+                    appliedMotorPowers.get(1),
+                    appliedMotorPowers.get(2),
+                    appliedMotorPowers.get(3)
+            );
         }
     }
 

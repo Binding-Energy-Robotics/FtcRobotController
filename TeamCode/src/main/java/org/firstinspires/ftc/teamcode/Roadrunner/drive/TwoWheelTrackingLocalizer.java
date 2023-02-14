@@ -8,10 +8,26 @@ import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.apache.commons.math3.filter.DefaultMeasurementModel;
+import org.apache.commons.math3.filter.DefaultProcessModel;
+import org.apache.commons.math3.filter.KalmanFilter;
+import org.apache.commons.math3.filter.MeasurementModel;
+import org.apache.commons.math3.filter.ProcessModel;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+import org.checkerframework.checker.units.qual.K;
 import org.firstinspires.ftc.teamcode.Roadrunner.util.Encoder;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.gyrationConstant;
 
 /*
  * Sample tracking wheel localizer implementation assuming the standard configuration:
@@ -55,6 +71,13 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
 	private SampleMecanumDrive drive;
 
+	private KalmanFilter kalmanFilter;
+	private ProcessModel processModel;
+	private MeasurementModel measurementModel;
+
+	private int headingWraps = 0;
+	private double previousHeading = 0;
+
 	public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, SampleMecanumDrive drive) {
 		super(Arrays.asList(
 				new Pose2d(PARALLEL_X, PARALLEL_Y, 0),
@@ -66,7 +89,101 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 		parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightFront"));
 		perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftFront"));
 
-		// TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+		double kV_r = kV / TRACK_WIDTH;
+		double kA_r = kA / (TRACK_WIDTH * gyrationConstant);
+		RealMatrix Ac = new Array2DRowRealMatrix(new double[][] {
+				{ 0, 0, 0,   1, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 1, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 1,   0, 0, 0 },
+
+				{ 0, 0, 0,     -kV / kA, 0,        0,                1 / kA, 0,      0 },
+				{ 0, 0, 0,     0,        -kV / kA, 0,                0,      1 / kA, 0 },
+				{ 0, 0, 0,     0,        0,        -kV_r / kA_r,     0,      0,      1 / kA_r },
+
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 }
+		});
+		RealMatrix Bc = new Array2DRowRealMatrix(new double[][] {
+				{ 0, 0, 0 },
+				{ 0, 0, 0 },
+				{ 0, 0, 0 },
+
+				{ 1 / kA,  0,      0 },
+				{ 0,       1 / kA, 0 },
+				{ 0,       0,      1 / kA_r },
+
+				{ 0, 0, 0 },
+				{ 0, 0, 0 },
+				{ 0, 0, 0 }
+		});
+		RealMatrix Q = new Array2DRowRealMatrix(new double[][] {
+				{ .05, 0,   0,      0, 0, 0,   0, 0, 0 },
+				{ 0,   .05, 0,      0, 0, 0,   0, 0, 0 },
+				{ 0,   0,   .005,   0, 0, 0,   0, 0, 0 },
+
+				{ 0, 0, 0,   .5, 0,  0,     0, 0, 0 },
+				{ 0, 0, 0,   0,  .5, 0,     0, 0, 0 },
+				{ 0, 0, 0,   0,  0,  .05,   0, 0, 0 },
+
+				{ 0, 0, 0,   0, 0, 0,   .03, 0,   0 },
+				{ 0, 0, 0,   0, 0, 0,   0,   .03, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0,   0,   .03 }
+		});
+
+		RealMatrix C = new Array2DRowRealMatrix(new double[][] {
+				{ 1, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 1, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 1,   0, 0, 0,   0, 0, 0 },
+
+				{ 0, 0, 0,   1, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 1, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 1,   0, 0, 0 }
+		});
+		RealMatrix R = new Array2DRowRealMatrix(new double[][] {
+				{ 0.001, 0,     0,        0, 0, 0 },
+				{ 0,     0.001, 0,        0, 0, 0 },
+				{ 0,     0,     0.0003,   0, 0, 0 },
+
+				{ 0, 0, 0,   0.01, 0,    0 },
+				{ 0, 0, 0,   0,    0.01, 0 },
+				{ 0, 0, 0,   0,    0,    0.0003 }
+		});
+
+		RealVector startPose = new ArrayRealVector(new double[] {
+				0, 0, 0,   0, 0, 0,   0, 0, 0
+		});
+		RealMatrix startCovariance = new Array2DRowRealMatrix(new double[][] {
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 }
+		});
+
+		double dt = 0.01;
+		RealMatrix plus = MatrixUtils.createRealIdentityMatrix(9)
+				.add(Ac.scalarMultiply(dt / 2));
+		RealMatrix minus = MatrixUtils.createRealIdentityMatrix(9)
+				.subtract(Ac.scalarMultiply(dt / 2));
+		RealMatrix Ad = plus.multiply(MatrixUtils.inverse(minus));
+		RealMatrix Bd = MatrixUtils.inverse(Ac)
+				.multiply(Ad.subtract(MatrixUtils.createRealIdentityMatrix(9)))
+				.multiply(Bc);
+
+		processModel = new DefaultProcessModel(
+				Ad, Bd, Q, startPose, startCovariance
+		);
+		measurementModel = new DefaultMeasurementModel(
+				C, R
+		);
+		kalmanFilter = new KalmanFilter(processModel, measurementModel);
 	}
 
 	public static double encoderTicksToInches(double ticks) {
@@ -105,8 +222,66 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 		);
 	}
 
+	public double[] measurementVector(Pose2d position, Pose2d velocity) {
+		if (velocity == null) velocity = new Pose2d();
+
+		double currentHeading = position.getHeading();
+		if (previousHeading > Math.PI / 2 && currentHeading <= -Math.PI / 2) {
+			headingWraps += 1;
+		}
+		else if (previousHeading < -Math.PI / 2 && currentHeading >= Math.PI / 2) {
+			headingWraps -= 1;
+		}
+		previousHeading = currentHeading;
+		currentHeading += Math.PI * 2 * headingWraps;
+
+		double[] vector = new double[6];
+		vector[0] = position.getX();
+		vector[1] = position.getY();
+		vector[2] = currentHeading;
+		vector[3] = velocity.getX();
+		vector[4] = velocity.getY();
+		vector[5] = velocity.getHeading();
+		return vector;
+	}
+
 	@Override
-	public void update() { // implement extended kalman filter with adrc here
+	public void setPoseEstimate(@NonNull Pose2d value) {
+		super.setPoseEstimate(value);
+		headingWraps = 0;
+		previousHeading = getPoseEstimate().getHeading();
+		double[] partialState = measurementVector(getPoseEstimate(), null);
+		double[] state = new double[9];
+		for (int i = 0; i < 9; i++) {
+			if (i < partialState.length) {
+				state[i] = partialState[i];
+				continue;
+			}
+			state[i] = 0;
+		}
+		processModel = new DefaultProcessModel(
+				processModel.getStateTransitionMatrix(),
+				processModel.getControlMatrix(),
+				processModel.getProcessNoise(),
+				new ArrayRealVector(state),
+				kalmanFilter.getErrorCovarianceMatrix()
+		);
+		kalmanFilter = new KalmanFilter(processModel, measurementModel);
+	}
+
+	public void update(double[] previousPowers) { // implement extended kalman filter with adrc here
 		super.update();
+		kalmanFilter.predict(previousPowers);
+		double[] measurement = measurementVector(getPoseEstimate(), getPoseVelocity());
+		kalmanFilter.correct(measurement);
+	}
+
+	public Pose2d getDisturbanceRejectionPower() {
+		double[] state = kalmanFilter.getStateEstimation();
+		return new Pose2d(
+				state[6],
+				state[7],
+				state[8]
+		);
 	}
 }
