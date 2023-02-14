@@ -85,7 +85,7 @@ public class LinearSlide extends SubsystemBase {
         if (usingPID.getAsBoolean())
             return;
 
-        power += controller.getKg(getEncoder()); // gravity feedforward
+        power += controller.getKg(); // gravity feedforward
 
         for (int i = 0; i < 4; i++) {
             slideMotors[i].set(power);

@@ -1,24 +1,25 @@
 package org.firstinspires.ftc.teamcode.Framework.Utilities;
 
-import android.provider.ContactsContract;
-
 import com.ThermalEquilibrium.homeostasis.Controllers.Feedback.PIDEx;
-import com.ThermalEquilibrium.homeostasis.Filters.Estimators.KalmanEstimator;
-import com.ThermalEquilibrium.homeostasis.Filters.FilterAlgorithms.KalmanFilter;
 import com.ThermalEquilibrium.homeostasis.Parameters.PIDCoefficientsEx;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.util.Util;
 
+import org.apache.commons.math3.filter.DefaultMeasurementModel;
+import org.apache.commons.math3.filter.DefaultProcessModel;
+import org.apache.commons.math3.filter.MeasurementModel;
+import org.apache.commons.math3.filter.ProcessModel;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.apache.commons.math3.filter.KalmanFilter;
+
 // good shit, see Ben Caunt
 // Kd = 2 * sqrt(Ka * Kp) - Kv, Kp >= Kv * Kv / (4 * Ka)
 @Config
@@ -51,6 +52,8 @@ public class SlideController {
 	private PIDEx controller;
 
 	private KalmanFilter kalmanFilter;
+	private ProcessModel model;
+	private MeasurementModel measurementModel;
 
 	private MotionProfile motionProfile;
 	private ElapsedTime elapsedTime;
@@ -68,7 +71,52 @@ public class SlideController {
 		telemetry = dash.getTelemetry();
 		motionProfile = staticProfile();
 		elapsedTime = new ElapsedTime();
-		kalmanFilter = new KalmanFilter(1, 5, 3);
+
+		Array2DRowRealMatrix A = new Array2DRowRealMatrix(new double[][] {
+				{ 0, 1, 0 },
+				{ 0, -Kv / Ka, 1 / Ka },
+				{ 0, 0, 0 }
+		});
+		Array2DRowRealMatrix B = new Array2DRowRealMatrix(new double[][] {
+				{ 0 },
+				{ 1 / Ka },
+				{ 0 }
+		});
+		Array2DRowRealMatrix Q = new Array2DRowRealMatrix(new double[][] {
+				{ 10, 0, 0 },
+				{ 0, 20, 0 },
+				{ 0, 0, 0.25 }
+		});
+		Array2DRowRealMatrix initError = new Array2DRowRealMatrix(new double[][] {
+				{ 1, 0, 0 },
+				{ 0, 1, 0 },
+				{ 0, 0, 0.1 }
+		});
+		ArrayRealVector initState = new ArrayRealVector(new double[] { 0, 0, 0 });
+
+		Array2DRowRealMatrix C = new Array2DRowRealMatrix(new double[][] {
+				{ 1, 0, 0 }
+		});
+		Array2DRowRealMatrix R = new Array2DRowRealMatrix(new double[][] {
+				{ 10 }
+		});
+
+		double loopTime = 0.01;
+
+		RealMatrix plus =
+				MatrixUtils.createRealIdentityMatrix(3)
+						.add(A.scalarMultiply(loopTime / 2));
+		RealMatrix minus =
+				MatrixUtils.createRealIdentityMatrix(3)
+						.subtract(A.scalarMultiply(loopTime / 2));
+		RealMatrix Ad = plus.multiply(MatrixUtils.inverse(minus));
+		RealMatrix Bd = MatrixUtils.inverse(A)
+				.multiply(Ad.subtract(MatrixUtils.createRealIdentityMatrix(3)))
+				.multiply(B);
+
+		model = new DefaultProcessModel(Ad, Bd, Q, initState, initError);
+		measurementModel = new DefaultMeasurementModel(C, R);
+		kalmanFilter = new KalmanFilter(model, measurementModel);
 	}
 
 	private MotionProfile staticProfile() {
@@ -81,7 +129,7 @@ public class SlideController {
 		);
 	}
 
-	public double getKg(int position) {
+	public double getKg() {
 		return Kg;
 	}
 
@@ -93,13 +141,21 @@ public class SlideController {
 		long time = System.nanoTime();
 		double dt = (time - prevTime) * 1.0e-9;
 
-		if (dt > 1e-2) {
-			double vel = (Pv - prevPv) / dt;
-			prevVel = kalmanFilter.estimate(vel);
-			telemetry.addData("vel", prevVel);
-			telemetry.update();
+		if (dt >= 0.01) {
+			prevTime += (long)(0.01 * 1.0e9);
 
-			prevPv = Pv;
+			kalmanFilter.predict(new double[] { power });
+			kalmanFilter.correct(new double[] { Pv });
+			double[] stateEstimate = kalmanFilter.getStateEstimation();
+
+			prevPv = stateEstimate[0];
+			prevVel = stateEstimate[1];
+			double adrCompensation = stateEstimate[2];
+
+			telemetry.addData("pos", prevPv);
+			telemetry.addData("vel", prevVel);
+			telemetry.addData("adr", adrCompensation);
+			telemetry.update();
 
 			if (SP != prevSP) { // generate new motion profile if target position has changed
 				try {
@@ -140,14 +196,12 @@ public class SlideController {
 			double v = targetState.getV();
 			double a = targetState.getA();
 			if (!isMovementFinished) {
-				power = controller.calculate(x, Pv) + Kg + v * Kv + a * Ka;
+				power = controller.calculate(x, Pv) + Kg + v * Kv + a * Ka - adrCompensation;
 				power += Math.copySign(Ks, v);
 			}
 			else {
-				power = controller.calculate(prevSP, Pv) + Kg;
+				power = controller.calculate(prevSP, Pv) + Kg - adrCompensation;
 			}
-
-			prevTime = time;
 		}
 
 		if (Pv < 10 && power < 0 || Pv > 600 && power > 0) {
