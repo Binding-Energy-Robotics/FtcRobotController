@@ -107,6 +107,6 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
 	@Override
 	public void update() { // implement extended kalman filter with adrc here
-		super.update()
+		super.update();
 	}
 }
