@@ -85,12 +85,12 @@ public class SlideController {
 		Array2DRowRealMatrix Q = new Array2DRowRealMatrix(new double[][] {
 				{ 10, 0, 0 },
 				{ 0, 20, 0 },
-				{ 0, 0, 0.25 }
+				{ 0, 0, 0.05 }
 		});
 		Array2DRowRealMatrix initError = new Array2DRowRealMatrix(new double[][] {
 				{ 1, 0, 0 },
 				{ 0, 1, 0 },
-				{ 0, 0, 0.1 }
+				{ 0, 0, 0.01 }
 		});
 		ArrayRealVector initState = new ArrayRealVector(new double[] { 0, 0, 0 });
 
@@ -103,20 +103,58 @@ public class SlideController {
 
 		double loopTime = 0.01;
 
-		RealMatrix plus =
-				MatrixUtils.createRealIdentityMatrix(3)
-						.add(A.scalarMultiply(loopTime / 2));
-		RealMatrix minus =
-				MatrixUtils.createRealIdentityMatrix(3)
-						.subtract(A.scalarMultiply(loopTime / 2));
-		RealMatrix Ad = plus.multiply(MatrixUtils.inverse(minus));
-		RealMatrix Bd = MatrixUtils.inverse(A)
-				.multiply(Ad.subtract(MatrixUtils.createRealIdentityMatrix(3)))
-				.multiply(B);
+		RealMatrix taylor = taylorSeries(A, loopTime, 15);
+		RealMatrix Bd = taylor.multiply(B);
+		RealMatrix Ad = A.multiply(taylor).add(MatrixUtils.createRealIdentityMatrix(3));
+		telemetry.addData("A_d", printMat(Ad));
+		telemetry.addData("B_d", printMat(Bd));
+
+//		RealMatrix plus =
+//				MatrixUtils.createRealIdentityMatrix(3)
+//						.add(A.scalarMultiply(loopTime / 2));
+//		RealMatrix minus =
+//				MatrixUtils.createRealIdentityMatrix(3)
+//						.subtract(A.scalarMultiply(loopTime / 2));
+//		RealMatrix Ad = plus.multiply(MatrixUtils.inverse(minus));
+//		RealMatrix Bd = MatrixUtils.inverse(A)
+//				.multiply(Ad.subtract(MatrixUtils.createRealIdentityMatrix(3)))
+//				.multiply(B);
 
 		model = new DefaultProcessModel(Ad, Bd, Q, initState, initError);
 		measurementModel = new DefaultMeasurementModel(C, R);
 		kalmanFilter = new KalmanFilter(model, measurementModel);
+	}
+
+	private String printMat(RealMatrix mat) {
+		StringBuilder toPrint = new StringBuilder("\n{\n");
+		for (int i = 0; i < mat.getRowDimension(); i++) {
+			for (int j = 0; j < mat.getColumnDimension(); j++) {
+				if (j == 0) {
+					toPrint.append("\t{").append(mat.getEntry(i, j));
+				}
+				else {
+					toPrint.append(", ").append(mat.getEntry(i, j));
+				}
+			}
+			toPrint.append("}\n");
+		}
+		toPrint.append("}");
+		return toPrint.toString();
+	}
+
+	private RealMatrix taylorSeries(RealMatrix A, double dt, int terms) {
+		RealMatrix exponentialA = MatrixUtils.createRealIdentityMatrix(3);
+		RealMatrix acc = MatrixUtils.createRealIdentityMatrix(3).scalarMultiply(dt);
+		double k = 1;
+		double T = dt;
+		for (int i = 2; i <= terms; i++) {
+			exponentialA = exponentialA.multiply(A);
+			T *= dt;
+			k /= i;
+			RealMatrix term = exponentialA.scalarMultiply(T * k);
+			acc = acc.add(term);
+		}
+		return acc;
 	}
 
 	private MotionProfile staticProfile() {
@@ -150,11 +188,11 @@ public class SlideController {
 
 			prevPv = stateEstimate[0];
 			prevVel = stateEstimate[1];
-			double adrCompensation = stateEstimate[2];
+			double adrCompensation = stateEstimate[2] / 5;
 
 			telemetry.addData("pos", prevPv);
 			telemetry.addData("vel", prevVel);
-			telemetry.addData("adr", adrCompensation);
+			telemetry.addData("adr", adrCompensation * 100);
 			telemetry.update();
 
 			if (SP != prevSP) { // generate new motion profile if target position has changed
