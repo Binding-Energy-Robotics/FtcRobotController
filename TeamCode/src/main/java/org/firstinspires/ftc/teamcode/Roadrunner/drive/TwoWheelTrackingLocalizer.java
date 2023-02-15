@@ -5,6 +5,9 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
+import com.acmerobotics.roadrunner.profile.MotionProfile;
+import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
+import com.acmerobotics.roadrunner.profile.MotionState;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -168,14 +171,10 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 		});
 
 		double dt = 0.01;
-		RealMatrix plus = MatrixUtils.createRealIdentityMatrix(9)
-				.add(Ac.scalarMultiply(dt / 2));
-		RealMatrix minus = MatrixUtils.createRealIdentityMatrix(9)
-				.subtract(Ac.scalarMultiply(dt / 2));
-		RealMatrix Ad = plus.multiply(MatrixUtils.inverse(minus));
-		RealMatrix Bd = MatrixUtils.inverse(Ac)
-				.multiply(Ad.subtract(MatrixUtils.createRealIdentityMatrix(9)))
-				.multiply(Bc);
+
+		RealMatrix taylor = taylorSeries(Ac, dt, 10);
+		RealMatrix Bd = taylor.multiply(Bc);
+		RealMatrix Ad = Ac.multiply(taylor).add(MatrixUtils.createRealIdentityMatrix(9));
 
 		processModel = new DefaultProcessModel(
 				Ad, Bd, Q, startPose, startCovariance
@@ -184,6 +183,38 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 				C, R
 		);
 		kalmanFilter = new KalmanFilter(processModel, measurementModel);
+	}
+
+	private String printMat(RealMatrix mat) {
+		StringBuilder toPrint = new StringBuilder("\n{\n");
+		for (int i = 0; i < mat.getRowDimension(); i++) {
+			for (int j = 0; j < mat.getColumnDimension(); j++) {
+				if (j == 0) {
+					toPrint.append("\t{").append(mat.getEntry(i, j));
+				}
+				else {
+					toPrint.append(", ").append(mat.getEntry(i, j));
+				}
+			}
+			toPrint.append("}\n");
+		}
+		toPrint.append("}");
+		return toPrint.toString();
+	}
+
+	private RealMatrix taylorSeries(RealMatrix A, double dt, int terms) {
+		RealMatrix exponentialA = MatrixUtils.createRealIdentityMatrix(9);
+		RealMatrix acc = MatrixUtils.createRealIdentityMatrix(9).scalarMultiply(dt);
+		double k = 1;
+		double T = dt;
+		for (int i = 2; i <= terms; i++) {
+			exponentialA = exponentialA.multiply(A);
+			T *= dt;
+			k /= i;
+			RealMatrix term = exponentialA.scalarMultiply(T * k);
+			acc = acc.add(term);
+		}
+		return acc;
 	}
 
 	public static double encoderTicksToInches(double ticks) {

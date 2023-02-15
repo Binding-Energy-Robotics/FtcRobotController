@@ -103,7 +103,7 @@ public class SlideController {
 
 		double loopTime = 0.01;
 
-		RealMatrix taylor = taylorSeries(A, loopTime, 15);
+		RealMatrix taylor = taylorSeries(A, loopTime, 10);
 		RealMatrix Bd = taylor.multiply(B);
 		RealMatrix Ad = A.multiply(taylor).add(MatrixUtils.createRealIdentityMatrix(3));
 		telemetry.addData("A_d", printMat(Ad));
