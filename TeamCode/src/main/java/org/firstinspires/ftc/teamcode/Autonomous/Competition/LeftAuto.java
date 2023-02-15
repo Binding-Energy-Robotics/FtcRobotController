@@ -236,7 +236,7 @@ public class LeftAuto extends CommandOpMode {
 		register(drive, slide, flipper, claw);
 
 		ElapsedTime time = new ElapsedTime();
-		while (!isStarted()) {
+		while (!isStarted() && !isStopRequested()) {
 			camera.periodic();
 			if (time.time() > 0.5) {
 				telemetry.addData("Camera", camera.getConfidences());
