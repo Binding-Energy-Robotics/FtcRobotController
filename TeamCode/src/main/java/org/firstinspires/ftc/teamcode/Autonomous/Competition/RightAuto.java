@@ -39,22 +39,22 @@ public class RightAuto extends CommandOpMode {
     public static Pose2d START_POSE_A = new Pose2d(34, -48, Math.toRadians(60));
     public static Pose2d START_POSE_B = new Pose2d(36, -24, Math.toRadians(120));
 
-    public static Pose2d SCORE_POSE_ZERO = new Pose2d(29, -6, Math.toRadians(-225));
-    public static Pose2d SCORE_POSE_ONE = new Pose2d(29, -6, Math.toRadians(-225));
-    public static Pose2d SCORE_POSE_TWO = new Pose2d(29, -7, Math.toRadians(-225));
-    public static Pose2d SCORE_POSE_THREE = new Pose2d(29, -7, Math.toRadians(-225));
-    public static Pose2d SCORE_POSE_FOUR = new Pose2d(29, -7, Math.toRadians(-225));
-    public static Pose2d SCORE_POSE_FIVE = new Pose2d(29, -7, Math.toRadians(-225));
+    public static Pose2d SCORE_POSE_ZERO = new Pose2d(26.5, -5, Math.toRadians(135));
+    public static Pose2d SCORE_POSE_ONE = new Pose2d(26.5, -5, Math.toRadians(135));
+    public static Pose2d SCORE_POSE_TWO = new Pose2d(26.5, -5, Math.toRadians(135));
+    public static Pose2d SCORE_POSE_THREE = new Pose2d(26.5, -5, Math.toRadians(135));
+    public static Pose2d SCORE_POSE_FOUR = new Pose2d(26.5, -5, Math.toRadians(135));
+    public static Pose2d SCORE_POSE_FIVE = new Pose2d(26.5, -5, Math.toRadians(135));
 
-    public static Pose2d CONE_POSE_ONE = new Pose2d(58.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_TWO = new Pose2d(58.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_THREE = new Pose2d(58.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FOUR = new Pose2d(58.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FIVE = new Pose2d(58.5, -11.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_ONE = new Pose2d(57.5, -10.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_TWO = new Pose2d(57.5, -10.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_THREE = new Pose2d(57.5, -10, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FOUR = new Pose2d(57.5, -10, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FIVE = new Pose2d(57.5, -10, Math.toRadians(0));
 
-    public static Pose2d ZONE_ONE = new Pose2d(-52, -16, Math.toRadians(0));
-    public static Pose2d ZONE_TWO = new Pose2d(-32, -16, Math.toRadians(90));
-    public static Pose2d ZONE_THREE = new Pose2d(-8, -16, Math.toRadians(90));
+    public static Pose2d ZONE_ONE = new Pose2d(52, -16, Math.toRadians(0));
+    public static Pose2d ZONE_TWO = new Pose2d(32, -16, Math.toRadians(90));
+    public static Pose2d ZONE_THREE = new Pose2d(8, -16, Math.toRadians(90));
 
     Telemetry telemetry;
 
@@ -128,7 +128,7 @@ public class RightAuto extends CommandOpMode {
                 .splineTo(CONE_POSE_ONE.vec(), Math.toRadians(0))
                 .build();
         Trajectory conesToJunctionOne = drive.trajectoryBuilder(
-                        junctionToConesOne.end(), Math.toRadians(0))
+                        junctionToConesOne.end(), Math.toRadians(180))
                 .splineTo(SCORE_POSE_ONE.vec(), SCORE_POSE_ONE.getHeading())
                 .build();
 
@@ -136,7 +136,7 @@ public class RightAuto extends CommandOpMode {
                 .splineTo(CONE_POSE_TWO.vec(), Math.toRadians(0))
                 .build();
         Trajectory conesToJunctionTwo = drive.trajectoryBuilder(
-                        junctionToConesTwo.end(), Math.toRadians(0))
+                        junctionToConesTwo.end(), Math.toRadians(180))
                 .splineTo(SCORE_POSE_TWO.vec(), SCORE_POSE_TWO.getHeading())
                 .build();
 
@@ -144,7 +144,7 @@ public class RightAuto extends CommandOpMode {
                 .splineTo(CONE_POSE_THREE.vec(), Math.toRadians(0))
                 .build();
         Trajectory conesToJunctionThree = drive.trajectoryBuilder(
-                        junctionToConesThree.end(), Math.toRadians(0))
+                        junctionToConesThree.end(), Math.toRadians(180))
                 .splineTo(SCORE_POSE_THREE.vec(), SCORE_POSE_THREE.getHeading())
                 .build();
 
@@ -152,25 +152,27 @@ public class RightAuto extends CommandOpMode {
                 .splineTo(CONE_POSE_FOUR.vec(), Math.toRadians(0))
                 .build();
         Trajectory conesToJunctionFour = drive.trajectoryBuilder(
-                        junctionToConesFour.end(), Math.toRadians(0))
+                        junctionToConesFour.end(), Math.toRadians(180))
                 .splineTo(SCORE_POSE_FOUR.vec(), SCORE_POSE_FOUR.getHeading())
                 .build();
 
         Trajectory junctionToConesFive = drive.trajectoryBuilder(conesToJunctionFour.end(), true)
                 .splineTo(CONE_POSE_FIVE.vec(), Math.toRadians(0))
                 .build();
-        Trajectory conesToJunctionFive = drive.trajectoryBuilder(junctionToConesFive.end(), Math.toRadians(0))
+        Trajectory conesToJunctionFive = drive.trajectoryBuilder(
+                junctionToConesFive.end(), Math.toRadians(180))
                 .splineTo(SCORE_POSE_FIVE.vec(), SCORE_POSE_FIVE.getHeading())
                 .build();
 
 
         TrajectoryCommand startToJunction = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(START_POSE, Math.toRadians(-90))
+                drive.trajectoryBuilder(START_POSE, Math.toRadians(90))
                         .splineTo(START_POSE_A.vec(), START_POSE_A.getHeading())
                         .splineToSplineHeading(START_POSE_B, Math.toRadians(105))
                         .splineToSplineHeading(SCORE_POSE_ZERO, SCORE_POSE_ZERO.getHeading())
                         .build()
         );
+
         TrajectoryCommand parkOne = new TrajectoryCommand(drive,
                 drive.trajectoryBuilder(SCORE_POSE_FIVE, true)
                         .splineToSplineHeading(ZONE_ONE, Math.toRadians(0))
@@ -182,8 +184,8 @@ public class RightAuto extends CommandOpMode {
                         .build()
         );
         TrajectoryCommand parkThree = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(-225))
-                        .splineToSplineHeading(ZONE_THREE, Math.toRadians(0))
+                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(-135))
+                        .splineToSplineHeading(ZONE_THREE, Math.toRadians(180))
                         .build()
         );
 
@@ -192,7 +194,7 @@ public class RightAuto extends CommandOpMode {
                 startToJunction,
                 new CloseClaw(claw),
                 new SequentialCommandGroup(
-                        new AsyncDelay(1.5),
+                        new AsyncDelay(1),
                         new ParallelCommandGroup(
                                 new SetSlidePosition(slide, LinearSlide.HIGH),
                                 new FlipOut(flipper)
@@ -222,13 +224,12 @@ public class RightAuto extends CommandOpMode {
                 )
         );
 
-
         SequentialCommandGroup runAuto = new SequentialCommandGroup(
                 setUpScoring,
                 cycle(5, junctionToConesOne, conesToJunctionOne),
                 cycle(4, junctionToConesTwo, conesToJunctionTwo),
-                cycle(2, junctionToConesThree, conesToJunctionThree),
-                cycle(1, junctionToConesFour, conesToJunctionFour),
+                cycle(3, junctionToConesThree, conesToJunctionThree),
+                cycle(2, junctionToConesFour, conesToJunctionFour),
                 dropForPark,
                 new SavePosition(drive::getPoseEstimate)
         );

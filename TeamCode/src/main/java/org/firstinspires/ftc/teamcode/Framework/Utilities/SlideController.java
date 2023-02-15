@@ -26,7 +26,7 @@ import org.apache.commons.math3.filter.KalmanFilter;
 public class SlideController {
 	public static double Kp = 0.015; // tuned by Alex Prichard on 20 Jan 2023
 	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
-	public static double Kd = 0.00027; // see Ben Caunt's paper for more details
+	public static double Kd = 0.0004; // see Ben Caunt's paper for more details
 	public static double Imax = 0;//0.2 / Ki;
 	public static double stabilityThreshold = 25;
 	private PIDCoefficientsEx coefficients;
@@ -106,19 +106,6 @@ public class SlideController {
 		RealMatrix taylor = taylorSeries(A, loopTime, 15);
 		RealMatrix Bd = taylor.multiply(B);
 		RealMatrix Ad = A.multiply(taylor).add(MatrixUtils.createRealIdentityMatrix(3));
-		telemetry.addData("A_d", printMat(Ad));
-		telemetry.addData("B_d", printMat(Bd));
-
-//		RealMatrix plus =
-//				MatrixUtils.createRealIdentityMatrix(3)
-//						.add(A.scalarMultiply(loopTime / 2));
-//		RealMatrix minus =
-//				MatrixUtils.createRealIdentityMatrix(3)
-//						.subtract(A.scalarMultiply(loopTime / 2));
-//		RealMatrix Ad = plus.multiply(MatrixUtils.inverse(minus));
-//		RealMatrix Bd = MatrixUtils.inverse(A)
-//				.multiply(Ad.subtract(MatrixUtils.createRealIdentityMatrix(3)))
-//				.multiply(B);
 
 		model = new DefaultProcessModel(Ad, Bd, Q, initState, initError);
 		measurementModel = new DefaultMeasurementModel(C, R);
@@ -188,10 +175,10 @@ public class SlideController {
 
 			prevPv = stateEstimate[0];
 			prevVel = stateEstimate[1];
-			double adrCompensation = stateEstimate[2] / 5;
+			double adrCompensation = stateEstimate[2] * 0;
 
 			telemetry.addData("pos", prevPv);
-			telemetry.addData("vel", prevVel);
+			telemetry.addData("actual pos", Pv);
 			telemetry.addData("adr", adrCompensation * 100);
 			telemetry.update();
 
@@ -235,7 +222,7 @@ public class SlideController {
 			double a = targetState.getA();
 			if (!isMovementFinished) {
 				power = controller.calculate(x, Pv) + Kg + v * Kv + a * Ka - adrCompensation;
-				power += Math.copySign(Ks, v);
+//				power += Math.copySign(Ks, v);
 			}
 			else {
 				power = controller.calculate(prevSP, Pv) + Kg - adrCompensation;
