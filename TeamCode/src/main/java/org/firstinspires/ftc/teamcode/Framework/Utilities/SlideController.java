@@ -24,22 +24,22 @@ import org.apache.commons.math3.filter.KalmanFilter;
 // Kd = 2 * sqrt(Ka * Kp) - Kv, Kp >= Kv * Kv / (4 * Ka)
 @Config
 public class SlideController {
-	public static double Kp = 0.015; // tuned by Alex Prichard on 20 Jan 2023
+	public static double Kg = 0.08; // tuned by Alex Prichard on 12 Jan 2023
+
+	public static double Kv = 0.00022; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ka = 0.00001; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ks = 0.08;
+
+	public static double MAX_V = 1_000; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_A = 10_000; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_J = 30_000; // tuned by Alex Prichard on 20 Jan 2023
+
+	public static double Kp = 5 * Kv * Kv / (4 * Ka); // tuned by Alex Prichard on 20 Jan 2023
 	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
-	public static double Kd = 0.0004; // see Ben Caunt's paper for more details
+	public static double Kd = 2 * Math.sqrt(Kp * Ka) - Kv; // see Ben Caunt's paper for more details
 	public static double Imax = 0;//0.2 / Ki;
 	public static double stabilityThreshold = 25;
 	private PIDCoefficientsEx coefficients;
-
-	public static double Kg = 0.05; // tuned by Alex Prichard on 12 Jan 2023
-
-	public static double Kv = 0.0005; // tuned by Alex Prichard on 12 Jan 2023
-	public static double Ka = 0.00001; // tuned by Alex Prichard on 12 Jan 2023
-	public static double Ks = 0;
-
-	public static double MAX_V = 1_000; // tuned by Alex Prichard on 20 Jan 2023
-	public static double MAX_A = 5_000; // tuned by Alex Prichard on 20 Jan 2023
-	public static double MAX_J = 30_000; // tuned by Alex Prichard on 20 Jan 2023
 
 	public double prevSP = 0;
 	public static double SP = 0;
@@ -62,6 +62,8 @@ public class SlideController {
 	private FtcDashboard dash;
 	private Telemetry telemetry;
 	private boolean isMovementFinished = false;
+
+	private double u = 0;
 
 	public SlideController() {
 		coefficients = new PIDCoefficientsEx(Kp, Ki, Kd, Imax, stabilityThreshold, 0.8);
@@ -103,7 +105,7 @@ public class SlideController {
 
 		double loopTime = 0.01;
 
-		RealMatrix taylor = taylorSeries(A, loopTime, 15);
+		RealMatrix taylor = taylorSeries(A, loopTime, 10);
 		RealMatrix Bd = taylor.multiply(B);
 		RealMatrix Ad = A.multiply(taylor).add(MatrixUtils.createRealIdentityMatrix(3));
 
@@ -169,18 +171,13 @@ public class SlideController {
 		if (dt >= 0.01) {
 			prevTime += (long)(0.01 * 1.0e9);
 
-			kalmanFilter.predict(new double[] { power });
+			kalmanFilter.predict(new double[] { u });
 			kalmanFilter.correct(new double[] { Pv });
 			double[] stateEstimate = kalmanFilter.getStateEstimation();
 
 			prevPv = stateEstimate[0];
 			prevVel = stateEstimate[1];
-			double adrCompensation = stateEstimate[2] * 0;
-
-			telemetry.addData("pos", prevPv);
-			telemetry.addData("actual pos", Pv);
-			telemetry.addData("adr", adrCompensation * 100);
-			telemetry.update();
+			double adrCompensation = stateEstimate[2] * 0.01;
 
 			if (SP != prevSP) { // generate new motion profile if target position has changed
 				try {
@@ -220,12 +217,14 @@ public class SlideController {
 			double x = targetState.getX();
 			double v = targetState.getV();
 			double a = targetState.getA();
+
 			if (!isMovementFinished) {
-				power = controller.calculate(x, Pv) + Kg + v * Kv + a * Ka - adrCompensation;
-//				power += Math.copySign(Ks, v);
+				u = controller.calculate(x, Pv) + v * Kv + a * Ka - adrCompensation;
+				power = u + Kg + Math.copySign(Ks, v);
 			}
 			else {
-				power = controller.calculate(prevSP, Pv) + Kg - adrCompensation;
+				u = controller.calculate(x, Pv) - adrCompensation;
+				power = u + Kg;
 			}
 		}
 
