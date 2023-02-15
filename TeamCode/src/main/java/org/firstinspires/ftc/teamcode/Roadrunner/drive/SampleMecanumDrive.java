@@ -74,6 +74,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(HEAD_P, 0,
             2 * Math.sqrt(HEAD_P * kA / (TRACK_WIDTH * gyrationConstant)) - kV / TRACK_WIDTH);
 
+    public static double ADRC_GAIN = 0.1;
+
     public static double LATERAL_MULTIPLIER = 1.8;
 
     public static double VX_WEIGHT = 1;
@@ -280,14 +282,13 @@ public class SampleMecanumDrive extends MecanumDrive {
                     robotRelativePower.getHeading()
             );
             Pose2d disturbanceRejection = localizer.getDisturbanceRejectionPower();
-            fieldRelativePower = new Pose2d(
-                    fieldRelativePower.getX() + disturbanceRejection.getX(),
-                    fieldRelativePower.getY() + disturbanceRejection.getY(),
-                    fieldRelativePower.getHeading() + disturbanceRejection.getHeading()
-            );
+            disturbanceRejection = disturbanceRejection.times(ADRC_GAIN);
+            fieldRelativePower = fieldRelativePower.plus(disturbanceRejection);
+
             previousPowers[0] = fieldRelativePower.getX();
             previousPowers[1] = fieldRelativePower.getY();
             previousPowers[2] = fieldRelativePower.getHeading();
+
             Pose2d appliedPower = new Pose2d(
                     fieldRelativePower.vec().rotated(-getPoseEstimate().getHeading()),
                     fieldRelativePower.getHeading()

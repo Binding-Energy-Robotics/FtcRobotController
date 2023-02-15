@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.kinematics.Kinematics;
 import com.acmerobotics.roadrunner.localization.TwoTrackingWheelLocalizer;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
@@ -23,6 +24,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.checkerframework.checker.units.qual.K;
 import org.firstinspires.ftc.teamcode.Roadrunner.util.Encoder;
+import org.opencv.core.Mat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,6 +82,8 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
 	private int headingWraps = 0;
 	private double previousHeading = 0;
+
+	private double dt = 0.01;
 
 	public TwoWheelTrackingLocalizer(HardwareMap hardwareMap, SampleMecanumDrive drive) {
 		super(Arrays.asList(
@@ -169,8 +173,6 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 },
 				{ 0, 0, 0,   0, 0, 0,   0, 0, 0 }
 		});
-
-		double dt = 0.01;
 
 		RealMatrix taylor = taylorSeries(Ac, dt, 10);
 		RealMatrix Bd = taylor.multiply(Bc);
@@ -302,7 +304,44 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
 	public void update(double[] previousPowers) { // implement extended kalman filter with adrc here
 		super.update();
-		kalmanFilter.predict(previousPowers);
+
+		double[] state = kalmanFilter.getStateEstimation();
+		Pose2d position = new Pose2d(
+				state[0],
+				state[1],
+				state[2]
+		);
+		Pose2d velocity = new Pose2d(
+				state[3],
+				state[4],
+				state[5]
+		);
+		velocity = Kinematics.fieldToRobotVelocity(position, velocity);
+		Pose2d predictedPosition = Kinematics.relativeOdometryUpdate(
+				position, velocity.times(dt));
+		state[0] = predictedPosition.getX();
+		state[1] = predictedPosition.getY();
+		state[2] = predictedPosition.getHeading();
+
+		RealMatrix B = processModel.getControlMatrix();
+		RealVector controlVector = B.operate(
+				new ArrayRealVector(previousPowers)
+		);
+		controlVector.add(new ArrayRealVector(state));
+		RealMatrix A = processModel.getStateTransitionMatrix();
+		RealMatrix Q = processModel.getProcessNoise();
+
+		processModel = new DefaultProcessModel(
+				A,
+				B,
+				Q,
+				controlVector,
+				A.multiply(kalmanFilter.getErrorCovarianceMatrix())
+						.multiply(A.transpose())
+						.add(Q)
+		);
+		kalmanFilter = new KalmanFilter(processModel, measurementModel);
+
 		double[] measurement = measurementVector(getPoseEstimate(), getPoseVelocity());
 		kalmanFilter.correct(measurement);
 	}
