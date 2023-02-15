@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Roadrunner.drive;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.kinematics.Kinematics;
@@ -23,6 +24,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.checkerframework.checker.units.qual.K;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Roadrunner.util.Encoder;
 import org.opencv.core.Mat;
 
@@ -133,9 +135,9 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 				{ 0, 0, 0,   0,  .5, 0,     0, 0, 0 },
 				{ 0, 0, 0,   0,  0,  .05,   0, 0, 0 },
 
-				{ 0, 0, 0,   0, 0, 0,   .03, 0,   0 },
-				{ 0, 0, 0,   0, 0, 0,   0,   .03, 0 },
-				{ 0, 0, 0,   0, 0, 0,   0,   0,   .03 }
+				{ 0, 0, 0,   0, 0, 0,   .1, 0,  0 },
+				{ 0, 0, 0,   0, 0, 0,   0,  .1, 0 },
+				{ 0, 0, 0,   0, 0, 0,   0,  0,  .1 }
 		});
 
 		RealMatrix C = new Array2DRowRealMatrix(new double[][] {
@@ -302,6 +304,19 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 		kalmanFilter = new KalmanFilter(processModel, measurementModel);
 	}
 
+	private RealMatrix symmetrize(RealMatrix P) {
+		for (int i = 0; i < 8; i++) {
+			for (int j = i + 1; j < 9; j++) {
+				double first = P.getEntry(i, j);
+				double second = P.getEntry(j, i);
+				double avg = (first + second) * 0.5;
+				P.setEntry(i, j, avg);
+				P.setEntry(j, i, avg);
+			}
+		}
+		return P;
+	}
+
 	public void update(double[] previousPowers) { // implement extended kalman filter with adrc here
 		super.update();
 
@@ -336,13 +351,14 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 				B,
 				Q,
 				controlVector,
-				A.multiply(kalmanFilter.getErrorCovarianceMatrix())
+				symmetrize(A.multiply(kalmanFilter.getErrorCovarianceMatrix())
 						.multiply(A.transpose())
-						.add(Q)
+						.add(Q))
 		);
 		kalmanFilter = new KalmanFilter(processModel, measurementModel);
 
 		double[] measurement = measurementVector(getPoseEstimate(), getPoseVelocity());
+		Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
 		kalmanFilter.correct(measurement);
 	}
 

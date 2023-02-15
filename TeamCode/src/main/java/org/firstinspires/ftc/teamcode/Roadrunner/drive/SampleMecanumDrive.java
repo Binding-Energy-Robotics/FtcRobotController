@@ -74,7 +74,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(HEAD_P, 0,
             2 * Math.sqrt(HEAD_P * kA / (TRACK_WIDTH * gyrationConstant)) - kV / TRACK_WIDTH);
 
-    public static double ADRC_GAIN = 0.1;
+    public static double ADRC_GAIN = 0.0001;
 
     public static double LATERAL_MULTIPLIER = 1.8;
 

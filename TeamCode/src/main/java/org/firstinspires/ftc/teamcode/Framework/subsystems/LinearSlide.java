@@ -133,8 +133,6 @@ public class LinearSlide extends SubsystemBase {
 
     @Override
     public void periodic() {
-        t.addData("slide", getEncoder());
-        t.update();
         if (usingPID.getAsBoolean()) {
             int position = slideMotors[0].getCurrentPosition();
             double power = controller.getPower(position);
