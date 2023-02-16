@@ -51,4 +51,10 @@ public class AutoDrive extends SubsystemBase {
     public Pose2d getPoseEstimate() {
         return drive.getPoseEstimate();
     }
+
+    @Override
+    public void periodic() {
+        super.periodic();
+        drive.clearCache();
+    }
 }

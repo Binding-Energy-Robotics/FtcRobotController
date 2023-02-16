@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
 import org.firstinspires.ftc.teamcode.Framework.Commands.SavePosition;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
+import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.AutoEndPose;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
@@ -123,6 +124,7 @@ public class LeftAuto extends CommandOpMode {
 		claw.open();
 		camera = new Camera(hardwareMap);
 
+		register(drive, slide, flipper, claw);
 
 		Trajectory junctionToConesOne = drive.trajectoryBuilder(SCORE_POSE_ZERO, true)
 				.splineTo(CONE_POSE_ONE.vec(), Math.toRadians(180))
@@ -233,8 +235,6 @@ public class LeftAuto extends CommandOpMode {
 				new SavePosition(drive::getPoseEstimate)
 		);
 
-		register(drive, slide, flipper, claw);
-
 		ElapsedTime time = new ElapsedTime();
 		while (!isStarted() && !isStopRequested()) {
 			camera.periodic();
@@ -249,6 +249,6 @@ public class LeftAuto extends CommandOpMode {
 		signalSide = camera.getSide();
 		camera.stop();
 
-		schedule(runAuto);
+		schedule(runAuto, new TelemetryUpdate(telemetry));
 	}
 }

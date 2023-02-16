@@ -74,7 +74,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(HEAD_P, 0,
             2 * Math.sqrt(HEAD_P * kA / (TRACK_WIDTH * gyrationConstant)) - kV / TRACK_WIDTH);
 
-    public static double ADRC_GAIN = 0.0001;
+    public static double ADRC_GAIN = 0.01;
 
     public static double LATERAL_MULTIPLIER = 1.8;
 
@@ -100,10 +100,17 @@ public class SampleMecanumDrive extends MecanumDrive {
     private double[] previousPowers = new double[] { 0, 0, 0 };
     private TwoWheelTrackingLocalizer localizer;
 
+    private List<LynxModule> hubs;
+
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         PhotonCore.enable();
+
+        hubs = hardwareMap.getAll(LynxModule.class);
+        for (int i = 0; i < hubs.size(); i++) {
+            hubs.get(i).setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.1, 0.1, Math.toRadians(1.0)), 1);
@@ -186,6 +193,12 @@ public class SampleMecanumDrive extends MecanumDrive {
         setLocalizer(localizer);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
+    }
+
+    public void clearCache() {
+        for (int i = 0; i < hubs.size(); i++) {
+            hubs.get(i).clearBulkCache();
+        }
     }
 
     public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
