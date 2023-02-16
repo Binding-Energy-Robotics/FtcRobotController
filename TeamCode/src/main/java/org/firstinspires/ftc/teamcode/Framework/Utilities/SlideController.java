@@ -177,7 +177,7 @@ public class SlideController {
 
 			prevPv = stateEstimate[0];
 			prevVel = stateEstimate[1];
-			double adrCompensation = stateEstimate[2] * 0.001;
+			double adrCompensation = stateEstimate[2] * 0;
 
 			if (SP != prevSP) { // generate new motion profile if target position has changed
 				try {
