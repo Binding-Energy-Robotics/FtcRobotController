@@ -36,7 +36,7 @@ public class SlideController {
 
 	public static double Kp = 5 * Kv * Kv / (4 * Ka); // tuned by Alex Prichard on 20 Jan 2023
 	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
-	public static double Kd = 2 * Math.sqrt(Kp * Ka) - Kv; // see Ben Caunt's paper for more details
+	public static double Kd = 2 * 2 * Math.sqrt(Kp * Ka) - Kv; // see Ben Caunt's paper for more details
 	public static double Imax = 0;//0.2 / Ki;
 	public static double stabilityThreshold = 25;
 	private PIDCoefficientsEx coefficients;
@@ -87,7 +87,7 @@ public class SlideController {
 		Array2DRowRealMatrix Q = new Array2DRowRealMatrix(new double[][] {
 				{ 10, 0, 0 },
 				{ 0, 20, 0 },
-				{ 0, 0, 0.05 }
+				{ 0, 0, 0.3 }
 		});
 		Array2DRowRealMatrix initError = new Array2DRowRealMatrix(new double[][] {
 				{ 1, 0, 0 },
@@ -177,7 +177,7 @@ public class SlideController {
 
 			prevPv = stateEstimate[0];
 			prevVel = stateEstimate[1];
-			double adrCompensation = stateEstimate[2] * 0.01;
+			double adrCompensation = stateEstimate[2] * 0.001;
 
 			if (SP != prevSP) { // generate new motion profile if target position has changed
 				try {
