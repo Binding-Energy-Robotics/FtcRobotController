@@ -39,18 +39,18 @@ public class RightAuto extends CommandOpMode {
     public static Pose2d START_POSE_A = new Pose2d(34, -48, Math.toRadians(60));
     public static Pose2d START_POSE_B = new Pose2d(36, -24, Math.toRadians(120));
 
-    public static Pose2d SCORE_POSE_ZERO = new Pose2d(26.5, -5, Math.toRadians(135));
+    public static Pose2d SCORE_POSE_ZERO = new Pose2d(26.2, -4.5, Math.toRadians(135));
     public static Pose2d SCORE_POSE_ONE = new Pose2d(26.5, -5, Math.toRadians(135));
     public static Pose2d SCORE_POSE_TWO = new Pose2d(26.5, -5, Math.toRadians(135));
     public static Pose2d SCORE_POSE_THREE = new Pose2d(26.5, -5, Math.toRadians(135));
-    public static Pose2d SCORE_POSE_FOUR = new Pose2d(26.5, -5, Math.toRadians(135));
+    public static Pose2d SCORE_POSE_FOUR = new Pose2d(26, -5, Math.toRadians(135));
     public static Pose2d SCORE_POSE_FIVE = new Pose2d(26.5, -5, Math.toRadians(135));
 
-    public static Pose2d CONE_POSE_ONE = new Pose2d(57.5, -10.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_TWO = new Pose2d(57.5, -10.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_ONE = new Pose2d(58, -10.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_TWO = new Pose2d(58, -10.25, Math.toRadians(0));
     public static Pose2d CONE_POSE_THREE = new Pose2d(57.5, -10, Math.toRadians(0));
     public static Pose2d CONE_POSE_FOUR = new Pose2d(57.5, -10, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FIVE = new Pose2d(57.5, -10, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FIVE = new Pose2d(57.25, -10, Math.toRadians(0));
 
     public static Pose2d ZONE_ONE = new Pose2d(52, -16, Math.toRadians(0));
     public static Pose2d ZONE_TWO = new Pose2d(32, -16, Math.toRadians(90));
