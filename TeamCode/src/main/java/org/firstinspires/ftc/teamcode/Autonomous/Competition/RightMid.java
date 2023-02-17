@@ -36,22 +36,22 @@ import java.util.HashMap;
 @Autonomous(preselectTeleOp = "MainTeleop")
 public class RightMid extends CommandOpMode {
     public static final Pose2d START_POSE = new Pose2d(31, -63.5, Math.toRadians(-90));
-    public static final Pose2d START_POSE_A = new Pose2d(36, -48, Math.toRadians(180));
+    public static final Pose2d START_POSE_A = new Pose2d(35, -48, Math.toRadians(180));
     public static final Pose2d START_POSE_B = new Pose2d(36, -24, Math.toRadians(-90));
-    public static final Pose2d START_POSE_C = new Pose2d(36, -15, Math.toRadians(225));
+    public static final Pose2d START_POSE_C = new Pose2d(37, -14, Math.toRadians(225));
 
-    public static Pose2d SCORE_POSE_ZERO = new Pose2d(28.5, -19, Math.toRadians(225));
-    public static Pose2d SCORE_POSE_ONE = new Pose2d(28.5, -19, Math.toRadians(225));
-    public static Pose2d SCORE_POSE_TWO = new Pose2d(28.5, -19, Math.toRadians(225));
-    public static Pose2d SCORE_POSE_THREE = new Pose2d(28.5, -19, Math.toRadians(225));
-    public static Pose2d SCORE_POSE_FOUR = new Pose2d(28.5, -19, Math.toRadians(225));
-    public static Pose2d SCORE_POSE_FIVE = new Pose2d(28.5, -19, Math.toRadians(225));
+    public static Pose2d SCORE_POSE_ZERO = new Pose2d(28.5, -15, Math.toRadians(225));
+    public static Pose2d SCORE_POSE_ONE = new Pose2d(28.5, -14.75, Math.toRadians(225));
+    public static Pose2d SCORE_POSE_TWO = new Pose2d(28.5, -14.5, Math.toRadians(225));
+    public static Pose2d SCORE_POSE_THREE = new Pose2d(28.5, -14.25, Math.toRadians(225));
+    public static Pose2d SCORE_POSE_FOUR = new Pose2d(28.5, -14.2, Math.toRadians(225));
+    public static Pose2d SCORE_POSE_FIVE = new Pose2d(28.5, -14, Math.toRadians(225));
 
-    public static Pose2d CONE_POSE_ONE = new Pose2d(-61, -11.3, Math.toRadians(0));
-    public static Pose2d CONE_POSE_TWO = new Pose2d(-61, -11.3, Math.toRadians(0));
-    public static Pose2d CONE_POSE_THREE = new Pose2d(-61, -11.3, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FOUR = new Pose2d(-61, -11.3, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FIVE = new Pose2d(-61, -11.3, Math.toRadians(0));
+    public static Pose2d CONE_POSE_ONE = new Pose2d(60, -10.3, Math.toRadians(0));
+    public static Pose2d CONE_POSE_TWO = new Pose2d(60, -10.3, Math.toRadians(0));
+    public static Pose2d CONE_POSE_THREE = new Pose2d(60, -10.2, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FOUR = new Pose2d(60, -10.1, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FIVE = new Pose2d(60, -10, Math.toRadians(0));
 
     public static Pose2d ZONE_ONE = new Pose2d(60, -11, Math.toRadians(0));
     public static Pose2d ZONE_TWO = new Pose2d(36, -11, Math.toRadians(90));
