@@ -194,7 +194,7 @@ public class LeftMid extends CommandOpMode {
                 new SequentialCommandGroup(
                         new AsyncDelay(1),
                         new ParallelCommandGroup(
-                                new SetSlidePosition(slide, LinearSlide.HIGH),
+                                new SetSlidePosition(slide, LinearSlide.MEDIUM),
                                 new FlipOut(flipper)
                         )
                 )
@@ -227,8 +227,8 @@ public class LeftMid extends CommandOpMode {
                 setUpScoring,
                 cycle(5, junctionToConesOne, conesToJunctionOne),
                 cycle(4, junctionToConesTwo, conesToJunctionTwo),
-                cycle(2, junctionToConesThree, conesToJunctionThree),
-                cycle(1, junctionToConesFour, conesToJunctionFour),
+                cycle(3, junctionToConesThree, conesToJunctionThree),
+                cycle(2, junctionToConesFour, conesToJunctionFour),
                 dropForPark,
                 new SavePosition(drive::getPoseEstimate)
         );

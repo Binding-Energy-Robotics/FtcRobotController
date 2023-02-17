@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipIn;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Flipper.FlipOut;
 import org.firstinspires.ftc.teamcode.Framework.Commands.SavePosition;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
+import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.AutoEndPose;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
@@ -255,6 +256,6 @@ public class RightAuto extends CommandOpMode {
         signalSide = camera.getSide();
         camera.stop();
 
-        schedule(runAuto);
+        schedule(runAuto, new TelemetryUpdate(telemetry));
     }
 }
