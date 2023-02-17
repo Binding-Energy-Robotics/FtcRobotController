@@ -52,9 +52,10 @@ public class RightAuto extends CommandOpMode {
     public static Pose2d CONE_POSE_FOUR = new Pose2d(57.5, -9.75, Math.toRadians(0));
     public static Pose2d CONE_POSE_FIVE = new Pose2d(57.25, -9.75, Math.toRadians(0));
 
-    public static Pose2d ZONE_ONE = new Pose2d(52, -16, Math.toRadians(0));
-    public static Pose2d ZONE_TWO = new Pose2d(32, -16, Math.toRadians(90));
-    public static Pose2d ZONE_THREE = new Pose2d(8, -16, Math.toRadians(90));
+    public static Pose2d ZONE_ONE = new Pose2d(11, -20, Math.toRadians(90));
+    public static Pose2d ZONE_ONE_A = new Pose2d(24, -7.5, Math.toRadians(90));
+    public static Pose2d ZONE_TWO = new Pose2d(32, -20, Math.toRadians(90));
+    public static Pose2d ZONE_THREE = new Pose2d(52, -20, Math.toRadians(90));
 
     Telemetry telemetry;
 
@@ -174,19 +175,23 @@ public class RightAuto extends CommandOpMode {
         );
 
         TrajectoryCommand parkOne = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, true)
-                        .splineToSplineHeading(ZONE_ONE, Math.toRadians(0))
+                drive.trajectoryBuilder(SCORE_POSE_FIVE)
+                        .lineToSplineHeading(ZONE_ONE_A)
+                        .splineToSplineHeading(ZONE_ONE, Math.toRadians(-90))
                         .build()
         );
         TrajectoryCommand parkTwo = new TrajectoryCommand(drive,
                 drive.trajectoryBuilder(SCORE_POSE_FIVE)
-                        .lineToLinearHeading(ZONE_TWO)
+                        .splineToSplineHeading(ZONE_TWO, Math.toRadians(-45))
                         .build()
         );
+//        TrajectoryCommand parkThree = new TrajectoryCommand(drive,
+//                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(-135))
+//                        .splineToSplineHeading(ZONE_THREE, Math.toRadians(0))
+//                        .build()
+//        );
         TrajectoryCommand parkThree = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(-135))
-                        .splineToSplineHeading(ZONE_THREE, Math.toRadians(180))
-                        .build()
+                junctionToConesFive
         );
 
 

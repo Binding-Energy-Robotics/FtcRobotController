@@ -399,6 +399,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         v2 = Range.clip(v2, -1, 1);
         v3 = Range.clip(v3, -1, 1);
         double power = batteryVoltageSensor.getVoltage();
+        Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+        telemetry.addData("Voltage", power);
         double scalar = 12 / power;
         leftFront.setPower(v * scalar);
         leftRear.setPower(v1 * scalar);
