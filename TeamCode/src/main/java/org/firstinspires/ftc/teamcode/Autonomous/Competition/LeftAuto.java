@@ -173,10 +173,13 @@ public class LeftAuto extends CommandOpMode {
 				.splineToSplineHeading(SCORE_POSE_ZERO, SCORE_POSE_ZERO.getHeading())
 				.build()
 		);
+//		TrajectoryCommand parkOne = new TrajectoryCommand(drive,
+//				drive.trajectoryBuilder(SCORE_POSE_FIVE, true)
+//				.splineToSplineHeading(ZONE_ONE, Math.toRadians(180))
+//				.build()
+//		);
 		TrajectoryCommand parkOne = new TrajectoryCommand(drive,
-				drive.trajectoryBuilder(SCORE_POSE_FIVE, true)
-				.splineToSplineHeading(ZONE_ONE, Math.toRadians(180))
-				.build()
+				conesToJunctionFive
 		);
 		TrajectoryCommand parkTwo = new TrajectoryCommand(drive,
 				drive.trajectoryBuilder(SCORE_POSE_FIVE)
