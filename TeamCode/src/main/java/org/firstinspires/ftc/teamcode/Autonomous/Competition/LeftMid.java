@@ -36,25 +36,28 @@ import java.util.HashMap;
 @Autonomous(preselectTeleOp = "MainTeleop")
 public class LeftMid extends CommandOpMode {
     public static Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
-    public static Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(100));
-    public static Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(70));
+    public static Pose2d START_POSE_A = new Pose2d(-35, -48, Math.toRadians(0));
+    public static Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(-90));
 
-    public static Pose2d SCORE_POSE_ZERO = new Pose2d(-28.5, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_ONE = new Pose2d(-28.5, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_TWO = new Pose2d(-28.5, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_THREE = new Pose2d(-28.5, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-28.5, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-28.5, -19, Math.toRadians(-45));
+    public static final Pose2d START_POSE_C = new Pose2d(-37, -14, Math.toRadians(-45));
 
-    public static Pose2d CONE_POSE_ONE = new Pose2d(-57.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_TWO = new Pose2d(-57.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_THREE = new Pose2d(-57.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FOUR = new Pose2d(-57.5, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FIVE = new Pose2d(-57.5, -11.25, Math.toRadians(0));
+    public static Pose2d SCORE_POSE_ZERO = new Pose2d(-30, -18.4, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_ONE = new Pose2d(-30.1, -18.3, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_TWO = new Pose2d(-30.2, -18.2, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_THREE = new Pose2d(-30.3, -18.2, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-30.4, -18.1, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-30.45, -18, Math.toRadians(-45));
 
-    public static Pose2d ZONE_ONE = new Pose2d(-59, -14, Math.toRadians(0));
-    public static Pose2d ZONE_TWO = new Pose2d(-36, -14, Math.toRadians(90));
-    public static Pose2d ZONE_THREE = new Pose2d(-9, -14, Math.toRadians(90));
+    public static Pose2d CONE_POSE_ONE = new Pose2d(-61, -11.3, Math.toRadians(0));
+    public static Pose2d CONE_POSE_TWO = new Pose2d(-60.6, -11.32, Math.toRadians(0));
+    public static Pose2d CONE_POSE_THREE = new Pose2d(-60.2, -11.35, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FOUR = new Pose2d(-60.1, -11.4, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FIVE = new Pose2d(-60.1, -11.45, Math.toRadians(0));
+
+    public static Pose2d ZONE_ONE = new Pose2d(-60, -11, Math.toRadians(0));
+    public static Pose2d ZONE_TWO = new Pose2d(-36, -11, Math.toRadians(90));
+
+    public static Pose2d ZONE_THREE = new Pose2d(-9, -11, Math.toRadians(90));
 
     Telemetry telemetry;
 
@@ -71,34 +74,34 @@ public class LeftMid extends CommandOpMode {
                 new ParallelCommandGroup(
                         new SetSlidePosition(slide, LinearSlide.CONE_STACK[coneHeight]),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.15),
+                                new AsyncDelay(0.07),
                                 new OpenClaw(claw),
-                                new AsyncDelay(0.1),
+                                new AsyncDelay(0.07),
                                 new FlipIn(flipper)
                         ),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.15),
+                                new AsyncDelay(0.07),
                                 new TrajectoryCommand(drive, junctionToCones)
                         )
                 ),
                 new CloseClaw(claw),
-                new AsyncDelay(0.15),
+                new AsyncDelay(0.07),
                 new ParallelCommandGroup(
                         new SetSlidePosition(slide, LinearSlide.LOW),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.15),
+                                new AsyncDelay(0.07),
                                 new ParallelCommandGroup(
                                         new TrajectoryCommand(drive, conesToJunction),
                                         new SequentialCommandGroup(
-                                                new AsyncDelay(0.1),
+                                                new AsyncDelay(0.07),
                                                 new ParallelCommandGroup(
                                                         new SetSlidePosition(slide, LinearSlide.TWO_CONE),
                                                         new SequentialCommandGroup(
-                                                                new AsyncDelay(0.35),
+                                                                new AsyncDelay(0.3),
                                                                 new ParallelCommandGroup(
-                                                                        new SetSlidePosition(slide, LinearSlide.HIGH),
+                                                                        new SetSlidePosition(slide, LinearSlide.MEDIUM),
                                                                         new SequentialCommandGroup(
-                                                                                new AsyncDelay(0.2),
+                                                                                new AsyncDelay(0.17),
                                                                                 new FlipOut(flipper)
                                                                         )
                                                                 )
@@ -167,8 +170,10 @@ public class LeftMid extends CommandOpMode {
 
         TrajectoryCommand startToJunction = new TrajectoryCommand(drive,
                 drive.trajectoryBuilder(START_POSE, Math.toRadians(90))
-                        .splineTo(START_POSE_A.vec(), START_POSE_A.getHeading())
-                        .splineToSplineHeading(SCORE_POSE_ZERO, SCORE_POSE_ZERO.getHeading())
+                        .splineToSplineHeading(START_POSE_A, Math.toRadians(90))
+                        .splineToSplineHeading(START_POSE_B, Math.toRadians(90))
+                        .splineToSplineHeading(START_POSE_C, Math.toRadians(90))
+                        .splineToConstantHeading(SCORE_POSE_ZERO.vec(), Math.toRadians(-45))
                         .build()
         );
         TrajectoryCommand parkOne = new TrajectoryCommand(drive,
@@ -182,8 +187,9 @@ public class LeftMid extends CommandOpMode {
                         .build()
         );
         TrajectoryCommand parkThree = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(-45))
-                        .splineToSplineHeading(ZONE_THREE, Math.toRadians(0))
+                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(0))
+                        .splineToSplineHeading(ZONE_TWO, Math.toRadians(0))
+                        .splineToSplineHeading(ZONE_THREE, Math.toRadians(90))
                         .build()
         );
 
@@ -192,9 +198,9 @@ public class LeftMid extends CommandOpMode {
                 startToJunction,
                 new CloseClaw(claw),
                 new SequentialCommandGroup(
-                        new AsyncDelay(1),
+                        new AsyncDelay(.15),
                         new ParallelCommandGroup(
-                                new SetSlidePosition(slide, LinearSlide.HIGH),
+                                new SetSlidePosition(slide, LinearSlide.MEDIUM),
                                 new FlipOut(flipper)
                         )
                 )
@@ -210,12 +216,12 @@ public class LeftMid extends CommandOpMode {
         ParallelCommandGroup dropForPark = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.ONE_CONE),
                 new SequentialCommandGroup(
-                        new AsyncDelay(0.25),
+                        new AsyncDelay(0.15),
                         new OpenClaw(claw),
                         new ParallelCommandGroup(
                                 park,
                                 new SequentialCommandGroup(
-                                        new AsyncDelay(.33),
+                                        new AsyncDelay(.2),
                                         new FlipIn(flipper)
                                 )
                         )
@@ -227,8 +233,9 @@ public class LeftMid extends CommandOpMode {
                 setUpScoring,
                 cycle(5, junctionToConesOne, conesToJunctionOne),
                 cycle(4, junctionToConesTwo, conesToJunctionTwo),
-                cycle(2, junctionToConesThree, conesToJunctionThree),
-                cycle(1, junctionToConesFour, conesToJunctionFour),
+                cycle(3, junctionToConesThree, conesToJunctionThree),
+                cycle(2, junctionToConesFour, conesToJunctionFour),
+                cycle(1, junctionToConesFive, conesToJunctionFive),
                 dropForPark,
                 new SavePosition(drive::getPoseEstimate)
         );
@@ -251,9 +258,4 @@ public class LeftMid extends CommandOpMode {
 
         schedule(runAuto);
     }
-
-
-
-
-
 }
