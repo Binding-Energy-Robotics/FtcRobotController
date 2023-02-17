@@ -13,9 +13,9 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class LeftMid {
     public static final Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
-    public static final Pose2d START_POSE_A = new Pose2d(-36, -48, Math.toRadians(90));
-    public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(90));
-    public static final Pose2d START_POSE_C = new Pose2d(-36, -18, Math.toRadians(-45));
+    public static final Pose2d START_POSE_A = new Pose2d(-36, -48, Math.toRadians(0));
+    public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(-90));
+    public static final Pose2d START_POSE_C = new Pose2d(-36, -15, Math.toRadians(-45));
     public static final Pose2d SCORE_POSE = new Pose2d(-28.5, -19, Math.toRadians(-45));
     public static final Pose2d CONE_POSE = new Pose2d(-57.5, -11.25, Math.toRadians(0));
     public static final Pose2d ZONE_ONE = new Pose2d(-59, -12, Math.toRadians(0));
@@ -31,8 +31,8 @@ public class LeftMid {
                 .setConstraints(MAX_VEL, MAX_ACCEL, MAX_ANG_VEL, MAX_ANG_ACCEL, TRACK_WIDTH)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(START_POSE)
                                 .setReversed(true)
-                                .splineToConstantHeading(START_POSE_A.vec(), START_POSE_A.getHeading())
-                                .strafeTo(START_POSE_B.vec())
+                                .splineToSplineHeading(START_POSE_A, Math.toRadians(90))
+                                .lineToSplineHeading(START_POSE_B)
                                 .splineToSplineHeading(START_POSE_C, Math.toRadians(90))
                                 .splineToConstantHeading(SCORE_POSE.vec(), Math.toRadians(-45))
                                 .waitSeconds(.7)
