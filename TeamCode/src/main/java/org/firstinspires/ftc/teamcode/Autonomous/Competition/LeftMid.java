@@ -43,16 +43,16 @@ public class LeftMid extends CommandOpMode {
 
     public static Pose2d SCORE_POSE_ZERO = new Pose2d(-30, -19, Math.toRadians(-45));
     public static Pose2d SCORE_POSE_ONE = new Pose2d(-30, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_TWO = new Pose2d(-30, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_THREE = new Pose2d(-30, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-30, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-30, -19, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_TWO = new Pose2d(-30, -18, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_THREE = new Pose2d(-30, -18, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-30, -18, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-30, -18, Math.toRadians(-45));
 
-    public static Pose2d CONE_POSE_ONE = new Pose2d(-62, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_TWO = new Pose2d(-62, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_THREE = new Pose2d(-62, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FOUR = new Pose2d(-62, -11.25, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FIVE = new Pose2d(-62, -11.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_ONE = new Pose2d(-61.15, -11.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_TWO = new Pose2d(-61.15, -11.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_THREE = new Pose2d(-61.15, -11.25, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FOUR = new Pose2d(-61.15, -11.22, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FIVE = new Pose2d(-61.15, -11.2, Math.toRadians(0));
 
     public static Pose2d ZONE_ONE = new Pose2d(-59, -14, Math.toRadians(0));
     public static Pose2d ZONE_TWO = new Pose2d(-36, -14, Math.toRadians(90));
@@ -233,6 +233,7 @@ public class LeftMid extends CommandOpMode {
                 cycle(4, junctionToConesTwo, conesToJunctionTwo),
                 cycle(3, junctionToConesThree, conesToJunctionThree),
                 cycle(2, junctionToConesFour, conesToJunctionFour),
+                cycle(1, junctionToConesFive, conesToJunctionFive),
                 dropForPark,
                 new SavePosition(drive::getPoseEstimate)
         );
