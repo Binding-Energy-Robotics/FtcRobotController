@@ -20,7 +20,8 @@ public class LeftMid {
     public static final Pose2d CONE_POSE = new Pose2d(-57.5, -11.25, Math.toRadians(0));
     public static final Pose2d ZONE_ONE = new Pose2d(-59, -12, Math.toRadians(0));
     public static final Pose2d ZONE_TWO = new Pose2d(-36, -12, Math.toRadians(90));
-    public static final Pose2d ZONE_THREE = new Pose2d(-12, -12, Math.toRadians(90));
+    public static final Pose2d ZONE_THREE = new Pose2d(-12, -24, Math.toRadians(90));
+    public static final Pose2d ZONE_THREE_A = new Pose2d(-20, -12, Math.toRadians(-45));
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(600);
@@ -65,6 +66,9 @@ public class LeftMid {
                                 .setReversed(false)
                                 .splineTo(SCORE_POSE.vec(), SCORE_POSE.getHeading())
                                 .waitSeconds(.7)
+                                .setTangent(Math.toRadians(135))
+                                .splineToConstantHeading(ZONE_THREE_A.vec(), Math.toRadians(-45))
+                                .splineTo(ZONE_THREE.vec(), Math.toRadians(-90))
 //						.lineToLinearHeading(ZONE_TWO)
 //						.setReversed(true)
 //						.splineToSplineHeading(ZONE_ONE, Math.toRadians(180))

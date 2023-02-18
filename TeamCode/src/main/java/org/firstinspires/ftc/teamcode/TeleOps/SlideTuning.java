@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOps;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Wrist.MoveWrist;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Wrist;
 
+@Disabled
 @TeleOp
 public class SlideTuning extends CommandOpMode {
 	LinearSlide slide;

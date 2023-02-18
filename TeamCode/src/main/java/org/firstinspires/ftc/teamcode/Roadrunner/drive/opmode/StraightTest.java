@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleTankDrive;
  * This is a simple routine to test translational drive capabilities.
  */
 @Config
-//@Disabled
+@Disabled
 @Autonomous(group = "drive")
 public class StraightTest extends LinearOpMode {
     public static double DISTANCE = 144; // in

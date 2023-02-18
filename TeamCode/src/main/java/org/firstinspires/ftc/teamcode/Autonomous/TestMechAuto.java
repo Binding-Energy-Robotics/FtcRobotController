@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.OpenClaw;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.AutoDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 
+@Disabled
 @Autonomous
 public class TestMechAuto extends CommandOpMode {
     private AutoDrive drivetrain;

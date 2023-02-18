@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.TeleDrive;
 
+@Disabled
 @TeleOp
 public class Tele extends CommandOpMode {
     private GamepadEx gp1, gp2;

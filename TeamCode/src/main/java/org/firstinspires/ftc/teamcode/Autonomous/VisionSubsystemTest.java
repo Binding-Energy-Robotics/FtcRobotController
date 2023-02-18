@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Camera;
 
+@Disabled
 @Autonomous(name="VisionSubsystemTest", group="Test")
 public class VisionSubsystemTest extends LinearOpMode {
 	@Override

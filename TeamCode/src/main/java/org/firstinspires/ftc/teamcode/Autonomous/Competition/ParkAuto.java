@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 
+@Disabled
 @Autonomous(preselectTeleOp = "MainTeleop")
 public class ParkAuto extends LinearOpMode {
 	@Override

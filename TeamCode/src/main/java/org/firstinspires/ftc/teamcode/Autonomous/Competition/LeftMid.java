@@ -38,8 +38,7 @@ public class LeftMid extends CommandOpMode {
     public static Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
     public static Pose2d START_POSE_A = new Pose2d(-35, -48, Math.toRadians(0));
     public static Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(-90));
-
-    public static final Pose2d START_POSE_C = new Pose2d(-37, -14, Math.toRadians(-45));
+    public static Pose2d START_POSE_C = new Pose2d(-37, -14, Math.toRadians(-45));
 
     public static Pose2d SCORE_POSE_ZERO = new Pose2d(-30, -18.4, Math.toRadians(-45));
     public static Pose2d SCORE_POSE_ONE = new Pose2d(-30.1, -18.3, Math.toRadians(-45));
@@ -54,10 +53,11 @@ public class LeftMid extends CommandOpMode {
     public static Pose2d CONE_POSE_FOUR = new Pose2d(-60.1, -11.4, Math.toRadians(0));
     public static Pose2d CONE_POSE_FIVE = new Pose2d(-60.1, -11.45, Math.toRadians(0));
 
-    public static Pose2d ZONE_ONE = new Pose2d(-60, -11, Math.toRadians(0));
-    public static Pose2d ZONE_TWO = new Pose2d(-36, -11, Math.toRadians(90));
+    public static Pose2d ZONE_ONE = new Pose2d(-62, -11.5, Math.toRadians(0));
+    public static Pose2d ZONE_TWO = new Pose2d(-36, -14, Math.toRadians(90));
 
-    public static Pose2d ZONE_THREE = new Pose2d(-9, -11, Math.toRadians(90));
+    public static Pose2d ZONE_THREE = new Pose2d(-15, -20, Math.toRadians(-90));
+    public static Pose2d ZONE_THREE_A = new Pose2d(-24, -14, Math.toRadians(-45));
 
     Telemetry telemetry;
 
@@ -85,15 +85,15 @@ public class LeftMid extends CommandOpMode {
                         )
                 ),
                 new CloseClaw(claw),
-                new AsyncDelay(0.07),
+                new AsyncDelay(0.1),
                 new ParallelCommandGroup(
                         new SetSlidePosition(slide, LinearSlide.LOW),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.07),
+                                new AsyncDelay(0.2),
                                 new ParallelCommandGroup(
                                         new TrajectoryCommand(drive, conesToJunction),
                                         new SequentialCommandGroup(
-                                                new AsyncDelay(0.07),
+                                                new AsyncDelay(0.25),
                                                 new ParallelCommandGroup(
                                                         new SetSlidePosition(slide, LinearSlide.TWO_CONE),
                                                         new SequentialCommandGroup(
@@ -177,8 +177,8 @@ public class LeftMid extends CommandOpMode {
                         .build()
         );
         TrajectoryCommand parkOne = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, true)
-                        .splineToSplineHeading(ZONE_ONE, Math.toRadians(180))
+                drive.trajectoryBuilder(conesToJunctionFour.end(), true)
+                        .splineTo(ZONE_ONE.vec(), Math.toRadians(180))
                         .build()
         );
         TrajectoryCommand parkTwo = new TrajectoryCommand(drive,
@@ -187,9 +187,9 @@ public class LeftMid extends CommandOpMode {
                         .build()
         );
         TrajectoryCommand parkThree = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(0))
-                        .splineToSplineHeading(ZONE_TWO, Math.toRadians(0))
-                        .splineToSplineHeading(ZONE_THREE, Math.toRadians(90))
+                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(135))
+                        .splineToConstantHeading(ZONE_THREE_A.vec(), Math.toRadians(-45))
+                        .splineTo(ZONE_THREE.vec(), Math.toRadians(-90))
                         .build()
         );
 

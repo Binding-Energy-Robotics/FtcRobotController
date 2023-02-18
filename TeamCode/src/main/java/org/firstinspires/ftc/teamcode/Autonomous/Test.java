@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.teamcode.Framework.Commands.AsyncDelay;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.CloseClaw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 
+@Disabled
 @Autonomous
 public class Test extends CommandOpMode {
 	@Override
