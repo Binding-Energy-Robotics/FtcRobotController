@@ -27,6 +27,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePosition;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Slide.SetSlidePower;
 import org.firstinspires.ftc.teamcode.Framework.Commands.TelemetryUpdate;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.AutoEndPose;
+import org.firstinspires.ftc.teamcode.Framework.Utilities.LogData;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Flipper;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
@@ -257,5 +258,7 @@ public class MainTeleop extends CommandOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        LogData.open();
     }
 }

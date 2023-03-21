@@ -182,6 +182,9 @@ public class SlideController {
 	}
 
 	public double getPower(int Pv) {
+		LogData.addData("Slide power", power);
+		LogData.addData("Slide encoder", Pv);
+
 		long time = System.nanoTime();
 		double dt = (time - prevTime) * 1.0e-9;
 
