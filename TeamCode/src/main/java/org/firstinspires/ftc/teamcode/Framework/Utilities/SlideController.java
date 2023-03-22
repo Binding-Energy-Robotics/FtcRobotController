@@ -9,17 +9,10 @@ import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.apache.commons.math3.filter.DefaultMeasurementModel;
-import org.apache.commons.math3.filter.DefaultProcessModel;
-import org.apache.commons.math3.filter.MeasurementModel;
-import org.apache.commons.math3.filter.ProcessModel;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.apache.commons.math3.filter.KalmanFilter;
 
 // good shit, see Ben Caunt
 // Kd = 2 * sqrt(Ka * Kp) - Kv, Kp >= Kv * Kv / (4 * Ka)
@@ -30,6 +23,23 @@ public class SlideController {
 	public static double Kv = 0.00022; // tuned by Alex Prichard on 12 Jan 2023
 	public static double Ka = 0.00001; // tuned by Alex Prichard on 12 Jan 2023
 	public static double Ks = 0.08;
+
+	private static final RealMatrix A = new Array2DRowRealMatrix(new double[][] {
+			{ 0, 0 },
+			{ 0, 0 }
+	});
+	private static final RealMatrix B = new Array2DRowRealMatrix(new double[][] {
+			{ 0 },
+			{ 0 }
+	});
+	private static final RealMatrix Q = new Array2DRowRealMatrix(new double[][] {
+			{ 0, 0 },
+			{ 0, 0 }
+	});
+	private static final RealMatrix R = new Array2DRowRealMatrix(new double[][] {
+			{ 0, 0 },
+			{ 0, 0 }
+	});
 
 	public static double MAX_V = 1_000; // tuned by Alex Prichard on 20 Jan 2023
 	public static double MAX_A = 10_000; // tuned by Alex Prichard on 20 Jan 2023
@@ -52,9 +62,7 @@ public class SlideController {
 
 	private PIDEx controller;
 
-	private KalmanFilter kalmanFilter;
-	private ProcessModel model;
-	private MeasurementModel measurementModel;
+	private SlideFilter kalmanFilter;
 
 	private MotionProfile motionProfile;
 	private ElapsedTime elapsedTime;
@@ -75,79 +83,7 @@ public class SlideController {
 		telemetry = dash.getTelemetry();
 		motionProfile = staticProfile();
 		elapsedTime = new ElapsedTime();
-
-		Array2DRowRealMatrix A = new Array2DRowRealMatrix(new double[][] {
-				{ 0, 1, 0 },
-				{ 0, -Kv / Ka, 1 / Ka },
-				{ 0, 0, 0 }
-		});
-		Array2DRowRealMatrix B = new Array2DRowRealMatrix(new double[][] {
-				{ 0 },
-				{ 1 / Ka },
-				{ 0 }
-		});
-		Array2DRowRealMatrix Q = new Array2DRowRealMatrix(new double[][] {
-				{ 10, 0, 0 },
-				{ 0, 20, 0 },
-				{ 0, 0, 0.3 }
-		});
-		Array2DRowRealMatrix initError = new Array2DRowRealMatrix(new double[][] {
-				{ 1, 0, 0 },
-				{ 0, 1, 0 },
-				{ 0, 0, 0.01 }
-		});
-		ArrayRealVector initState = new ArrayRealVector(new double[] { 0, 0, 0 });
-
-		Array2DRowRealMatrix C = new Array2DRowRealMatrix(new double[][] {
-				{ 1, 0, 0 },
-				{ 0, 1, 0 }
-		});
-		Array2DRowRealMatrix R = new Array2DRowRealMatrix(new double[][] {
-				{ 5, 0 },
-				{ 0, 5 }
-		});
-
-		double loopTime = 0.03;
-
-		RealMatrix taylor = taylorSeries(A, loopTime, 10);
-		RealMatrix Bd = taylor.multiply(B);
-		RealMatrix Ad = A.multiply(taylor).add(MatrixUtils.createRealIdentityMatrix(3));
-
-		model = new DefaultProcessModel(Ad, Bd, Q, initState, initError);
-		measurementModel = new DefaultMeasurementModel(C, R);
-		kalmanFilter = new KalmanFilter(model, measurementModel);
-	}
-
-	private String printMat(RealMatrix mat) {
-		StringBuilder toPrint = new StringBuilder("\n{\n");
-		for (int i = 0; i < mat.getRowDimension(); i++) {
-			for (int j = 0; j < mat.getColumnDimension(); j++) {
-				if (j == 0) {
-					toPrint.append("\t{").append(mat.getEntry(i, j));
-				}
-				else {
-					toPrint.append(", ").append(mat.getEntry(i, j));
-				}
-			}
-			toPrint.append("}\n");
-		}
-		toPrint.append("}");
-		return toPrint.toString();
-	}
-
-	private RealMatrix taylorSeries(RealMatrix A, double dt, int terms) {
-		RealMatrix exponentialA = MatrixUtils.createRealIdentityMatrix(3);
-		RealMatrix acc = MatrixUtils.createRealIdentityMatrix(3).scalarMultiply(dt);
-		double k = 1;
-		double T = dt;
-		for (int i = 2; i <= terms; i++) {
-			exponentialA = exponentialA.multiply(A);
-			T *= dt;
-			k /= i;
-			RealMatrix term = exponentialA.scalarMultiply(T * k);
-			acc = acc.add(term);
-		}
-		return acc;
+		kalmanFilter = new SlideFilter(A, B, Q, R);
 	}
 
 	private MotionProfile staticProfile() {
@@ -168,19 +104,6 @@ public class SlideController {
 		SP = Sp;
 	}
 
-	private RealMatrix symmetrize(RealMatrix P) {
-		for (int i = 0; i < 2; i++) {
-			for (int j = i + 1; j < 3; j++) {
-				double first = P.getEntry(i, j);
-				double second = P.getEntry(j, i);
-				double avg = (first + second) * 0.5;
-				P.setEntry(i, j, avg);
-				P.setEntry(j, i, avg);
-			}
-		}
-		return P;
-	}
-
 	public double getPower(int Pv) {
 		LogData.addData("Slide power", power);
 		LogData.addData("Slide encoder", Pv);
@@ -193,26 +116,11 @@ public class SlideController {
 		double velMeasurement = (Pv - prevPos) / dt;
 		prevPos = Pv;
 
-		kalmanFilter.predict(new double[] { u });
-		RealMatrix P = model.getProcessNoise();
-		RealMatrix A = model.getStateTransitionMatrix();
-		RealMatrix B = model.getControlMatrix();
-		RealMatrix Q = model.getProcessNoise();
-		RealVector stateVector = kalmanFilter.getStateEstimationVector();
-		model = new DefaultProcessModel(
-				A,
-				B,
-				Q,
-				stateVector,
-				A.multiply(P).multiply(A.transpose()).add(Q)
-		);
-		kalmanFilter = new KalmanFilter(model, measurementModel);
-		kalmanFilter.correct(new double[] { Pv, velMeasurement });
-		double[] stateEstimate = kalmanFilter.getStateEstimation();
+		kalmanFilter.predict(u);
+		kalmanFilter.correct(Pv, velMeasurement);
 
-		prevPv = stateEstimate[0];
-		prevVel = stateEstimate[1];
-		double adrCompensation = stateEstimate[2] * 0.2;
+		prevPv = kalmanFilter.getPosition();
+		prevVel = kalmanFilter.getVelocity();
 
 		if (SP != prevSP) { // generate new motion profile if target position has changed
 			try {
@@ -253,14 +161,11 @@ public class SlideController {
 		double v = targetState.getV();
 		double a = targetState.getA();
 
+		u = controller.calculate(x, Pv);
 		if (!isMovementFinished) {
-			u = controller.calculate(x, Pv) + v * Kv + a * Ka - adrCompensation;
-			power = u + Kg + Math.copySign(Ks, v);
+			u += v * Kv + a * Ka;
 		}
-		else {
-			u = controller.calculate(x, Pv) - adrCompensation;
-			power = u + Kg;
-		}
+		power = u + Kg + Math.copySign(Ks, prevVel);
 
 		telemetry.addData("position", Pv);
 		telemetry.addData("target position", SP);
