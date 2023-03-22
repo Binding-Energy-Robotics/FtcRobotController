@@ -261,4 +261,10 @@ public class MainTeleop extends CommandOpMode {
 
         LogData.open();
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        LogData.close();
+    }
 }

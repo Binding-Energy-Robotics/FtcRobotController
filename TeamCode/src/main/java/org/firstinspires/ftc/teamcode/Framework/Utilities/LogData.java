@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Framework.Utilities;
 import android.annotation.SuppressLint;
 import android.os.Environment;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.io.File;
@@ -23,7 +24,7 @@ public class LogData {
 		@SuppressLint("SimpleDateFormat") String timestamp =
 				new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
 		String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() +
-				"/FIRST/data/log_" + timestamp + ".txt";
+				"/Logs/log_" + timestamp + ".txt";
 
 		try {
 			File logFile = new File(filePath);
@@ -67,6 +68,7 @@ public class LogData {
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+			FtcDashboard.getInstance().getTelemetry().addData("Error", e.toString());
 		}
 
 		clearLine();
