@@ -26,7 +26,7 @@ public class TestMechAuto extends CommandOpMode {
 
         // Hardware initialization
         this.drivetrain = new AutoDrive(hardwareMap);
-        this.claw = new Claw(hardwareMap, "claw");
+        this.claw = new Claw(hardwareMap);
         this.slide = new LinearSlide(hardwareMap, telemetry, true);
 
         register(drivetrain, claw, slide);

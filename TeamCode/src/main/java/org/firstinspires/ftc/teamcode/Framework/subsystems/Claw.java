@@ -1,35 +1,56 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.hardware.ServoEx;
-import com.arcrobotics.ftclib.hardware.SimpleServo;
-import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.outoftheboxrobotics.photoncore.Neutrino.RevColorSensor.RevColorSensorV3Ex;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Claw extends SubsystemBase {
-    private HardwareMap hw;
-    private ServoImplEx clawServo;
-    private boolean servoClosed;
+    public static double GRAB_DISTANCE = 2.5; // maximum distance to try to grab a cone in cm
+    public static double BLUE_THRESHOLD = 0.5; // only auto grab a blue or red object
+    public static double RED_THRESHOLD = 0.5;
 
-    public Claw(HardwareMap hw, String name){
+    public static double RELEASE_DELAY = 0.5; // only grab if claw has been open for this long
+
+    private HardwareMap hw;
+
+    private ServoImplEx clawServo;
+    private DigitalChannel beamSensor;
+    private RevColorSensorV3Ex clawSensor;
+
+    private float[] hsv;
+    private boolean servoClosed;
+    private ElapsedTime openTime;
+
+    public Claw(HardwareMap hw, String clawName, String beamName, String colorName){
         this.hw = hw;
-        clawServo = hw.get(ServoImplEx.class, name);
+
+        clawServo = hw.get(ServoImplEx.class, clawName);
         clawServo.setPwmRange(new PwmControl.PwmRange(500, 2500));
+
+        beamSensor = hw.get(DigitalChannel.class, beamName);
+
+        clawSensor = hw.get(RevColorSensorV3Ex.class, colorName);
+
+        hsv = new float[3];
+        openTime = new ElapsedTime();
         close();
     }
 
     public Claw(HardwareMap hw) {
-        this(hw, "claw");
+        this(hw, "claw", "beamSensor", "clawSensor");
     }
 
     public void open(){
         clawServo.setPosition(0.5);
         servoClosed = false;
+        openTime.reset();
     }
 
     public void close(){
@@ -43,5 +64,24 @@ public class Claw extends SubsystemBase {
         } else {
             close();
         }
+    }
+
+    public boolean grabIfConeDetected() {
+        if (servoClosed)
+            return false;
+
+        if (openTime.seconds() < RELEASE_DELAY)
+            return false;
+
+        double distance = clawSensor.getDistance(DistanceUnit.CM);
+        if (distance > GRAB_DISTANCE)
+            return false;
+
+        NormalizedRGBA colors = clawSensor.getNormalizedColors();
+        if (colors.blue < BLUE_THRESHOLD && colors.red < RED_THRESHOLD)
+            return false;
+
+        close();
+        return true;
     }
 }
