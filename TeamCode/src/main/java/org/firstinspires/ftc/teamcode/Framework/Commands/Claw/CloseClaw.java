@@ -7,16 +7,14 @@ import org.firstinspires.ftc.teamcode.Framework.subsystems.Claw;
 public class CloseClaw extends InstantCommand {
 
     private Claw claw;
-    private long startTime;
 
-    public CloseClaw(Claw claw){
+    public CloseClaw(Claw claw) {
         this.claw = claw;
         addRequirements(claw);
     }
 
     @Override
-    public void execute(){
-        startTime = System.nanoTime();
+    public void execute() {
         this.claw.close();
     }
 }

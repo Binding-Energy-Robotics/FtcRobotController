@@ -24,7 +24,6 @@ public class Claw extends SubsystemBase {
     private DigitalChannel beamSensor;
     private RevColorSensorV3Ex clawSensor;
 
-    private float[] hsv;
     private boolean servoClosed;
     private ElapsedTime openTime;
 
@@ -38,7 +37,6 @@ public class Claw extends SubsystemBase {
 
         clawSensor = hw.get(RevColorSensorV3Ex.class, colorName);
 
-        hsv = new float[3];
         openTime = new ElapsedTime();
         close();
     }
@@ -66,7 +64,11 @@ public class Claw extends SubsystemBase {
         }
     }
 
-    public boolean grabIfConeDetected() {
+    public boolean isBeamBroken() {
+        return !beamSensor.getState(); // adafruit 3mm ir beam break sensor is active low
+    }
+
+    public boolean isConeDetected() {
         if (servoClosed)
             return false;
 
@@ -78,10 +80,15 @@ public class Claw extends SubsystemBase {
             return false;
 
         NormalizedRGBA colors = clawSensor.getNormalizedColors();
-        if (colors.blue < BLUE_THRESHOLD && colors.red < RED_THRESHOLD)
-            return false;
+        return colors.blue >= BLUE_THRESHOLD || colors.red >= RED_THRESHOLD;
+    }
 
-        close();
-        return true;
+    public boolean grabIfConeDetected() {
+        boolean coneDetected = isConeDetected();
+
+        if (coneDetected)
+            close();
+
+        return coneDetected;
     }
 }

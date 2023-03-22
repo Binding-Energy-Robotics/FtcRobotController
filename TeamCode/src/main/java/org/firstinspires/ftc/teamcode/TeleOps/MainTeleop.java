@@ -16,7 +16,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.AutoGrab;
+import org.firstinspires.ftc.teamcode.Framework.Commands.Claw.SignalBeamBreak;
 import org.firstinspires.ftc.teamcode.Framework.Commands.DriverToggle;
 import org.firstinspires.ftc.teamcode.Framework.Commands.AsyncDelay;
 import org.firstinspires.ftc.teamcode.Framework.Commands.Drive.MecDrive;
@@ -138,7 +141,7 @@ public class MainTeleop extends CommandOpMode {
         claw.open();
 
         // Command setup
-        DriverToggle driverToggle = new DriverToggle(slide, flipper, claw);
+        DriverToggle driverToggle = new DriverToggle(slide, flipper, claw, gamepad1);
 
         MecDrive mecDrive = new MecDrive(hardwareMap, drive, () -> gamepad1.left_stick_y,
                 () -> -gamepad1.left_stick_x, () -> -gamepad1.right_stick_x,
@@ -235,8 +238,10 @@ public class MainTeleop extends CommandOpMode {
                 new Rumble(gamepad1, 333)
         );
 
+        SignalBeamBreak detectJunction = new SignalBeamBreak(claw, gamepad1);
+
         // Command Binding
-        rightTrigger.whenPressed(driverToggle);
+        rightTrigger.whenPressed(driverToggle.andThen());
 
         rightTrigger.whenPressed(() -> gamepad1.rumble(1, 1, 100));
 
@@ -252,7 +257,7 @@ public class MainTeleop extends CommandOpMode {
         leftShoulder.whenPressed(() -> isDriving = !isDriving);
         resetEncoder.whenPressed(() -> slide.resetEncoder());
 
-        schedule(mecDrive, manualMove, rumbleTimes, new TelemetryUpdate(telemetry));
+        schedule(mecDrive, manualMove, rumbleTimes, detectJunction, new TelemetryUpdate(telemetry));
 
         register(drive, claw, slide, flipper);
 
