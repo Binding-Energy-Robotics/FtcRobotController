@@ -54,7 +54,6 @@ public class AutoDrive extends SubsystemBase {
 
     @Override
     public void periodic() {
-        super.periodic();
         drive.clearCache();
     }
 }
