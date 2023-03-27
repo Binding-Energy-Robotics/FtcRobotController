@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Framework.Utilities.DriveSensors;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
@@ -15,15 +14,21 @@ public class UltrasonicSensor implements UnscentedKalmanFilter.NonlinearSensor {
 	private AnalogInput distanceSensor;
 	private Pose2d sensorPose;
 
+	private double distance;
+
 	public UltrasonicSensor(HardwareMap hw, String name, Pose2d sensorPose) {
 		distanceSensor = hw.get(AnalogInput.class, name);
 		this.sensorPose = sensorPose;
+		distance = 0;
 	}
 
 	@Override
 	public RealVector measure(RealVector x, RealVector u) {
 		Pose2d robotPose = new Pose2d(x.getEntry(0), x.getEntry(1), x.getEntry(2));
-		Pose2d currentSensorPose = sensorPose.plus(robotPose);
+		Vector2d relativeSensorPose = sensorPose.vec().rotated(robotPose.getHeading());
+		Pose2d currentSensorPose = robotPose.plus(
+				new Pose2d(relativeSensorPose, sensorPose.getHeading())
+		);
 		Vector2d currentSensorLocation = currentSensorPose.vec();
 		Vector2d currentSensorHeadingVector = currentSensorPose.headingVec();
 
@@ -36,10 +41,10 @@ public class UltrasonicSensor implements UnscentedKalmanFilter.NonlinearSensor {
 		double cornerAngle = sensorToCorner.angle();
 
 		// get angle from x axis
-		sensorAngle = Math.PI / 2 - Math.abs(Math.abs(sensorAngle) - Math.PI / 2);
-		cornerAngle = Math.PI / 2 - Math.abs(Math.abs(cornerAngle) - Math.PI / 2);
+		sensorAngle = Math.PI / 2 - Math.abs(Math.abs(sensorAngle - Math.PI) - Math.PI / 2);
+		cornerAngle = Math.PI / 2 - Math.abs(Math.abs(cornerAngle - Math.PI) - Math.PI / 2);
 
-		double distance = 0;
+		double distance;
 		if (cornerAngle >= sensorAngle) { // read from x
 			distance = sensorToCorner.getX() / currentSensorHeadingVector.getX();
 		}
@@ -52,12 +57,15 @@ public class UltrasonicSensor implements UnscentedKalmanFilter.NonlinearSensor {
 
 	@Override
 	public RealVector getData() {
-		double distance = getDistance();
 		return new ArrayRealVector(new double[] { distance });
 	}
 
-	//  distance = [V_observed / ((Vcc/1024) * 6)] - 300
 	public double getDistance() { // returns distance in inches
-		return (distanceSensor.getVoltage() / ((SENSOR_VOLTAGE / 1024) * 6) - 300) / 25.4;
+		return distance;
+	}
+
+	//  distance = [V_observed / ((Vcc/1024) * 6)] - 300
+	public void read() {
+		distance = (distanceSensor.getVoltage() / ((SENSOR_VOLTAGE / 1024) * 6) - 300) / 25.4;
 	}
 }
