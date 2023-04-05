@@ -98,7 +98,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     private VoltageSensor batteryVoltageSensor;
 
     private double[] previousPowers = new double[] { 0, 0, 0 };
-    private TwoWheelTrackingLocalizer localizer;
+    private UnscentedLocalizer localizer;
 
     private List<LynxModule> hubs;
 
@@ -189,7 +189,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
-        localizer = new TwoWheelTrackingLocalizer(hardwareMap, this);
+//        localizer = new TwoWheelTrackingLocalizer(hardwareMap, this);
+        localizer = new UnscentedLocalizer(hardwareMap, new Pose2d());
         setLocalizer(localizer);
 
         trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
@@ -261,7 +262,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void update() {
-        localizer.update(previousPowers);
+//        localizer.update(previousPowers);
+        localizer.update();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
         if (signal != null) {
             // if signal != new DriveSignal, adrc
@@ -294,7 +296,7 @@ public class SampleMecanumDrive extends MecanumDrive {
                     robotRelativePower.vec().rotated(getPoseEstimate().getHeading()),
                     robotRelativePower.getHeading()
             );
-            Pose2d disturbanceRejection = localizer.getDisturbanceRejectionPower();
+            Pose2d disturbanceRejection = new Pose2d(); // localizer.getDisturbanceRejectionPower();
             disturbanceRejection = disturbanceRejection.times(ADRC_GAIN);
             fieldRelativePower = fieldRelativePower.plus(disturbanceRejection);
 

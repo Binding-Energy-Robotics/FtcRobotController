@@ -167,7 +167,7 @@ public class MainTeleop extends CommandOpMode {
         );
         ParallelCommandGroup lowJunction = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.LOW),
-                new FlipIn(flipper)
+                new FlipOut(flipper)
         );
         ParallelCommandGroup groundJunction = new ParallelCommandGroup(
                 new SetSlidePosition(slide, LinearSlide.GROUND),

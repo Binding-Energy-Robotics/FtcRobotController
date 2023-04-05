@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Framework.subsystems;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.outoftheboxrobotics.photoncore.Neutrino.RevColorSensor.RevColorSensorV3Ex;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -12,17 +13,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Claw extends SubsystemBase {
-    public static double GRAB_DISTANCE = 2.5; // maximum distance to try to grab a cone in cm
-    public static double BLUE_THRESHOLD = 0.5; // only auto grab a blue or red object
-    public static double RED_THRESHOLD = 0.5;
-
+    public static double GRAB_DISTANCE = 3;
     public static double RELEASE_DELAY = 0.5; // only grab if claw has been open for this long
 
     private HardwareMap hw;
 
     private ServoImplEx clawServo;
     private DigitalChannel beamSensor;
-    private RevColorSensorV3Ex clawSensor;
+    private DistanceSensor clawSensor;
 
     private boolean servoClosed;
     private ElapsedTime openTime;
@@ -35,7 +33,7 @@ public class Claw extends SubsystemBase {
 
         beamSensor = hw.get(DigitalChannel.class, beamName);
 
-        clawSensor = hw.get(RevColorSensorV3Ex.class, colorName);
+        clawSensor = hw.get(DistanceSensor.class, colorName);
 
         openTime = new ElapsedTime();
         close();
@@ -75,12 +73,7 @@ public class Claw extends SubsystemBase {
         if (openTime.seconds() < RELEASE_DELAY)
             return false;
 
-        double distance = clawSensor.getDistance(DistanceUnit.CM);
-        if (distance > GRAB_DISTANCE)
-            return false;
-
-        NormalizedRGBA colors = clawSensor.getNormalizedColors();
-        return colors.blue >= BLUE_THRESHOLD || colors.red >= RED_THRESHOLD;
+        return clawSensor.getDistance(DistanceUnit.CM) <= GRAB_DISTANCE;
     }
 
     public boolean grabIfConeDetected() {

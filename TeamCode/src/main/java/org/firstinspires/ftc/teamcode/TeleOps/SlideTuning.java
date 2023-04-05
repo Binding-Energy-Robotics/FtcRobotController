@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Framework.Commands.Wrist.MoveWrist;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.LinearSlide;
 import org.firstinspires.ftc.teamcode.Framework.subsystems.Wrist;
 
-@Disabled
+//@Disabled
 @TeleOp
 public class SlideTuning extends CommandOpMode {
 	LinearSlide slide;

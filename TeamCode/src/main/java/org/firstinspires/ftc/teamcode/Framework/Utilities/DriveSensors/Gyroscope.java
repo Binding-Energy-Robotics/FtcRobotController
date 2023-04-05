@@ -3,11 +3,18 @@ package org.firstinspires.ftc.teamcode.Framework.Utilities.DriveSensors;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.UnscentedKalmanFilter;
 
 public class Gyroscope implements UnscentedKalmanFilter.NonlinearSensor {
+	public static final RealMatrix R = new Array2DRowRealMatrix(new double[][] {
+			{ 0, 0 },
+			{ 0, 0.05 }
+	});
+
 	private BNO055IMU imu;
 
 	public Gyroscope(HardwareMap hw) {

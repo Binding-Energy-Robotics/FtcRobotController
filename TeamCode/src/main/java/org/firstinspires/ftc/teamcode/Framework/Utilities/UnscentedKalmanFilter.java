@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.Framework.Utilities;
 
-import org.apache.commons.math3.filter.MeasurementModel;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.CholeskyDecomposition;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -126,5 +126,30 @@ public class UnscentedKalmanFilter {
 
 		xHat = xHat.add(K.operate(sensor.getData().subtract(predictedMeasurement)));
 		P = P.subtract(K.multiply(measurementCovariance.multiply(K.transpose())));
+	}
+
+	public void correct(RealVector y, RealVector u, RealMatrix C, RealMatrix D, RealMatrix R) {
+		RealVector residual = y.subtract(C.operate(xHat)).subtract(D.operate(u));
+
+		RealMatrix S = C.multiply(P).multiply(C.transpose()).add(R);
+		RealMatrix K = P.multiply(C.transpose()).multiply(MatrixUtils.inverse(S));
+
+		xHat = xHat.add(K.operate(residual));
+		P = MatrixUtils.createRealIdentityMatrix(6).subtract(K.multiply(C)).multiply(P);
+	}
+
+	public RealVector getXHat() {
+		return xHat;
+	}
+
+	public void setXHat(Pose2d pose) {
+		xHat = new ArrayRealVector(new double[] {
+				pose.getX(),
+				pose.getY(),
+				pose.getHeading(),
+				0,
+				0,
+				0
+		});
 	}
 }

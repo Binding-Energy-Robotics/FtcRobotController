@@ -5,13 +5,20 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.firstinspires.ftc.teamcode.Framework.Utilities.UnscentedKalmanFilter;
 import org.firstinspires.ftc.teamcode.Roadrunner.util.Encoder;
 
 
 public class DeadWheels implements UnscentedKalmanFilter.NonlinearSensor {
+	public static final RealMatrix R = new Array2DRowRealMatrix(new double[][] {
+			{ 0.003, 0 },
+			{ 0, 0.003 }
+	});
+
 	public static double TICKS_PER_REV = 8192;
 	public static double WHEEL_RADIUS = 1; // in
 	public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
@@ -20,7 +27,7 @@ public class DeadWheels implements UnscentedKalmanFilter.NonlinearSensor {
 	public static double Y_MULTIPLIER = 0.7027;
 
 	private static final Pose2d parallelPose = new Pose2d(0, 0, 0);
-	private static final Pose2d perpendicularPose = new Pose2d(0, 0, Math.PI / 2);
+	private static final Pose2d perpendicularPose = new Pose2d(0.6, 0, Math.PI / 2);
 
 	private Encoder parallelEncoder, perpendicularEncoder;
 
