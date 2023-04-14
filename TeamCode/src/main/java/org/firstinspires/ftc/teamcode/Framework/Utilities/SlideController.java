@@ -26,13 +26,13 @@ import org.apache.commons.math3.filter.KalmanFilter;
 public class SlideController {
 	public static double Kg = 0.08; // tuned by Alex Prichard on 12 Jan 2023
 
-	public static double Kv = 0.00022; // tuned by Alex Prichard on 12 Jan 2023
-	public static double Ka = 0.00001; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Kv = 0.00028; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ka = 0.000012; // tuned by Alex Prichard on 12 Jan 2023
 	public static double Ks = 0.08;
 
-	public static double MAX_V = 1_000; // tuned by Alex Prichard on 20 Jan 2023
-	public static double MAX_A = 10_000; // tuned by Alex Prichard on 20 Jan 2023
-	public static double MAX_J = 30_000; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_V = 1_200; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_A = 10_300; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_J = 30_500; // tuned by Alex Prichard on 20 Jan 2023
 
 	public static double Kp = 5 * Kv * Kv / (4 * Ka); // tuned by Alex Prichard on 20 Jan 2023
 	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023

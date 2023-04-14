@@ -12,10 +12,10 @@ import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class LeftAuto {
-	public static final Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(-90));
-	public static final Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(120));
+	public static Pose2d START_POSE = new Pose2d(-31, -63.5, Math.toRadians(90));
+	public static final Pose2d START_POSE_A = new Pose2d(-34, -48, Math.toRadians(45));
 	public static final Pose2d START_POSE_B = new Pose2d(-36, -24, Math.toRadians(70));
-	public static final Pose2d SCORE_POSE = new Pose2d(-31, -7, Math.toRadians(45));
+	public static final Pose2d SCORE_POSE = new Pose2d(-29, -17, Math.toRadians(-45));
 	public static final Pose2d CONE_POSE = new Pose2d(-57.5, -11.25, Math.toRadians(0));
 	public static final Pose2d ZONE_ONE = new Pose2d(-59, -12, Math.toRadians(0));
 	public static final Pose2d ZONE_TWO = new Pose2d(-36, -12, Math.toRadians(90));
@@ -25,12 +25,12 @@ public class LeftAuto {
 		MeepMeep meepMeep = new MeepMeep(600);
 
 		RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-				.setDimensions(13, 13)
+				.setDimensions(12, 15)
 				// Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
 				.setConstraints(MAX_VEL, MAX_ACCEL, MAX_ANG_VEL, MAX_ANG_ACCEL, TRACK_WIDTH)
 				.followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(START_POSE)
 						.setReversed(true)
-						.splineTo(START_POSE_A.vec(), START_POSE_A.getHeading())
+				//		.splineTo(START_POSE_A.vec(), START_POSE_A.getHeading())
 						.splineToSplineHeading(START_POSE_B, Math.toRadians(75))
 						.splineToSplineHeading(SCORE_POSE, SCORE_POSE.getHeading())
 						.waitSeconds(1)

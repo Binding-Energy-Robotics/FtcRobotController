@@ -31,10 +31,10 @@ import org.opencv.core.Mat;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.drive.DriveConstants.gyrationConstant;
+import static org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants.kV;
+import static org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants.gyrationConstant;
 
 /*
  * Sample tracking wheel localizer implementation assuming the standard configuration:
@@ -62,11 +62,11 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 	public static double WHEEL_RADIUS = 1; // in
 	public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-	public static double PARALLEL_X = 0; // X is the up and down direction
-	public static double PARALLEL_Y = -3.97; // Y is the strafe direction
+	public static double PARALLEL_X = 3.1; // X is the up and down direction
+	public static double PARALLEL_Y = -0.5; // Y is the strafe direction
 
-	public static double PERPENDICULAR_X = 0;
-	public static double PERPENDICULAR_Y = 0;
+	public static double PERPENDICULAR_X = .5;
+	public static double PERPENDICULAR_Y = 2.3;
 
 	public static double X_MULTIPLIER = 0.6866;
 	public static double Y_MULTIPLIER = 0.7027;
@@ -95,8 +95,10 @@ public class TwoWheelTrackingLocalizer extends TwoTrackingWheelLocalizer {
 
 		this.drive = drive;
 
-		parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightFront"));
-		perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftFront"));
+		parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftFront"));
+		parallelEncoder.setDirection(Encoder.Direction.REVERSE);
+		perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightFront"));
+		perpendicularEncoder.setDirection(Encoder.Direction.REVERSE);
 
 		double kV_r = kV / TRACK_WIDTH;
 		double kA_r = kA / (TRACK_WIDTH * gyrationConstant);

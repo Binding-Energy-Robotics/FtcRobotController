@@ -11,24 +11,24 @@ import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 import java.util.function.BooleanSupplier;
 
 public class LinearSlide extends SubsystemBase {
-    public static final int HIGH = 575;
-    public static final int MEDIUM = 250;
-    public static final int LOW = 525;
+    public static final int HIGH = 600;
+    public static final int MEDIUM = 300;
+    public static final int LOW = 475;
     public static final int GROUND = 20;
 
-    public static final int FIVE_CONE = 200;
-    public static final int FOUR_CONE = 160;
-    public static final int THREE_CONE = 110;
-    public static final int TWO_CONE = 60;
-    public static final int ONE_CONE = 30;
+    public static final int FIVE_CONE = 250;
+    public static final int FOUR_CONE = 200;
+    public static final int THREE_CONE = 150;
+    public static final int TWO_CONE = 100;
+    public static final int ONE_CONE = 0;
 
     public static final int[] CONE_STACK = new int[] {
             0,
             30,
             100,
-            130,
-            160,
-            200
+            150,
+            200,
+            250
     };
 
     public static final int[] TELEOP_HEIGHTS = new int[] {
@@ -42,7 +42,7 @@ public class LinearSlide extends SubsystemBase {
     private int stackSize;
 
     private HardwareMap hw;
-    private MotorEx[] slideMotors = new MotorEx[4];
+    private MotorEx[] slideMotors = new MotorEx[2];
     private SlideController controller;
     private Telemetry t;
 
@@ -52,11 +52,10 @@ public class LinearSlide extends SubsystemBase {
                        Telemetry t, BooleanSupplier usingPID) {
         this.hw = hw;
         this.controller = new SlideController();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 2; i++) {
             slideMotors[i] = new MotorEx(hw, motorNames[i]);
         }
-        slideMotors[1].setInverted(true);
-        slideMotors[3].setInverted(true);
+        slideMotors[0].setInverted(true);
         slideMotors[0].resetEncoder();
         this.t = t;
         this.usingPID = usingPID;
@@ -65,7 +64,7 @@ public class LinearSlide extends SubsystemBase {
 
     public LinearSlide(final HardwareMap hw, Telemetry t, BooleanSupplier usingPID) {
         this(hw, new String[]{
-                "rightSpool", "rightAux", "leftAux", "leftSpool"
+                "rightSpool", "leftSpool"
         }, t, usingPID);
     }
 
@@ -87,7 +86,7 @@ public class LinearSlide extends SubsystemBase {
 
         power += controller.getKg(); // gravity feedforward
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 2; i++) {
             slideMotors[i].set(power);
         }
     }
@@ -136,7 +135,7 @@ public class LinearSlide extends SubsystemBase {
         if (usingPID.getAsBoolean()) {
             int position = slideMotors[0].getCurrentPosition();
             double power = controller.getPower(position);
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 2; i++) {
                 slideMotors[i].set(power);
             }
         }

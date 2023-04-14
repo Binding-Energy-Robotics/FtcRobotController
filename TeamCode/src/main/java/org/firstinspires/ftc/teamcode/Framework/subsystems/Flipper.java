@@ -11,16 +11,18 @@ public class Flipper extends SubsystemBase {
 	private HardwareMap hw;
 	private ServoEx mainPitchServo;
 	private ServoEx auxPitchServo;
-//	private ServoEx rollServo;
+	private ServoEx rollServo;
 	private Telemetry t;
 
 	public Flipper(HardwareMap hw, String mainPitchName, String auxPitchName, String rollName, Telemetry t) {
 		this.hw = hw;
-		this.mainPitchServo = new SimpleServo(hw, mainPitchName, 0, 180);
-		this.auxPitchServo = new SimpleServo(hw, auxPitchName, 0, 180);
+		this.mainPitchServo = new SimpleServo(hw, mainPitchName, 0, 210);
+		this.auxPitchServo = new SimpleServo(hw, auxPitchName, 0, 210);
 		auxPitchServo.setInverted(true);
+		this.rollServo = new SimpleServo(hw, rollName, 0, 180);
+		rollServo.setInverted(true);
 		this.t = t;
-		setPosition(1);
+		setPosition(.95);
 	}
 
 	public Flipper(HardwareMap hw, Telemetry t) {
@@ -30,5 +32,6 @@ public class Flipper extends SubsystemBase {
 	public void setPosition(double position) {
 		mainPitchServo.setPosition(position);
 		auxPitchServo.setPosition(position);
+		rollServo.setPosition(position);
 	}
 }
