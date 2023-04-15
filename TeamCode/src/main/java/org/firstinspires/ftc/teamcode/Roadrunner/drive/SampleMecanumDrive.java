@@ -67,14 +67,14 @@ import static org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants.gyr
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static double TRANS_P = 16;
-    public static double HEAD_P = 8;
+    public static double TRANS_P = 9; // 2
+    public static double HEAD_P = 4; // 4
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients( TRANS_P, 0,
-            2 * Math.sqrt(TRANS_P * kA) - kV);
+            0.05);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(HEAD_P, 0,
             2 * Math.sqrt(HEAD_P * kA / (TRACK_WIDTH * gyrationConstant)) - kV / TRACK_WIDTH);
 
-    public static double ADRC_GAIN = 0.0001;
+    public static double ADRC_GAIN = 0;//0.0001;
 
     public static double LATERAL_MULTIPLIER = 1.8;
 

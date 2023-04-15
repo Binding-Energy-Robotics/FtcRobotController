@@ -39,25 +39,25 @@ public class worlds extends CommandOpMode {
     public static Pose2d START_POSE_A = new Pose2d(-37, -48, Math.toRadians(0));
     public static Pose2d START_POSE_B = new Pose2d(-39, -24, Math.toRadians(-90));
 
-    public static final Pose2d START_POSE_C = new Pose2d(-38, -14, Math.toRadians(-45));
+    public static final Pose2d START_POSE_C = new Pose2d(-38, -5, Math.toRadians(-45));
 
-    public static Pose2d SCORE_POSE_ZERO = new Pose2d(-31, -18.4, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_ONE = new Pose2d(-35, -18.3, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_TWO = new Pose2d(-35, -18.2, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_THREE = new Pose2d(-35, -18.2, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-35, -18.1, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-35, -18, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_ZERO = new Pose2d(-32, -17, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_ONE = new Pose2d(-33, -19, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_TWO = new Pose2d(-32.5, -18, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_THREE = new Pose2d(-31, -19, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-31, -19, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-31, -19, Math.toRadians(-45));
 
-    public static Pose2d CONE_POSE_ONE = new Pose2d(-61.5, -14, Math.toRadians(0));
-    public static Pose2d CONE_POSE_TWO = new Pose2d(-62, -13.5, Math.toRadians(0));
-    public static Pose2d CONE_POSE_THREE = new Pose2d(-61, -13.3, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FOUR = new Pose2d(-61, -13.1, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FIVE = new Pose2d(-61, -13, Math.toRadians(0));
+    public static Pose2d CONE_POSE_ONE = new Pose2d(-60, -12, Math.toRadians(0));
+    public static Pose2d CONE_POSE_TWO = new Pose2d(-60, -11.8, Math.toRadians(0));
+    public static Pose2d CONE_POSE_THREE = new Pose2d(-60.3, -11.5, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FOUR = new Pose2d(-60.6, -11.3, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FIVE = new Pose2d(-61, -11, Math.toRadians(0));
 
-    public static Pose2d ZONE_ONE = new Pose2d(-60, -11, Math.toRadians(0));
+    public static Pose2d ZONE_ONE = new Pose2d(-61, -11, Math.toRadians(0));
     public static Pose2d ZONE_TWO = new Pose2d(-36, -11, Math.toRadians(90));
 
-    public static Pose2d ZONE_THREE = new Pose2d(-9, -11, Math.toRadians(90));
+    public static Pose2d ZONE_THREE = new Pose2d(-13, -11, Math.toRadians(90));
 
     Telemetry telemetry;
 
@@ -75,41 +75,40 @@ public class worlds extends CommandOpMode {
                       //  new SetSlidePosition(slide, LinearSlide.CONE_STACK[coneHeight]),
                         new SetSlidePosition(slide, LinearSlide.ONE_CONE),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.2),
+                                new AsyncDelay(0.05),
                                 new OpenClaw(claw),
-                                new AsyncDelay(0.2),
+                                new AsyncDelay(0.15),
                                 new FlipIn(flipper),
-                                new AsyncDelay(0.1),
                                 new SetSlidePosition(slide, LinearSlide.CONE_STACK[coneHeight])
                         ),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.2),
+                                new AsyncDelay(0.05),
                                 new TrajectoryCommand(drive, junctionToCones)
                         )
                 ),
                 new CloseClaw(claw),
                 new AsyncDelay(0.07),
                 new ParallelCommandGroup(
-                        new SetSlidePosition(slide, LinearSlide.LOW),
+                        new SetSlidePosition(slide, LinearSlide.MEDIUM),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.1),
+                                new AsyncDelay(0.15),
                                 new ParallelCommandGroup(
                                         new TrajectoryCommand(drive, conesToJunction),
                                         new SequentialCommandGroup(
                                                 new AsyncDelay(0.07),
-                                                new ParallelCommandGroup(
-                                                        new SetSlidePosition(slide, LinearSlide.TWO_CONE),
+                                            //    new ParallelCommandGroup(
+                                              //          new SetSlidePosition(slide, LinearSlide.TWO_CONE),
                                                         new SequentialCommandGroup(
-                                                                new AsyncDelay(0.3),
+                                                                new AsyncDelay(0.2),
                                                                 new ParallelCommandGroup(
-                                                                        new SetSlidePosition(slide, LinearSlide.MEDIUM),
+                                                                   //     new SetSlidePosition(slide, LinearSlide.MEDIUM),
                                                                         new SequentialCommandGroup(
-                                                                                new AsyncDelay(0.17),
+                                                                                new AsyncDelay(0.1),
                                                                                 new FlipOut(flipper)
                                                                         )
                                                                 )
                                                         )
-                                                )
+                                                //)
                                         )
                                 )
                         )
@@ -135,7 +134,7 @@ public class worlds extends CommandOpMode {
                 .build();
         Trajectory conesToJunctionOne = drive.trajectoryBuilder(
                         junctionToConesOne.end(), Math.toRadians(0))
-                .splineTo(SCORE_POSE_ONE.vec(), SCORE_POSE_ONE.getHeading())
+                .splineToSplineHeading(SCORE_POSE_ONE, SCORE_POSE_ONE.getHeading())
                 .build();
 
         Trajectory junctionToConesTwo = drive.trajectoryBuilder(conesToJunctionOne.end(), true)
@@ -143,7 +142,7 @@ public class worlds extends CommandOpMode {
                 .build();
         Trajectory conesToJunctionTwo = drive.trajectoryBuilder(
                         junctionToConesTwo.end(), Math.toRadians(0))
-                .splineTo(SCORE_POSE_TWO.vec(), SCORE_POSE_TWO.getHeading())
+                .splineToSplineHeading(SCORE_POSE_TWO, SCORE_POSE_TWO.getHeading())
                 .build();
 
         Trajectory junctionToConesThree = drive.trajectoryBuilder(conesToJunctionTwo.end(), true)
@@ -151,7 +150,7 @@ public class worlds extends CommandOpMode {
                 .build();
         Trajectory conesToJunctionThree = drive.trajectoryBuilder(
                         junctionToConesThree.end(), Math.toRadians(0))
-                .splineTo(SCORE_POSE_THREE.vec(), SCORE_POSE_THREE.getHeading())
+                .splineToSplineHeading(SCORE_POSE_THREE, SCORE_POSE_THREE.getHeading())
                 .build();
 
         Trajectory junctionToConesFour = drive.trajectoryBuilder(conesToJunctionThree.end(), true)
@@ -159,16 +158,16 @@ public class worlds extends CommandOpMode {
                 .build();
         Trajectory conesToJunctionFour = drive.trajectoryBuilder(
                         junctionToConesFour.end(), Math.toRadians(0))
-                .splineTo(SCORE_POSE_FOUR.vec(), SCORE_POSE_FOUR.getHeading())
+                .splineToSplineHeading(SCORE_POSE_FOUR, SCORE_POSE_FOUR.getHeading())
                 .build();
 
-        Trajectory junctionToConesFive = drive.trajectoryBuilder(conesToJunctionFour.end(), true)
-                .splineTo(CONE_POSE_FIVE.vec(), Math.toRadians(180))
-                .build();
-        Trajectory conesToJunctionFive = drive.trajectoryBuilder(
-                        junctionToConesFive.end(), Math.toRadians(0))
-                .splineTo(SCORE_POSE_FIVE.vec(), SCORE_POSE_FIVE.getHeading())
-                .build();
+    //    Trajectory junctionToConesFive = drive.trajectoryBuilder(conesToJunctionFour.end(), true)
+      //          .splineTo(CONE_POSE_FIVE.vec(), Math.toRadians(180))
+        //        .build();
+     //   Trajectory conesToJunctionFive = drive.trajectoryBuilder(
+       //                 junctionToConesFive.end(), Math.toRadians(0))
+         //       .splineToSplineHeading(SCORE_POSE_FIVE, SCORE_POSE_FIVE.getHeading())
+           //     .build();
 
 
         TrajectoryCommand startToJunction = new TrajectoryCommand(drive,
@@ -180,17 +179,17 @@ public class worlds extends CommandOpMode {
                         .build()
         );
         TrajectoryCommand parkOne = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, true)
+                drive.trajectoryBuilder(SCORE_POSE_FOUR, true)
                         .splineToSplineHeading(ZONE_ONE, Math.toRadians(180))
                         .build()
         );
         TrajectoryCommand parkTwo = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE)
+                drive.trajectoryBuilder(SCORE_POSE_FOUR)
                         .lineToLinearHeading(ZONE_TWO)
                         .build()
         );
         TrajectoryCommand parkThree = new TrajectoryCommand(drive,
-                drive.trajectoryBuilder(SCORE_POSE_FIVE, Math.toRadians(0))
+                drive.trajectoryBuilder(SCORE_POSE_FOUR, Math.toRadians(0))
                         .splineToSplineHeading(ZONE_TWO, Math.toRadians(0))
                         .splineToSplineHeading(ZONE_THREE, Math.toRadians(90))
                         .build()
@@ -238,7 +237,7 @@ public class worlds extends CommandOpMode {
                 cycle(4, junctionToConesTwo, conesToJunctionTwo),
                 cycle(3, junctionToConesThree, conesToJunctionThree),
                 cycle(2, junctionToConesFour, conesToJunctionFour),
-                cycle(1, junctionToConesFive, conesToJunctionFive),
+          //      cycle(1, junctionToConesFive, conesToJunctionFive),
                 dropForPark,
                 new SavePosition(drive::getPoseEstimate)
         );

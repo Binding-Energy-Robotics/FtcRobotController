@@ -34,7 +34,7 @@ public class SlideController {
 	public static double MAX_A = 10_300; // tuned by Alex Prichard on 20 Jan 2023
 	public static double MAX_J = 30_500; // tuned by Alex Prichard on 20 Jan 2023
 
-	public static double Kp = 5 * Kv * Kv / (4 * Ka); // tuned by Alex Prichard on 20 Jan 2023
+	public static double Kp = 5.2 * Kv * Kv / (4 * Ka); // tuned by Alex Prichard on 20 Jan 2023
 	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
 	public static double Kd = 2 * Math.sqrt(Kp * Ka) - Kv; // see Ben Caunt's paper for more details
 	public static double Imax = 0;//0.2 / Ki;

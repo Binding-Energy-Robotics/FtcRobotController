@@ -11,24 +11,24 @@ import org.firstinspires.ftc.teamcode.Framework.Utilities.SlideController;
 import java.util.function.BooleanSupplier;
 
 public class LinearSlide extends SubsystemBase {
-    public static final int HIGH = 600;
+    public static final int HIGH = 612;
     public static final int MEDIUM = 300;
     public static final int LOW = 475;
     public static final int GROUND = 20;
 
-    public static final int FIVE_CONE = 250;
-    public static final int FOUR_CONE = 200;
-    public static final int THREE_CONE = 150;
-    public static final int TWO_CONE = 100;
+    public static final int FIVE_CONE = 160;
+    public static final int FOUR_CONE = 140;
+    public static final int THREE_CONE = 100;
+    public static final int TWO_CONE = 40;
     public static final int ONE_CONE = 0;
 
     public static final int[] CONE_STACK = new int[] {
             0,
-            30,
+            0,
+            40,
             100,
-            150,
-            200,
-            250
+            140,
+            160
     };
 
     public static final int[] TELEOP_HEIGHTS = new int[] {
@@ -38,6 +38,8 @@ public class LinearSlide extends SubsystemBase {
             FOUR_CONE,
             FIVE_CONE
     };
+
+    private int targetHeight;
 
     private int stackSize;
 
@@ -96,6 +98,7 @@ public class LinearSlide extends SubsystemBase {
     }
 
     public void setSlidePosition(int position) {
+        targetHeight = position;
         controller.setTargetPosition(position);
     }
 
@@ -138,6 +141,12 @@ public class LinearSlide extends SubsystemBase {
             for (int i = 0; i < 2; i++) {
                 slideMotors[i].set(power);
             }
+            t.addData("Target Position", targetHeight);
+            t.addData("Current Position", position);
         }
+
+        t.update();
+
+
     }
 }

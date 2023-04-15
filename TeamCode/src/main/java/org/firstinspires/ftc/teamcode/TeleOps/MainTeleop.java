@@ -140,7 +140,7 @@ public class MainTeleop extends CommandOpMode {
                 () -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1, telemetry);
         SetSlidePower manualMove = new SetSlidePower(slide,
                 () -> (driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) -
-                        driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)) * 0.25);
+                        driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)) * 0.5);
 
 
         ParallelCommandGroup highJunction = new ParallelCommandGroup(
