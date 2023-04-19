@@ -39,20 +39,20 @@ public class worlds extends CommandOpMode {
     public static Pose2d START_POSE_A = new Pose2d(-37, -48, Math.toRadians(0));
     public static Pose2d START_POSE_B = new Pose2d(-39, -24, Math.toRadians(-90));
 
-    public static final Pose2d START_POSE_C = new Pose2d(-41, -8, Math.toRadians(-80));
+    public static final Pose2d START_POSE_C = new Pose2d(-36, -8, Math.toRadians(-30));
 
-    public static Pose2d SCORE_POSE_ZERO = new Pose2d(-31.5, -18, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_ZERO = new Pose2d(-31, -19, Math.toRadians(-45));
     public static Pose2d SCORE_POSE_ONE = new Pose2d(-31, -19, Math.toRadians(-45));
     public static Pose2d SCORE_POSE_TWO = new Pose2d(-31, -19, Math.toRadians(-45));
     public static Pose2d SCORE_POSE_THREE = new Pose2d(-31, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-31, -19, Math.toRadians(-45));
-    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-31, -19, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FOUR = new Pose2d(-31, -18.5, Math.toRadians(-45));
+    public static Pose2d SCORE_POSE_FIVE = new Pose2d(-31, -18.5, Math.toRadians(-45));
 
     public static Pose2d CONE_POSE_ONE = new Pose2d(-59, -12.5, Math.toRadians(0));
     public static Pose2d CONE_POSE_TWO = new Pose2d(-59, -12, Math.toRadians(0));
-    public static Pose2d CONE_POSE_THREE = new Pose2d(-59, -12, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FOUR = new Pose2d(-59, -11.7, Math.toRadians(0));
-    public static Pose2d CONE_POSE_FIVE = new Pose2d(-59, -12, Math.toRadians(0));
+    public static Pose2d CONE_POSE_THREE = new Pose2d(-59, -11.7, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FOUR = new Pose2d(-59, -11.5, Math.toRadians(0));
+    public static Pose2d CONE_POSE_FIVE = new Pose2d(-59, -11.3, Math.toRadians(0));
 
     public static Pose2d ZONE_ONE = new Pose2d(-61, -11, Math.toRadians(0));
     public static Pose2d ZONE_TWO = new Pose2d(-36, -11, Math.toRadians(90));
@@ -73,25 +73,25 @@ public class worlds extends CommandOpMode {
         return new SequentialCommandGroup(
                 new ParallelCommandGroup(
                       //  new SetSlidePosition(slide, LinearSlide.CONE_STACK[coneHeight]),
-                        new SetSlidePosition(slide, LinearSlide.ONE_CONE, .4),
+                        new SetSlidePosition(slide, LinearSlide.ONE_CONE, 1),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.06),
+                                new AsyncDelay(0.09),
                                 new OpenClaw(claw),
-                                new AsyncDelay(0.1),
+                                new AsyncDelay(0.2),
                                 new FlipIn(flipper),
                                 new SetSlidePosition(slide, LinearSlide.CONE_STACK[coneHeight], 2)
                         ),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.08),
+                                new AsyncDelay(0.09),
                                 new TrajectoryCommand(drive, junctionToCones)
                         )
                 ),
                 new CloseClaw(claw),
-                new AsyncDelay(0.07),
+                new AsyncDelay(0.2),
                 new ParallelCommandGroup(
                         new SetSlidePosition(slide, LinearSlide.MEDIUM),
                         new SequentialCommandGroup(
-                                new AsyncDelay(0.08),
+                                new AsyncDelay(0.15),
                                 new ParallelCommandGroup(
                                         new TrajectoryCommand(drive, conesToJunction),
                                         new SequentialCommandGroup(
