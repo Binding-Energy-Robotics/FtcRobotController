@@ -67,10 +67,12 @@ import static org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants.gyr
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static double TRANS_P = 9; // 2
-    public static double HEAD_P = 4; // 4
+//    public static double TRANS_P = 9; // 2
+    public static double TRANS_P = 8; // 2
+//    public static double HEAD_P = 4; // 4
+    public static double HEAD_P = 8; // 4
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients( TRANS_P, 0,
-            0.05);
+            2 * Math.sqrt(TRANS_P * kA ) - kV);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(HEAD_P, 0,
             2 * Math.sqrt(HEAD_P * kA / (TRACK_WIDTH * gyrationConstant)) - kV / TRACK_WIDTH);
 
@@ -106,7 +108,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         PhotonCore.enable();
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.1, 0.1, Math.toRadians(1.0)), 1);
+                new Pose2d(0.1, 0.1, Math.toRadians(1.0)), 0.75);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -248,64 +250,9 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     public void update() {
-        localizer.update(previousPowers);
+        updatePoseEstimate();
         DriveSignal signal = trajectorySequenceRunner.update(getPoseEstimate(), getPoseVelocity());
-        if (signal != null) {
-            // if signal != new DriveSignal, adrc
-            if (signal.equals(new DriveSignal())) {
-                setDriveSignal(signal);
-                previousPowers = new double[] { 0, 0, 0 };
-                return;
-            }
-            List<Double> wheelVelocities = MecanumKinematics.robotToWheelVelocities(
-                    signal.getVel(),
-                    TRACK_WIDTH,
-                    TRACK_WIDTH,
-                    LATERAL_MULTIPLIER
-            );
-            List<Double> wheelAccelerations = MecanumKinematics.robotToWheelAccelerations(
-                    signal.getAccel(),
-                    TRACK_WIDTH,
-                    TRACK_WIDTH,
-                    LATERAL_MULTIPLIER
-            );
-            List<Double> motorPowers = Kinematics.calculateMotorFeedforward(
-                    wheelVelocities, wheelAccelerations, kV, kA, kStatic);
-            Pose2d robotRelativePower = MecanumKinematics.wheelToRobotVelocities(
-                    motorPowers,
-                    TRACK_WIDTH,
-                    TRACK_WIDTH,
-                    LATERAL_MULTIPLIER
-            );
-            Pose2d fieldRelativePower = new Pose2d(
-                    robotRelativePower.vec().rotated(getPoseEstimate().getHeading()),
-                    robotRelativePower.getHeading()
-            );
-            Pose2d disturbanceRejection = localizer.getDisturbanceRejectionPower();
-            disturbanceRejection = disturbanceRejection.times(ADRC_GAIN);
-            fieldRelativePower = fieldRelativePower.plus(disturbanceRejection);
-
-            previousPowers[0] = fieldRelativePower.getX();
-            previousPowers[1] = fieldRelativePower.getY();
-            previousPowers[2] = fieldRelativePower.getHeading();
-
-            Pose2d appliedPower = new Pose2d(
-                    fieldRelativePower.vec().rotated(-getPoseEstimate().getHeading()),
-                    fieldRelativePower.getHeading()
-            );
-            List<Double> appliedMotorPowers = MecanumKinematics.robotToWheelVelocities(
-                    appliedPower,
-                    TRACK_WIDTH,
-                    TRACK_WIDTH,
-                    LATERAL_MULTIPLIER
-            );
-            setMotorPowers(
-                    appliedMotorPowers.get(0),
-                    appliedMotorPowers.get(1),
-                    appliedMotorPowers.get(2),
-                    appliedMotorPowers.get(3)
-            );
-        }
+        if (signal != null) setDriveSignal(signal);
     }
 
     public void waitForIdle() {
@@ -405,7 +352,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         // expected). This bug does NOT affect orientation. 
         //
         // See https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/251 for details.
-        return (double) -imu.getAngularVelocity().yRotationRate;
+        return (double) imu.getAngularVelocity().xRotationRate;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {

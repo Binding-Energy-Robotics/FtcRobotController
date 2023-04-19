@@ -18,13 +18,13 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
  */
 @Config
 public class DriveConstants {
-    public static double gyrationConstant = 0.42;
+    public static double gyrationConstant = 0.7;
 
     /*
      * These are motor constants that should be listed online for your motors.
      */
     public static final double TICKS_PER_REV = 145.6;
-    public static final double MAX_RPM = 2500;
+    public static final double MAX_RPM = 1150;
 
     /*
      * Set RUN_USING_ENCODER to true to enable built-in hub velocity control using drive encoders.
@@ -47,8 +47,8 @@ public class DriveConstants {
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
     public static double WHEEL_RADIUS = 1.8898; // in
-    public static double GEAR_RATIO = 0.3333333333333333; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 9.84; // in
+    public static double GEAR_RATIO = 1.0/3; // output (wheel) speed / input (motor) speed
+    public static double TRACK_WIDTH = 10.8; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -56,9 +56,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.01;
-    public static double kA = .0022;
-    public static double kStatic = 0.08;
+    public static double kV = 0.012;
+    public static double kA = 0.0022;
+    public static double kStatic = 0.13768;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -88,10 +88,10 @@ public class DriveConstants {
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
 
      */
-    public static double MAX_VEL = 55;
-    public static double MAX_ACCEL = 40;
-    public static double MAX_ANG_VEL = 5;
-    public static double MAX_ANG_ACCEL = 4;
+    public static double MAX_VEL = 65;
+    public static double MAX_ACCEL = 65;
+    public static double MAX_ANG_VEL = 6.25 * .8;
+    public static double MAX_ANG_ACCEL = 10 * .8;
 
 
     public static double encoderTicksToInches(double ticks) {
