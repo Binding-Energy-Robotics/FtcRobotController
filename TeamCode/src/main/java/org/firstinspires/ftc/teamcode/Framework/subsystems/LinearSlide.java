@@ -12,23 +12,24 @@ import java.util.function.BooleanSupplier;
 
 public class LinearSlide extends SubsystemBase {
     public static final int HIGH = 612;
-    public static final int MEDIUM = 300;
-    public static final int LOW = 475;
+    public static final int MEDIUM = 320;
+    public static final int LOW = 520;
     public static final int GROUND = 20;
 
-    public static final int FIVE_CONE = 160;
-    public static final int FOUR_CONE = 140;
-    public static final int THREE_CONE = 100;
+    public static final int sus_offset = 40;
+    public static final int FIVE_CONE = 175;
+    public static final int FOUR_CONE = 150;
+    public static final int THREE_CONE = 110;
     public static final int TWO_CONE = 40;
-    public static final int ONE_CONE = 0;
+    public static final int ONE_CONE = sus_offset;
 
     public static final int[] CONE_STACK = new int[] {
             0,
             0,
-            40,
-            100,
-            140,
-            160
+            40 + sus_offset,
+            100 + sus_offset,
+            140 + sus_offset,
+            170 + sus_offset
     };
 
     public static final int[] TELEOP_HEIGHTS = new int[] {

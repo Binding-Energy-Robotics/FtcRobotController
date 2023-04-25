@@ -26,18 +26,18 @@ import org.apache.commons.math3.filter.KalmanFilter;
 public class SlideController {
 	public static double Kg = 0.08; // tuned by Alex Prichard on 12 Jan 2023
 
-	public static double Kv = 0.00028; // tuned by Alex Prichard on 12 Jan 2023
-	public static double Ka = 0.000012; // tuned by Alex Prichard on 12 Jan 2023
-	public static double Ks = 0.08;
+	public static double Kv = 0.0007; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ka = 0.0001; // tuned by Alex Prichard on 12 Jan 2023
+	public static double Ks = 0.1;
 
-	public static double MAX_V = 1_200; // tuned by Alex Prichard on 20 Jan 2023
-	public static double MAX_A = 10_300; // tuned by Alex Prichard on 20 Jan 2023
-	public static double MAX_J = 30_500; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_V = 800; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_A = 5_000; // tuned by Alex Prichard on 20 Jan 2023
+	public static double MAX_J = 20_000; // tuned by Alex Prichard on 20 Jan 2023
 
-	public static double Kp = 5.2 * Kv * Kv / (4 * Ka); // tuned by Alex Prichard on 20 Jan 2023
-	public static double Ki = 0;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
-	public static double Kd = 2 * Math.sqrt(Kp * Ka) - Kv; // see Ben Caunt's paper for more details
-	public static double Imax = 0;//0.2 / Ki;
+	public static double Kp = 0.001; // tuned by Alex Prichard on 20 Jan 2023
+	public static double Ki = 0.0001;//0.0000001; // tuned by Alex Prichard on 13 Jan 2023
+	public static double Kd = 0.0001;//2 * Math.sqrt(Kp * Ka) - Kv; // see Ben Caunt's paper for more details
+	public static double Imax = 2000;//0.2 / Ki;
 	public static double stabilityThreshold = 25;
 	private PIDCoefficientsEx coefficients;
 
@@ -212,11 +212,15 @@ public class SlideController {
 			coefficients.Kp = Kp;
 			coefficients.Ki = Ki;
 			coefficients.Kd = Kd;
+			coefficients.maximumIntegralSum = Imax;
 
 			MotionState targetState = motionProfile.get(elapsedTime.seconds());
 			double x = targetState.getX();
 			double v = targetState.getV();
 			double a = targetState.getA();
+
+			telemetry.addData("target velocity", v);
+			telemetry.addData("current velocity", prevVel);
 
 			if (!isMovementFinished) {
 				u = controller.calculate(x, Pv) + v * Kv + a * Ka - adrCompensation;
@@ -228,7 +232,7 @@ public class SlideController {
 			}
 		}
 
-		if (Pv < 10 && power < 0 || Pv > 600 && power > 0) {
+		if (Pv < 10 && power < 0 || Pv > 625 && power > 0) {
 			return 0;
 		}
 

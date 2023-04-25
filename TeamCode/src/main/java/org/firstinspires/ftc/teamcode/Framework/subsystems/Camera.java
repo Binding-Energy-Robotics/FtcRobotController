@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Framework.subsystems;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -9,6 +10,7 @@ import org.openftc.apriltag.AprilTagDetection;
 
 import java.util.ArrayList;
 
+@Config
 public class Camera extends SubsystemBase {
 	private Webcam webcam;
 	private AprilTagDetector tagDetector;
@@ -16,6 +18,7 @@ public class Camera extends SubsystemBase {
 	private int[] tagIds = new int[] { 434, 435, 436 };
 	private double[] confidences = new double[] { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
 	private static final double UPDATE_WEIGHT = 0.1;
+	public static int DEFAULT_SIDE = 1;
 
 	public Camera(HardwareMap hw, String webcamName) {
 		tagDetector = new AprilTagDetector(true);
@@ -27,8 +30,8 @@ public class Camera extends SubsystemBase {
 	}
 
 	public int getSide() {
-		int index = 0;
-		for (int i = 1; i < 3; i++) {
+		int index = DEFAULT_SIDE - 1;
+		for (int i = 0; i < 3; i++) {
 			if (confidences[index] < confidences[i])
 				index = i;
 		}

@@ -31,7 +31,9 @@ public class ParkAuto extends LinearOpMode {
 		drive.setPoseEstimate(START);
 
 		Claw claw = new Claw(hardwareMap);
+		claw.close();
 		Flipper flipper = new Flipper(hardwareMap, telemetry);
+		flipper.setPosition(0.6);
 
 
 		telemetry.addData("Status", "1");
@@ -65,6 +67,7 @@ public class ParkAuto extends LinearOpMode {
 			telemetry.update();
 			idle();
 		}
+		claw.open();
 		AutoEndPose.setTimer();
 		camera.stop();
 

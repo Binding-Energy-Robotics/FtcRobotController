@@ -129,7 +129,7 @@ public class MainTeleop extends CommandOpMode {
         drive = new TeleDrive(hardwareMap);
         claw = new Claw(hardwareMap);
         slide = new LinearSlide(hardwareMap, telemetry, () -> isDriving);
-        flipper = new Flipper(hardwareMap, telemetry);
+        flipper = new Flipper(hardwareMap, telemetry, false);
         claw.open();
 
         // Command setup
@@ -253,5 +253,9 @@ public class MainTeleop extends CommandOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        waitForStart();
+
+        flipper.setPosition(1);
     }
 }

@@ -13,6 +13,6 @@ public class FlipIn extends InstantCommand {
 
 	@Override
 	public void execute() {
-		flipper.setPosition(.95);
+		flipper.setPosition(0.98);
 	}
 }
